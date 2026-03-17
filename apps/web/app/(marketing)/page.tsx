@@ -23,21 +23,24 @@ function Home() {
         <Hero
           pill={
             <Pill label={'New'}>
-              <span>The leading SaaS Starter Kit for ambitious developers</span>
+              <span>The professional restaurant management solution</span>
             </Pill>
           }
+
           title={
             <>
-              <span>The ultimate SaaS Starter</span>
-              <span>for your next project</span>
+              <span>Streamline Your Restaurant</span>
+              <span>with Restoloop</span>
             </>
           }
+
           subtitle={
             <span>
-              Build and Ship a SaaS faster than ever before with the next-gen
-              SaaS Starter Kit. Ship your SaaS in days, not months.
+              Restoloop helps you collect leads, manage customer coupons, and track your revenue effortlessly.
+              Grow your restaurant business with our all-in-one platform.
             </span>
           }
+
           cta={<MainCallToActionButton />}
           image={
             <Image
@@ -62,15 +65,15 @@ function Home() {
             heading={
               <>
                 <b className="font-semibold dark:text-white">
-                  The ultimate SaaS Starter Kit
+                  Everything you need to grow
                 </b>
                 .{' '}
                 <span className="text-muted-foreground font-normal">
-                  Unleash your creativity and build your SaaS faster than ever
-                  with Makerkit.
+                  Restoloop provides the tools you need to manage your restaurant more efficiently.
                 </span>
               </>
             }
+
             icon={
               <FeatureShowcaseIconContainer>
                 <LayoutDashboard className="h-5" />
@@ -81,29 +84,30 @@ function Home() {
             <FeatureGrid>
               <FeatureCard
                 className={'relative col-span-2 overflow-hidden'}
-                label={'Beautiful Dashboard'}
-                description={`Makerkit provides a beautiful dashboard to manage your SaaS business.`}
+                label={'Lead Generation'}
+                description={`Restoloop provides high-converting forms to collect customer information and grow your database.`}
               />
 
               <FeatureCard
                 className={
                   'relative col-span-2 w-full overflow-hidden lg:col-span-1'
                 }
-                label={'Authentication'}
-                description={`Makerkit provides a variety of providers to allow your users to sign in.`}
+                label={'Coupon Management'}
+                description={`Issue and track coupons to incentivize repeat visits and track performance.`}
               />
 
               <FeatureCard
                 className={'relative col-span-2 overflow-hidden lg:col-span-1'}
-                label={'Multi Tenancy'}
-                description={`Multi tenant memberships for your SaaS business.`}
+                label={'Digital Loyalty'}
+                description={`Build a loyal customer base with automated SMS and digital interactions.`}
               />
 
               <FeatureCard
                 className={'relative col-span-2 overflow-hidden'}
-                label={'Billing'}
-                description={`Makerkit supports multiple payment gateways to charge your customers.`}
+                label={'Revenue Analytics'}
+                description={`Track your ROI and see exactly how much revenue your campaigns are generating.`}
               />
+
             </FeatureGrid>
           </FeatureShowcase>
         </div>

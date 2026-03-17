@@ -23,6 +23,11 @@ const getUser = (request: NextRequest, response: NextResponse) => {
 };
 
 export async function middleware(request: NextRequest) {
+  // skip middleware for cron jobs
+  if (request.nextUrl.pathname.startsWith('/api/cron')) {
+    return NextResponse.next();
+  }
+
   const response = NextResponse.next();
 
   // set a unique request ID for each request
@@ -70,7 +75,7 @@ async function withCsrfMiddleware(
     ignoreMethods: isServerAction(request)
       ? ['POST']
       : // always ignore GET, HEAD, and OPTIONS requests
-        ['GET', 'HEAD', 'OPTIONS'],
+      ['GET', 'HEAD', 'OPTIONS'],
   });
 
   try {

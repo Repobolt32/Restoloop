@@ -1,4 +1,4 @@
-import { Home, User } from 'lucide-react';
+import { Home, Store, User } from 'lucide-react';
 import { z } from 'zod';
 
 import { NavigationConfigSchema } from '@kit/ui/navigation-schema';
@@ -16,6 +16,16 @@ const routes = [
         path: pathsConfig.app.home,
         Icon: <Home className={iconClasses} />,
         end: true,
+      },
+      {
+        label: 'Billing Center',
+        path: pathsConfig.app.billing,
+        Icon: <Store className={iconClasses} />,
+      },
+      {
+        label: 'Restaurant Profile',
+        path: pathsConfig.app.restaurantProfile,
+        Icon: <Store className={iconClasses} />,
       },
     ],
   },

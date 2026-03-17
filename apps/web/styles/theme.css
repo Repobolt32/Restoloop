@@ -61,6 +61,21 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* Stitch-inspired Color Tokens */
+  --color-stitch-bg: #000000;
+  --color-stitch-card: #0a0a0a;
+  --color-stitch-card-hover: #111111;
+  --color-stitch-border: rgba(255, 255, 255, 0.05);
+  --color-stitch-orange: #f37b1c;
+  --color-stitch-green: #22c55e;
+  --color-stitch-text-secondary: #71717a;
+
+  /* Dashboard Glows */
+  --stitch-glow-orange: rgba(243, 123, 28, 0.15);
+  --stitch-glow-green: rgba(34, 197, 94, 0.15);
+
+  --font-serif: "Bona Nova", serif;
+
   --animate-fade-up: fade-up 0.5s;
   --animate-fade-down: fade-down 0.5s;
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -91,9 +106,11 @@
       opacity: 0;
       transform: translateY(10px);
     }
+
     80% {
       opacity: 0.6;
     }
+
     100% {
       opacity: 1;
       transform: translateY(0px);
@@ -105,9 +122,11 @@
       opacity: 0;
       transform: translateY(-10px);
     }
+
     80% {
       opacity: 0.6;
     }
+
     100% {
       opacity: 1;
       transform: translateY(0px);

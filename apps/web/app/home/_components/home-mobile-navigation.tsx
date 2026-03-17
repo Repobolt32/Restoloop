@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { LogOut, Menu } from 'lucide-react';
+import { ShieldAlert, LogOut, Menu } from 'lucide-react';
 
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import {
@@ -21,7 +21,7 @@ import { navigationConfig } from '~/config/navigation.config';
  * Mobile navigation for the home page
  * @constructor
  */
-export function HomeMobileNavigation() {
+export function HomeMobileNavigation({ isSuperAdmin }: { isSuperAdmin?: boolean }) {
   const signOut = useSignOut();
 
   const Links = navigationConfig.routes.map((item, index) => {
@@ -51,6 +51,17 @@ export function HomeMobileNavigation() {
 
       <DropdownMenuContent sideOffset={10} className={'w-screen rounded-none'}>
         <DropdownMenuGroup>{Links}</DropdownMenuGroup>
+
+        {isSuperAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownLink
+              Icon={<ShieldAlert className={'w-4'} />}
+              path={'/admin'}
+              label={'Admin'}
+            />
+          </>
+        )}
 
         <DropdownMenuSeparator />
 

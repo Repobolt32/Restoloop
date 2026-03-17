@@ -1,4 +1,4 @@
-import { Inter as SansFont } from 'next/font/google';
+import { Inter as SansFont, Bona_Nova as SerifFont } from 'next/font/google';
 
 /**
  * @sans
@@ -14,10 +14,20 @@ const sans = SansFont({
 });
 
 /**
+ * @serif
+ * @description Define here the serif font for high-end headings.
+ */
+const serif = SerifFont({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  weight: ['400', '700'],
+});
+
+/**
  * @heading
  * @description Define here the heading font.
  */
 const heading = sans;
 
 // we export these fonts into the root layout
-export { sans, heading };
+export { sans, heading, serif };

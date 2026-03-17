@@ -7,7 +7,7 @@ import { AppLogo } from '~/components/app-logo';
 import { ProfileAccountDropdownContainer } from '~/components/personal-account-dropdown-container';
 import { navigationConfig } from '~/config/navigation.config';
 
-export function HomeMenuNavigation() {
+export function HomeMenuNavigation({ isSuperAdmin }: { isSuperAdmin?: boolean }) {
   const routes = navigationConfig.routes.reduce<
     Array<{
       path: string;
@@ -36,6 +36,9 @@ export function HomeMenuNavigation() {
           {routes.map((route) => (
             <BorderedNavigationMenuItem {...route} key={route.path} />
           ))}
+          {isSuperAdmin && (
+            <BorderedNavigationMenuItem path="/admin" label="Admin" />
+          )}
         </BorderedNavigationMenu>
       </div>
 

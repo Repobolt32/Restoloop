@@ -1,0 +1,108 @@
+/**
+ * WhatsApp messaging module for Restoloop.
+ *
+ * During development: all functions are mocked with console.log.
+ * Phase 7 swap-in: replace the body of each function with the
+ * real Meta Cloud API call using META_TOKEN + PHONE_ID env vars.
+ * The typed interfaces below MUST NOT change — they are the contract.
+ */
+
+export interface WelcomeMessagePayload {
+    phone: string;       // E.164 format preferred, e.g. "919876543210"
+    name: string;
+    restaurantName: string;
+    couponCode: string;
+    discount: number;    // ₹ amount
+}
+
+export interface BirthdayMessagePayload {
+    phone: string;
+    name: string;
+    restaurantName: string;
+    couponCode: string;
+    discount: number;
+}
+
+export interface WinbackMessagePayload {
+    phone: string;
+    name: string;
+    restaurantName: string;
+    couponCode: string;
+    discount: number;
+}
+
+export type MessageResult =
+    | { success: true; messageId: string }
+    | { success: false; error: string };
+
+/** Send a welcome coupon message after a customer signs up. */
+export async function sendWelcomeMessage(
+    payload: WelcomeMessagePayload,
+): Promise<MessageResult> {
+    return sendMetaMessage(payload.phone, 'welcome_coupon', payload.discount.toString(), payload.couponCode);
+}
+
+/** Send a birthday coupon message. */
+export async function sendBirthdayMessage(
+    payload: BirthdayMessagePayload,
+): Promise<MessageResult> {
+    return sendMetaMessage(payload.phone, 'birthday_coupon', payload.discount.toString(), payload.couponCode);
+}
+
+/** Send a win-back coupon message. */
+export async function sendWinbackMessage(
+    payload: WinbackMessagePayload,
+): Promise<MessageResult> {
+    return sendMetaMessage(payload.phone, 'winback_coupon', payload.discount.toString(), payload.couponCode);
+}
+
+/** Helper function to send template messages via Meta Cloud API */
+async function sendMetaMessage(phone: string, templateName: string, discount: string, couponCode: string): Promise<MessageResult> {
+    const waPhoneId = process.env.WA_PHONE_ID;
+    const waToken = process.env.WA_TOKEN;
+
+    if (!waPhoneId || !waToken || waPhoneId === 'your_phone_id_here' || waToken === 'your_permanent_token_here') {
+        console.warn('Missing WA credentials. Skipping live send.');
+        return { success: false, error: 'Missing WA credentials' };
+    }
+
+    try {
+        const response = await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${waToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: phone,
+                type: "template",
+                template: {
+                    name: templateName,
+                    language: { code: "en_US" },
+                    components: [
+                        {
+                            type: "body",
+                            parameters: [
+                                { type: "text", text: discount },
+                                { type: "text", text: couponCode }
+                            ]
+                        }
+                    ]
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            console.error(`WhatsApp API sending failed for ${templateName}:`, errBody);
+            return { success: false, error: errBody };
+        }
+
+        const data = await response.json();
+        return { success: true, messageId: data.messages?.[0]?.id || `wa_${Date.now()}` };
+    } catch (apiErr: any) {
+        console.error('Failed to reach WhatsApp API:', apiErr);
+        return { success: false, error: apiErr.message || 'Network error' };
+    }
+}

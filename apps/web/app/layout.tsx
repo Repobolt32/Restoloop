@@ -4,7 +4,7 @@ import { Toaster } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
 
 import { RootProviders } from '~/components/root-providers';
-import { heading, sans } from '~/lib/fonts';
+import { heading, sans, serif } from '~/lib/fonts';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { generateRootMetadata } from '~/lib/root-metdata';
 
@@ -36,7 +36,7 @@ function getClassName(theme?: string) {
   const dark = theme === 'dark';
   const light = !dark;
 
-  const font = [sans.variable, heading.variable].reduce<string[]>(
+  const font = [sans.variable, heading.variable, serif.variable].reduce<string[]>(
     (acc, curr) => {
       if (acc.includes(curr)) return acc;
 
