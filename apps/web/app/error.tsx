@@ -1,14 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-
 import { ArrowLeft, MessageCircle } from 'lucide-react';
-
-import { Button } from '@kit/ui/button';
-import { Heading } from '@kit/ui/heading';
-import { Trans } from '@kit/ui/trans';
-
-import { SiteHeader } from '~/(marketing)/_components/site-header';
 
 const ErrorPage = ({
   error,
@@ -20,54 +13,28 @@ const ErrorPage = ({
   console.error(error);
 
   return (
-    <div className={'flex h-screen flex-1 flex-col'}>
-      <SiteHeader />
-
-      <div
-        className={
-          'container m-auto flex w-full flex-1 flex-col items-center justify-center'
-        }
-      >
-        <div className={'flex flex-col items-center space-y-8'}>
-          <div>
-            <h1 className={'font-heading text-9xl font-semibold'}>
-              <Trans i18nKey={'common:errorPageHeading'} />
-            </h1>
-          </div>
-
-          <div className={'flex flex-col items-center space-y-8'}>
-            <div
-              className={
-                'flex max-w-xl flex-col items-center space-y-1 text-center'
-              }
-            >
-              <div>
-                <Heading level={2}>
-                  <Trans i18nKey={'common:genericError'} />
-                </Heading>
-              </div>
-
-              <p className={'text-muted-foreground text-lg'}>
-                <Trans i18nKey={'common:genericErrorSubHeading'} />
-              </p>
-            </div>
-
-            <div className={'flex space-x-4'}>
-              <Button className={'w-full'} variant={'default'} onClick={reset}>
-                <ArrowLeft className={'mr-2 h-4'} />
-
-                <Trans i18nKey={'common:goBack'} />
-              </Button>
-
-              <Button className={'w-full'} variant={'outline'} asChild>
-                <Link href={'/contact'}>
-                  <MessageCircle className={'mr-2 h-4'} />
-
-                  <Trans i18nKey={'common:contactUs'} />
-                </Link>
-              </Button>
-            </div>
-          </div>
+    <div className={'flex h-screen flex-1 flex-col items-center justify-center p-8'}>
+      <div className="text-center space-y-6">
+        <h1 className="text-6xl font-bold text-red-600">Oops!</h1>
+        <h2 className="text-2xl font-semibold">Something went wrong</h2>
+        <p className="text-gray-500 max-w-md mx-auto">
+          An unexpected error occurred. Please try again.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+          <button
+            onClick={reset}
+            className="inline-flex items-center px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors w-full sm:w-auto justify-center"
+          >
+            <ArrowLeft className={'mr-2 h-4 w-4'} />
+            Try again
+          </button>
+          <Link
+            href="/contact"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors w-full sm:w-auto justify-center"
+          >
+            <MessageCircle className={'mr-2 h-4 w-4'} />
+            Contact Support
+          </Link>
         </div>
       </div>
     </div>

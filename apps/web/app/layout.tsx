@@ -1,7 +1,5 @@
 import { cookies } from 'next/headers';
 
-import { Toaster } from '@kit/ui/sonner';
-import { cn } from '@kit/ui/utils';
 
 import { RootProviders } from '~/components/root-providers';
 import { heading, sans, serif } from '~/lib/fonts';
@@ -25,8 +23,6 @@ export default async function RootLayout({
         <RootProviders theme={theme} lang={language}>
           {children}
         </RootProviders>
-
-        <Toaster richColors={true} theme={theme} position="top-center" />
       </body>
     </html>
   );
@@ -45,10 +41,7 @@ function getClassName(theme?: string) {
     [],
   );
 
-  return cn('bg-background min-h-screen antialiased', ...font, {
-    dark,
-    light,
-  });
+  return `bg-black min-h-screen antialiased ${font.join(' ')} ${dark ? 'dark' : ''} ${light ? 'light' : ''}`;
 }
 
 async function getTheme() {

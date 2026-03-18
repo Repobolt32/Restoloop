@@ -9,26 +9,13 @@ import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { useUpdateUser } from '@kit/supabase/hooks/use-update-user-mutation';
-import { Alert, AlertDescription, AlertTitle } from '@kit/ui/alert';
-import { Button } from '@kit/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@kit/ui/form';
-import { Heading } from '@kit/ui/heading';
-import { Input } from '@kit/ui/input';
-import { Trans } from '@kit/ui/trans';
 
 import { PasswordResetSchema } from '../schemas/password-reset.schema';
 
 export function UpdatePasswordForm(params: { redirectTo: string }) {
   const updateUser = useUpdateUser();
 
-  const form = useForm<z.infer<typeof PasswordResetSchema>>({
+  const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof PasswordResetSchema>>({
     resolver: zodResolver(PasswordResetSchema),
     defaultValues: {
       password: '',
@@ -45,68 +32,50 @@ export function UpdatePasswordForm(params: { redirectTo: string }) {
   }
 
   return (
-    <div className={'flex w-full flex-col space-y-6'}>
+    <div className={'flex w-full flex-col space-y-6 max-w-sm mx-auto font-sans'}>
       <div className={'flex justify-center'}>
-        <Heading level={5} className={'tracking-tight'}>
-          <Trans i18nKey={'auth:passwordResetLabel'} />
-        </Heading>
+        <h2 className={'tracking-tight text-xl font-black text-white'}>
+          RESET PASSWORD
+        </h2>
       </div>
 
-      <Form {...form}>
-        <form
-          className={'flex w-full flex-1 flex-col'}
-          onSubmit={form.handleSubmit(({ password }) => {
-            return updateUser.mutateAsync({
-              password,
-              redirectTo: params.redirectTo,
-            });
-          })}
+      <form
+        className="flex flex-col gap-4 w-full"
+        onSubmit={handleSubmit(({ password }) => {
+          return updateUser.mutateAsync({
+            password,
+            redirectTo: params.redirectTo,
+          });
+        })}
+      >
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-bold tracking-tight text-white">Password</label>
+          <input
+            {...register('password')}
+            type="password"
+            required
+            className="border border-white/10 bg-white/5 rounded-lg p-2.5 w-full text-white placeholder-white/30 focus:outline-none focus:border-orange-500 transition-colors"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-bold tracking-tight text-white">Repeat Password</label>
+          <input
+            {...register('repeatPassword')}
+            type="password"
+            required
+            className="border border-white/10 bg-white/5 rounded-lg p-2.5 w-full text-white placeholder-white/30 focus:outline-none focus:border-orange-500 transition-colors"
+          />
+        </div>
+
+        <button
+          disabled={updateUser.isPending}
+          type="submit"
+          className="mt-2 bg-white text-black hover:bg-neutral-200 font-black tracking-widest text-sm uppercase rounded-lg p-3 transition-colors disabled:opacity-50"
         >
-          <div className={'flex-col space-y-4'}>
-            <FormField
-              name={'password'}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    <Trans i18nKey={'common:password'} />
-                  </FormLabel>
-
-                  <FormControl>
-                    <Input required type="password" {...field} />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name={'repeatPassword'}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    <Trans i18nKey={'common:repeatPassword'} />
-                  </FormLabel>
-
-                  <FormControl>
-                    <Input required type="password" {...field} />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              disabled={updateUser.isPending}
-              type="submit"
-              className={'w-full'}
-            >
-              <Trans i18nKey={'auth:passwordResetLabel'} />
-            </Button>
-          </div>
-        </form>
-      </Form>
+          {updateUser.isPending ? 'UPDATING...' : 'UPDATE PASSWORD'}
+        </button>
+      </form>
     </div>
   );
 }
@@ -114,26 +83,19 @@ export function UpdatePasswordForm(params: { redirectTo: string }) {
 function SuccessState(props: { redirectTo: string }) {
   return (
     <div className={'flex flex-col space-y-4'}>
-      <Alert variant={'success'}>
-        <CheckIcon className={'s-6'} />
-
-        <AlertTitle>
-          <Trans i18nKey={'account:updatePasswordSuccess'} />
-        </AlertTitle>
-
-        <AlertDescription>
-          <Trans i18nKey={'account:updatePasswordSuccessMessage'} />
-        </AlertDescription>
-      </Alert>
+      <div className="flex gap-2 p-3 border border-green-500/20 bg-green-500/10 text-green-500 text-sm rounded-lg" data-test="auth-success-message">
+        <CheckIcon className="w-5 h-5 mt-0.5" />
+        <div>
+          <div className="font-bold mb-1">Success</div>
+          <div>Your password was updated successfully.</div>
+        </div>
+      </div>
 
       <Link href={props.redirectTo}>
-        <Button variant={'outline'} className={'w-full'}>
-          <span>
-            <Trans i18nKey={'common:backToHomePage'} />
-          </span>
-
-          <ArrowRightIcon className={'ml-2 h-4'} />
-        </Button>
+        <button className="flex items-center justify-center space-x-2 border border-white/10 bg-white/5 hover:bg-white/10 text-white p-2.5 rounded-lg transition-colors text-sm font-bold w-full uppercase tracking-widest mt-4">
+          <span>Back to Home Page</span>
+          <ArrowRightIcon className={'w-4 h-4'} />
+        </button>
       </Link>
     </div>
   );
@@ -142,21 +104,17 @@ function SuccessState(props: { redirectTo: string }) {
 function ErrorState(props: { onRetry: () => void }) {
   return (
     <div className={'flex flex-col space-y-4'}>
-      <Alert variant={'destructive'}>
-        <ExclamationTriangleIcon className={'s-6'} />
+      <div className="flex gap-2 p-3 border border-red-500/20 bg-red-500/10 text-red-500 text-sm rounded-lg" data-test="auth-error-message">
+        <ExclamationTriangleIcon className="w-5 h-5 mt-0.5" />
+        <div>
+          <div className="font-bold mb-1">Error</div>
+          <div>There was an error updating your password. Please try again.</div>
+        </div>
+      </div>
 
-        <AlertTitle>
-          <Trans i18nKey={'common:genericError'} />
-        </AlertTitle>
-
-        <AlertDescription>
-          <Trans i18nKey={'auth:resetPasswordError'} />
-        </AlertDescription>
-      </Alert>
-
-      <Button onClick={props.onRetry} variant={'outline'}>
-        <Trans i18nKey={'common:retry'} />
-      </Button>
+      <button onClick={props.onRetry} className="border border-white/10 bg-white/5 hover:bg-white/10 text-white font-black tracking-widest text-sm uppercase rounded-lg p-3 transition-colors mt-4 w-full">
+        Retry
+      </button>
     </div>
   );
 }

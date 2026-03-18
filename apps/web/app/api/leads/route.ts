@@ -1,177 +1,90 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/response';
+import { z } from 'zod';
+import { createSupabaseServerClient } from '~/lib/supabase/server';
 
-import { createSupabaseServiceClient } from '~/lib/supabase/server';
-import { generateCouponCode, generateExpiryDate } from '~/lib/coupons';
-import { sendWelcomeMessage } from '~/lib/whatsapp';
+const leadSchema = z.object({
+    tenantId: z.string().uuid(),
+    name: z.string().min(2, 'Name is too short'),
+    phone: z.string().regex(/^\+91\d{10}$/, 'Must be a valid Indian (+91) phone number'),
+    birthday: z.string().optional(),
+    favouriteDish: z.string().optional(),
+});
 
-/**
- * POST /api/leads
- * Public endpoint — no auth required (customers are not Supabase users).
- * Uses service role client since it's called server-side and bypasses RLS for the insert.
- *
- * Body: { slug, name, phone, birthday? }
- */
-export async function POST(req: NextRequest) {
-    let body: { slug?: string; name?: string; phone?: string; birthday?: string };
-
+export async function POST(req: Request) {
     try {
-        body = await req.json();
-    } catch {
-        return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-    }
+        const body = await req.json();
+        const result = leadSchema.safeParse(body);
 
-    const { slug, name, phone, birthday } = body;
+        if (!result.success) {
+            return NextResponse.json(
+                { error: 'Invalid data', details: result.error.errors },
+                { status: 400 }
+            );
+        }
 
-    // ── Validation ──────────────────────────────────────────────────────────────
-    if (!slug || !name || !phone) {
-        return NextResponse.json(
-            { error: 'slug, name, and phone are required' },
-            { status: 400 },
-        );
-    }
+        const data = result.data;
+        const supabase = createSupabaseServerClient();
 
-    const trimmedName = name.trim();
-    const trimmedPhone = phone.trim().replace(/\D/g, ''); // strip non-digits
-
-    if (trimmedName.length < 2) {
-        return NextResponse.json(
-            { error: 'Name must be at least 2 characters' },
-            { status: 400 },
-        );
-    }
-
-    // Accept 10-digit (Indian local) or 12-digit (91XXXXXXXXXX) format
-    if (!/^(91)?\d{10}$/.test(trimmedPhone)) {
-        return NextResponse.json(
-            { error: 'Please enter a valid 10-digit Indian mobile number' },
-            { status: 400 },
-        );
-    }
-
-    const supabase = createSupabaseServiceClient();
-
-    // ── 1. Resolve slug → tenant ─────────────────────────────────────────────────
-    const { data: tenant, error: tenantError } = await supabase
-        .from('tenants')
-        .select('id, name, coupon_welcome, credits_balance')
-        .eq('slug', slug)
-        .single();
-
-    if (tenantError || !tenant) {
-        return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 });
-    }
-
-    // ── 2. Check tenant credits ──────────────────────────────────────────────────
-    if (tenant.credits_balance <= 0) {
-        return NextResponse.json(
-            { error: 'Service temporarily unavailable' },
-            { status: 503 },
-        );
-    }
-
-    // ── 3. Dedup: check if phone already exists for this tenant ─────────────────
-    const phoneForStorage = trimmedPhone.length === 10
-        ? `91${trimmedPhone}`
-        : trimmedPhone;
-
-    const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('tenant_id', tenant.id)
-        .eq('phone', phoneForStorage)
-        .single();
-
-    if (existingCustomer) {
-        return NextResponse.json(
-            { error: 'This phone number is already registered. Visit us to redeem your welcome coupon!' },
-            { status: 409 },
-        );
-    }
-
-    // ── 4. Insert customer ───────────────────────────────────────────────────────
-    const { data: customer, error: customerError } = await supabase
-        .from('customers')
-        .insert({
-            tenant_id: tenant.id,
-            name: trimmedName,
-            phone: phoneForStorage,
-            birthday: birthday ?? null,
-            last_visit: new Date().toISOString(),
-        })
-        .select('id')
-        .single();
-
-    if (customerError || !customer) {
-        console.error('[leads] Customer insert error:', customerError);
-        return NextResponse.json({ error: 'Failed to save. Please try again.' }, { status: 500 });
-    }
-
-    // ── 5. Generate coupon ───────────────────────────────────────────────────────
-    const couponCode = generateCouponCode();
-    const expiresAt = generateExpiryDate(7); // welcome coupon valid 7 days
-
-    const { error: couponError } = await supabase.from('coupons').insert({
-        tenant_id: tenant.id,
-        customer_id: customer.id,
-        type: 'welcome',
-        code: couponCode,
-        discount: tenant.coupon_welcome,
-        status: 'sent',
-        expires_at: expiresAt,
-    });
-
-    if (couponError) {
-        console.error('[leads] Coupon insert error:', couponError);
-        // Non-fatal — customer saved, continue
-    }
-
-    // ── 7. Fire Live WhatsApp message ────────────────────────────────────────────
-    const waResult = await sendWelcomeMessage({
-        phone: phoneForStorage,
-        name: trimmedName,
-        restaurantName: tenant.name,
-        couponCode,
-        discount: tenant.coupon_welcome,
-    });
-
-    if (waResult.success) {
-        // ── 6. Deduct credits (tenant wallet AND platform wallet) ────────────────
-        await supabase
-            .from('tenants')
-            .update({ credits_balance: tenant.credits_balance - 1 })
-            .eq('id', tenant.id);
-
-        const { data: platformData } = await supabase
-            .from('platform_credits')
-            .select('id, balance')
-            .limit(1)
+        // 1. Insert lead into `customers` table
+        const { data: customer, error: insertError } = await supabase
+            .from('customers')
+            .insert({
+                tenant_id: data.tenantId,
+                name: data.name,
+                phone: data.phone,
+                birthday: data.birthday ? data.birthday : null,
+                food_pref: data.favouriteDish ? data.favouriteDish : null,
+                visit_count: 1,
+                last_visit: new Date().toISOString(),
+            })
+            .select()
             .single();
 
-        if (platformData) {
-            await supabase
-                .from('platform_credits')
-                .update({ balance: platformData.balance - 1 })
-                .eq('id', platformData.id);
+        if (insertError) {
+            console.error('Supabase customer insert error:', insertError);
+            // Handle unique constraint violations (e.g., phone number already exists for this tenant)
+            if (insertError.code === '23505') {
+                return NextResponse.json({ error: 'You have already signed up for this restaurant.' }, { status: 400 });
+            }
+            return NextResponse.json({ error: 'Database error' }, { status: 500 });
         }
+
+        // 2. Fetch tenant coupon configuration to know WELCOME50 amount
+        const { data: tenant } = await supabase
+            .from('tenants')
+            .select('coupon_welcome, name')
+            .eq('id', data.tenantId)
+            .single();
+
+        const discountAmount = tenant?.coupon_welcome || 50;
+
+        // 3. Issue the WELCOME50 coupon immediately
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
+
+        const { error: couponError } = await supabase
+            .from('coupons')
+            .insert({
+                tenant_id: data.tenantId,
+                customer_id: customer.id,
+                code: 'WELCOME50',
+                type: 'welcome',
+                discount_amount: discountAmount,
+                expires_at: expiresAt.toISOString(),
+                status: 'active'
+            });
+
+        if (couponError) {
+            console.error('Coupon issue error:', couponError);
+        }
+
+        // 4. TODO (Day 3): Trigger Meta Cloud API WhatsApp Welcome Message
+        // sendWhatsAppMessage(data.phone, 'welcome_template', ...);
+
+        return NextResponse.json({ success: true, message: 'Lead captured completely' }, { status: 200 });
+
+    } catch (err) {
+        console.error('API /leads error:', err);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-
-    // Log message result
-    await supabase.from('message_log').insert({
-        tenant_id: tenant.id,
-        customer_id: customer.id,
-        coupon_id: null, // will be set when we have the coupon id
-        wa_message_id: waResult.success ? waResult.messageId : null,
-        status: waResult.success ? 'sent' : 'failed',
-    });
-
-    return NextResponse.json(
-        {
-            success: true,
-            couponCode,
-            discount: tenant.coupon_welcome,
-            restaurantName: tenant.name,
-        },
-        { status: 201 },
-    );
 }
-

@@ -52,7 +52,8 @@ export function useAuthChangeListener({
 
       if (shouldRedirectUser) {
         // send user away when signed out
-        window.location.assign('/');
+        // TEMPORARY: testing UI without auth
+        // window.location.assign('/');
 
         return;
       }

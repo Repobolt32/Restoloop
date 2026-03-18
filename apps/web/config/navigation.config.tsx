@@ -1,7 +1,6 @@
 import { Home, Store, User } from 'lucide-react';
 import { z } from 'zod';
 
-import { NavigationConfigSchema } from '@kit/ui/navigation-schema';
 
 import pathsConfig from '~/config/paths.config';
 
@@ -39,10 +38,10 @@ const routes = [
       },
     ],
   },
-] satisfies z.infer<typeof NavigationConfigSchema>['routes'];
+];
 
-export const navigationConfig = NavigationConfigSchema.parse({
+export const navigationConfig = {
   routes,
   style: process.env.NEXT_PUBLIC_NAVIGATION_STYLE,
   sidebarCollapsed: process.env.NEXT_PUBLIC_HOME_SIDEBAR_COLLAPSED,
-});
+};

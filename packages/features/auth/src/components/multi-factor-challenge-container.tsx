@@ -1,35 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useMutation } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useFetchAuthFactors } from '@kit/supabase/hooks/use-fetch-mfa-factors';
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { useSupabase } from '@kit/supabase/hooks/use-supabase';
-import { Alert, AlertDescription, AlertTitle } from '@kit/ui/alert';
-import { Button } from '@kit/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@kit/ui/form';
-import { If } from '@kit/ui/if';
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from '@kit/ui/input-otp';
-import { Spinner } from '@kit/ui/spinner';
-import { Trans } from '@kit/ui/trans';
 
 export function MultiFactorChallengeContainer({
   paths,
@@ -76,93 +55,62 @@ export function MultiFactorChallengeContainer({
   }
 
   return (
-    <Form {...verificationCodeForm}>
-      <form
-        className={'w-full'}
-        onSubmit={verificationCodeForm.handleSubmit(async (data) => {
-          await verifyMFAChallenge.mutateAsync({
-            factorId,
-            verificationCode: data.verificationCode,
-          });
-        })}
-      >
-        <div className={'flex flex-col space-y-4'}>
-          <span className={'text-muted-foreground text-sm'}>
-            <Trans i18nKey={'account:verifyActivationCodeDescription'} />
-          </span>
+    <form
+      className={'w-full'}
+      onSubmit={verificationCodeForm.handleSubmit(async (data) => {
+        await verifyMFAChallenge.mutateAsync({
+          factorId,
+          verificationCode: data.verificationCode,
+        });
+      })}
+    >
+      <div className={'flex flex-col space-y-4'}>
+        <span className={'text-muted-foreground text-sm'}>
+          Enter the 6-digit code from your authenticator app
+        </span>
 
-          <div className={'flex w-full flex-col space-y-2.5'}>
-            <div className={'flex flex-col space-y-4'}>
-              <If condition={verifyMFAChallenge.error}>
-                <Alert variant={'destructive'}>
-                  <ExclamationTriangleIcon className={'h-5'} />
+        <div className={'flex w-full flex-col space-y-2.5'}>
+          <div className={'flex flex-col space-y-4'}>
+            {verifyMFAChallenge.error && (
+              <div className="alert alert-destructive border-red-500 bg-red-50 p-4">
+                <h3 className="font-semibold text-red-800">Invalid code</h3>
+                <p className="text-sm text-red-700">
+                  The verification code you entered is invalid. Please try again.
+                </p>
+              </div>
+            )}
 
-                  <AlertTitle>
-                    <Trans i18nKey={'account:invalidVerificationCodeHeading'} />
-                  </AlertTitle>
-
-                  <AlertDescription>
-                    <Trans
-                      i18nKey={'account:invalidVerificationCodeDescription'}
-                    />
-                  </AlertDescription>
-                </Alert>
-              </If>
-
-              <FormField
-                name={'verificationCode'}
-                render={({ field }) => {
-                  return (
-                    <FormItem
-                      className={
-                        'mx-auto flex flex-col items-center justify-center'
-                      }
-                    >
-                      <FormControl>
-                        <InputOTP {...field} maxLength={6} minLength={6}>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
-                          </InputOTPGroup>
-                          <InputOTPSeparator />
-                          <InputOTPGroup>
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
-                          </InputOTPGroup>
-                        </InputOTP>
-                      </FormControl>
-
-                      <FormDescription>
-                        <Trans
-                          i18nKey={'account:verifyActivationCodeDescription'}
-                        />
-                      </FormDescription>
-
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
+            <div className="mx-auto flex flex-col items-center justify-center">
+              <input
+                type="text"
+                autoComplete="one-time-code"
+                inputMode="numeric"
+                maxLength={6}
+                minLength={6}
+                pattern="\d{6}"
+                className="w-full max-w-xs px-3 py-2 border rounded-md"
+                placeholder="123456"
+                {...verificationCodeForm.register('verificationCode')}
               />
+              <p className="text-sm text-muted-foreground mt-2">
+                Verification code is required
+              </p>
             </div>
           </div>
-
-          <Button
-            disabled={
-              verifyMFAChallenge.isPending ||
-              !verificationCodeForm.formState.isValid
-            }
-          >
-            {verifyMFAChallenge.isPending ? (
-              <Trans i18nKey={'account:verifyingCode'} />
-            ) : (
-              <Trans i18nKey={'account:submitVerificationCode'} />
-            )}
-          </Button>
         </div>
-      </form>
-    </Form>
+
+        <button
+          type="submit"
+          disabled={
+            verifyMFAChallenge.isPending ||
+            !verificationCodeForm.formState.isValid
+          }
+          className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md disabled:opacity-50"
+        >
+          {verifyMFAChallenge.isPending ? 'Verifying...' : 'Submit Code'}
+        </button>
+      </div>
+    </form>
   );
 }
 
@@ -204,14 +152,12 @@ function FactorsListContainer({
   const isSuccess = factors && !isLoading && !error;
 
   useEffect(() => {
-    // If there is an error, sign out
     if (error) {
       void signOut.mutateAsync();
     }
   }, [error, signOut]);
 
   useEffect(() => {
-    // If there is only one factor, select it automatically
     if (isSuccess && factors.totp.length === 1) {
       const factorId = factors.totp[0]?.id;
 
@@ -224,11 +170,7 @@ function FactorsListContainer({
   if (isLoading) {
     return (
       <div className={'flex flex-col items-center space-y-4 py-8'}>
-        <Spinner />
-
-        <div>
-          <Trans i18nKey={'account:loadingFactors'} />
-        </div>
+        <div>Loading factors...</div>
       </div>
     );
   }
@@ -236,17 +178,12 @@ function FactorsListContainer({
   if (error) {
     return (
       <div className={'w-full'}>
-        <Alert variant={'destructive'}>
-          <ExclamationTriangleIcon className={'h-4'} />
-
-          <AlertTitle>
-            <Trans i18nKey={'account:factorsListError'} />
-          </AlertTitle>
-
-          <AlertDescription>
-            <Trans i18nKey={'account:factorsListErrorDescription'} />
-          </AlertDescription>
-        </Alert>
+        <div className="alert alert-destructive border-red-500 bg-red-50 p-4">
+          <h3 className="font-semibold text-red-800">Error loading factors</h3>
+          <p className="text-sm text-red-700">
+            There was an error loading your authentication factors. Please try again later.
+          </p>
+        </div>
       </div>
     );
   }
@@ -257,20 +194,20 @@ function FactorsListContainer({
     <div className={'flex flex-col space-y-4'}>
       <div>
         <span className={'font-medium'}>
-          <Trans i18nKey={'account:selectFactor'} />
+          Select an authentication factor
         </span>
       </div>
 
       <div className={'flex flex-col space-y-2'}>
         {verifiedFactors.map((factor) => (
           <div key={factor.id}>
-            <Button
-              variant={'outline'}
-              className={'w-full'}
+            <button
+              type="button"
+              className="w-full px-4 py-2 border rounded-md"
               onClick={() => onSelect(factor.id)}
             >
               {factor.friendly_name}
-            </Button>
+            </button>
           </div>
         ))}
       </div>

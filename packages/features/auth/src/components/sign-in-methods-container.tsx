@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import type { Provider } from '@supabase/supabase-js';
 
 import { isBrowser } from '@kit/shared/utils';
-import { If } from '@kit/ui/if';
-import { Separator } from '@kit/ui/separator';
 
 import { MagicLinkAuthContainer } from './magic-link-auth-container';
 import { OauthProviders } from './oauth-providers';
@@ -36,30 +34,30 @@ export function SignInMethodsContainer(props: {
   };
 
   return (
-    <>
-      <If condition={props.providers.password}>
-        <PasswordSignInContainer onSignIn={onSignIn} />
-      </If>
+    <div className="flex flex-col gap-4">
+      {props.providers.password && <PasswordSignInContainer onSignIn={onSignIn} />}
 
-      <If condition={props.providers.magicLink}>
+      {props.providers.magicLink && (
         <MagicLinkAuthContainer
           redirectUrl={redirectUrl}
           shouldCreateUser={false}
         />
-      </If>
+      )}
 
-      <If condition={props.providers.oAuth.length}>
-        <Separator />
+      {Boolean(props.providers.oAuth.length) && (
+        <>
+          <div className="h-px w-full bg-white/10 my-1" />
 
-        <OauthProviders
-          enabledProviders={props.providers.oAuth}
-          shouldCreateUser={false}
-          paths={{
-            callback: props.paths.callback,
-            returnPath: props.paths.home,
-          }}
-        />
-      </If>
-    </>
+          <OauthProviders
+            enabledProviders={props.providers.oAuth}
+            shouldCreateUser={false}
+            paths={{
+              callback: props.paths.callback,
+              returnPath: props.paths.home,
+            }}
+          />
+        </>
+      )}
+    </div>
   );
 }

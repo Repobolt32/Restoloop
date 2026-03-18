@@ -1,11 +1,7 @@
 import Link from 'next/link';
 
 import type { AuthError } from '@supabase/supabase-js';
-
 import { ResendAuthLinkForm } from '@kit/auth/resend-email-link';
-import { Alert, AlertDescription, AlertTitle } from '@kit/ui/alert';
-import { Button } from '@kit/ui/button';
-import { Trans } from '@kit/ui/trans';
 
 import pathsConfig from '~/config/paths.config';
 import { withI18n } from '~/lib/i18n/with-i18n';
@@ -25,22 +21,21 @@ async function AuthCallbackErrorPage(props: AuthCallbackErrorPageProps) {
   const redirectPath = callback ?? pathsConfig.auth.callback;
 
   return (
-    <div className={'flex flex-col space-y-4 py-4'}>
-      <Alert variant={'warning'}>
-        <AlertTitle>
-          <Trans i18nKey={'auth:authenticationErrorAlertHeading'} />
-        </AlertTitle>
+    <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 max-w-md mx-auto w-full space-y-8">
+      <div className="w-full bg-red-50 border border-red-500 rounded-md p-4">
+        <h2 className="text-red-800 font-semibold mb-2">Authentication Error</h2>
+        <p className="text-sm text-red-700">
+          {error ?? 'There was an error authenticating your account. Please try again.'}
+        </p>
+      </div>
 
-        <AlertDescription>
-          <Trans i18nKey={error ?? 'auth:authenticationErrorAlertBody'} />
-        </AlertDescription>
-      </Alert>
-
-      <AuthCallbackForm
-        code={code}
-        signInPath={signInPath}
-        redirectPath={redirectPath}
-      />
+      <div className="w-full">
+        <AuthCallbackForm
+          code={code}
+          signInPath={signInPath}
+          redirectPath={redirectPath}
+        />
+      </div>
     </div>
   );
 }
@@ -60,11 +55,12 @@ function AuthCallbackForm(props: {
 
 function SignInButton(props: { signInPath: string }) {
   return (
-    <Button className={'w-full'} asChild>
-      <Link href={props.signInPath}>
-        <Trans i18nKey={'auth:signIn'} />
-      </Link>
-    </Button>
+    <Link
+      href={props.signInPath}
+      className="flex items-center justify-center w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+    >
+      Sign in
+    </Link>
   );
 }
 

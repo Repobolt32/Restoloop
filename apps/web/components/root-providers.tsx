@@ -8,8 +8,6 @@ import { ThemeProvider } from 'next-themes';
 
 import { CaptchaProvider } from '@kit/auth/captcha/client';
 import { I18nProvider } from '@kit/i18n/provider';
-import { If } from '@kit/ui/if';
-import { VersionUpdater } from '@kit/ui/version-updater';
 
 import { AuthProvider } from '~/components/auth-provider';
 import appConfig from '~/config/app.config';
@@ -63,9 +61,6 @@ export function RootProviders({
           </AuthProvider>
         </CaptchaProvider>
 
-        <If condition={featuresFlagConfig.enableVersionUpdater}>
-          <VersionUpdater />
-        </If>
       </I18nProvider>
     </ReactQueryProvider>
   );

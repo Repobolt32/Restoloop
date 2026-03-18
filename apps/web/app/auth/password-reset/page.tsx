@@ -1,9 +1,6 @@
 import Link from 'next/link';
 
 import { PasswordResetRequestContainer } from '@kit/auth/password-reset';
-import { Button } from '@kit/ui/button';
-import { Heading } from '@kit/ui/heading';
-import { Trans } from '@kit/ui/trans';
 
 import pathsConfig from '~/config/paths.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
@@ -22,23 +19,21 @@ const redirectPath = `${callback}?next=${passwordUpdate}`;
 
 function PasswordResetPage() {
   return (
-    <>
-      <Heading level={5} className={'tracking-tight'}>
-        <Trans i18nKey={'auth:passwordResetLabel'} />
-      </Heading>
+    <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8 p-8 max-w-md mx-auto w-full">
+      <h1 className="text-2xl font-bold tracking-tight text-center">
+        Reset Password
+      </h1>
 
-      <div className={'flex flex-col space-y-4'}>
+      <div className={'flex flex-col space-y-4 w-full'}>
         <PasswordResetRequestContainer redirectPath={redirectPath} />
 
-        <div className={'flex justify-center text-xs'}>
-          <Button asChild variant={'link'} size={'sm'}>
-            <Link href={signIn}>
-              <Trans i18nKey={'auth:passwordRecoveredQuestion'} />
-            </Link>
-          </Button>
+        <div className={'flex justify-center text-xs mt-6'}>
+          <Link href={signIn} className="underline hover:text-gray-600 transition-colors">
+            Password recovered? Sign in
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

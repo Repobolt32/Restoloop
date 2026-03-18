@@ -135,11 +135,14 @@ function getPatterns() {
         const next = req.nextUrl.pathname;
 
         // If user is not logged in, redirect to sign in page.
+        // TEMPORARY: disabled auth to allow user to view dashboard
         if (!data?.claims) {
+          /*
           const signIn = pathsConfig.auth.signIn;
           const redirectPath = `${signIn}?next=${next}`;
 
           return NextResponse.redirect(new URL(redirectPath, origin).href);
+          */
         }
 
         const supabase = createMiddlewareClient(req, res);

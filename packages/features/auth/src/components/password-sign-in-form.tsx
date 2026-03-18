@@ -1,25 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRight } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
-
-import { Button } from '@kit/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@kit/ui/form';
-import { If } from '@kit/ui/if';
-import { Input } from '@kit/ui/input';
-import { Trans } from '@kit/ui/trans';
 
 import { PasswordSignInSchema } from '../schemas/password-sign-in.schema';
 
@@ -30,108 +14,48 @@ export function PasswordSignInForm({
   onSubmit: (params: z.infer<typeof PasswordSignInSchema>) => unknown;
   loading: boolean;
 }) {
-  const { t } = useTranslation('auth');
-
-  const form = useForm<z.infer<typeof PasswordSignInSchema>>({
+  const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof PasswordSignInSchema>>({
     resolver: zodResolver(PasswordSignInSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: { email: '', password: '' },
   });
 
   return (
-    <Form {...form}>
-      <form
-        className={'w-full space-y-2.5'}
-        onSubmit={form.handleSubmit(onSubmit)}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-sm w-full font-sans">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-bold tracking-tight text-white">Email Address</label>
+        <input
+          {...register('email')}
+          type="email"
+          required
+          placeholder="Enter your email"
+          className="border border-white/10 bg-white/5 rounded-lg p-2.5 w-full text-white placeholder-white/30 focus:outline-none focus:border-orange-500 transition-colors"
+        />
+        {errors.email && <span className="text-red-500 text-xs mt-1">{errors.email.message}</span>}
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-bold tracking-tight text-white flex justify-between">
+          Password
+          <Link href="/auth/password-reset" className="text-xs font-normal text-neutral-400 hover:text-white transition-colors">
+            Forgot Password?
+          </Link>
+        </label>
+        <input
+          {...register('password')}
+          type="password"
+          required
+          className="border border-white/10 bg-white/5 rounded-lg p-2.5 w-full text-white placeholder-white/30 focus:outline-none focus:border-orange-500 transition-colors"
+        />
+        {errors.password && <span className="text-red-500 text-xs mt-1">{errors.password.message}</span>}
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="mt-2 bg-[#FF6B00] hover:bg-[#FF6B00]/80 text-white font-black tracking-widest text-sm uppercase rounded-lg p-3 transition-colors disabled:opacity-50"
       >
-        <FormField
-          control={form.control}
-          name={'email'}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans i18nKey={'common:emailAddress'} />
-              </FormLabel>
-
-              <FormControl>
-                <Input
-                  data-test={'email-input'}
-                  required
-                  type="email"
-                  placeholder={t('emailPlaceholder')}
-                  {...field}
-                />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name={'password'}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans i18nKey={'common:password'} />
-              </FormLabel>
-
-              <FormControl>
-                <Input
-                  required
-                  data-test={'password-input'}
-                  type="password"
-                  placeholder={''}
-                  {...field}
-                />
-              </FormControl>
-
-              <FormMessage />
-
-              <div>
-                <Button
-                  asChild
-                  type={'button'}
-                  size={'sm'}
-                  variant={'link'}
-                  className={'text-xs'}
-                >
-                  <Link href={'/auth/password-reset'}>
-                    <Trans i18nKey={'auth:passwordForgottenQuestion'} />
-                  </Link>
-                </Button>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <Button
-          data-test="auth-submit-button"
-          className={'group w-full'}
-          type="submit"
-          disabled={loading}
-        >
-          <If
-            condition={loading}
-            fallback={
-              <>
-                <Trans i18nKey={'auth:signInWithEmail'} />
-
-                <ArrowRight
-                  className={
-                    'zoom-in animate-in slide-in-from-left-2 fill-mode-both h-4 delay-500 duration-500'
-                  }
-                />
-              </>
-            }
-          >
-            <Trans i18nKey={'auth:signingIn'} />
-          </If>
-        </Button>
-      </form>
-    </Form>
+        {loading ? 'SIGNING IN...' : 'SIGN IN'}
+      </button>
+    </form>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { StitchPortal } from '~/components/stitch/StitchPortal';
 import { StitchCard } from '~/components/stitch/StitchCard';
 import { StitchInput } from '~/components/stitch/StitchInput';
 import { toast } from 'sonner';
@@ -83,7 +82,7 @@ export default function BillingPage() {
     };
 
     return (
-        <StitchPortal>
+        <>
             {/* Success Notification */}
             {isConfirmed && (
                 <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] bg-emerald-500 text-black font-bold px-12 py-5 rounded-full shadow-[0_20px_40px_rgba(16,185,129,0.3)] animate-bounce">
@@ -293,6 +292,6 @@ export default function BillingPage() {
                     </StitchCard>
                 </div>
             </div>
-        </StitchPortal>
+        </>
     );
 }

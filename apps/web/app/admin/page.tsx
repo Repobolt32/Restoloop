@@ -1,9 +1,9 @@
-import { PageBody, PageHeader } from '@kit/ui/page';
+
 import { createSupabaseServiceClient } from '~/lib/supabase/server';
-import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
+import { StitchCard } from '~/components/stitch/StitchCard';
 import { AdminTenantTable } from './_components/admin-tenant-table';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Users, Coins, ShieldAlert } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,60 +25,62 @@ export default async function AdminDashboardPage() {
     const platformCredits = platformData?.balance || 0;
 
     return (
-        <>
-            <PageHeader
-                title="Super Admin Dashboard"
-                description="Manage all connected tenants and monitor system credits."
-            />
-
-            <PageBody>
-                <div className="flex flex-col gap-6 max-w-6xl mx-auto">
-
-                    <div>
-                        <Link href="/home" className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Dashboard
-                        </Link>
+        <div className="animate-fade-in-up">
+            <header className="mb-14 flex items-end justify-between border-b border-white/5 pb-10 font-sans">
+                <div>
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
+                        <p className="text-xs font-black tracking-[0.4em] text-neutral-500 uppercase">
+                            Super Admin
+                        </p>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-500">Total Tenants</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold">{tenants?.length || 0}</div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-500">Total Tenant Credits Circulating</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold text-blue-600">{totalTenantCredits}</div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-500">Master Platform Credits</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold text-purple-600">{platformCredits}</div>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Tenant Management</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <AdminTenantTable initialTenants={tenants || []} />
-                        </CardContent>
-                    </Card>
-
+                    <h1 className="text-7xl font-black tracking-tighter text-[#FF6B00] mb-2 drop-shadow-[0_0_30px_rgba(255,107,0,0.2)]">
+                        Control <span className="text-white">.</span>
+                    </h1>
+                    <p className="text-neutral-500 font-medium">Manage all connected tenants and monitor system credits.</p>
                 </div>
-            </PageBody>
-        </>
+            </header>
+
+            <div className="flex flex-col gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <StitchCard className="p-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-black tracking-[0.2em] text-neutral-500 uppercase">Total Tenants</h3>
+                            <Users className="text-orange-500 w-5 h-5 opacity-50" />
+                        </div>
+                        <div className="text-5xl font-black text-white">{tenants?.length || 0}</div>
+                        <div className="text-xs text-orange-500 font-bold mt-2">Active Instances</div>
+                    </StitchCard>
+
+                    <StitchCard className="p-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-black tracking-[0.2em] text-neutral-500 uppercase">Tenant Credits</h3>
+                            <Coins className="text-blue-500 w-5 h-5 opacity-50" />
+                        </div>
+                        <div className="text-5xl font-black text-white">{totalTenantCredits}</div>
+                        <div className="text-xs text-blue-500 font-bold mt-2">Circulating Value</div>
+                    </StitchCard>
+
+                    <StitchCard className="p-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-black tracking-[0.2em] text-neutral-500 uppercase">Master Credits</h3>
+                            <ShieldAlert className="text-emerald-500 w-5 h-5 opacity-50" />
+                        </div>
+                        <div className="text-5xl font-black text-white">{platformCredits}</div>
+                        <div className="text-xs text-emerald-500 font-bold mt-2">Platform Treasury</div>
+                    </StitchCard>
+                </div>
+
+                <StitchCard padding="none" className="mt-8 border-white/5 bg-transparent overflow-hidden">
+                    <div className="p-8 border-b border-white/5">
+                        <h3 className="text-xl font-black tracking-tight text-white mb-1">Tenant Management</h3>
+                        <p className="text-neutral-500 text-sm">Direct access to instance modifications and balance adjustments.</p>
+                    </div>
+                    <div className="p-0">
+                        <AdminTenantTable initialTenants={tenants || []} />
+                    </div>
+                </StitchCard>
+            </div>
+        </div>
     );
 }

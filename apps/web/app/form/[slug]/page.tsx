@@ -1,16 +1,16 @@
 import { notFound } from 'next/navigation';
+import { createSupabaseServerClient } from '~/lib/supabase/server';
+import { PublicIntakeForm } from './_components/PublicIntakeForm';
 
-import { createSupabaseServiceClient } from '~/lib/supabase/server';
-import { CustomerForm } from './_components/CustomerForm';
-
-interface Props {
-    params: Promise<{ slug: string }>;
+interface FormPageProps {
+    params: Promise<{
+        slug: string;
+    }>;
 }
 
-export async function generateMetadata({ params }: Props) {
-    const { slug } = await params;
-    const supabase = createSupabaseServiceClient();
-
+export async function generateMetadata(props: FormPageProps) {
+    const { slug } = await props.params;
+    const supabase = createSupabaseServerClient();
     const { data: tenant } = await supabase
         .from('tenants')
         .select('name')
@@ -18,63 +18,38 @@ export async function generateMetadata({ params }: Props) {
         .single();
 
     if (!tenant) {
-        return { title: 'Restaurant Not Found — Restoloop' };
+        return { title: 'Not Found' };
     }
 
     return {
-        title: `Join ${tenant.name} — Get your welcome coupon!`,
-        description: `Sign up for exclusive offers and discounts at ${tenant.name}.`,
+        title: `Welcome to ${tenant.name}`,
+        description: 'Sign up to receive your exclusive welcome offer.',
     };
 }
 
-export default async function FormPage({ params }: Props) {
-    const { slug } = await params;
-    const supabase = createSupabaseServiceClient();
+export default async function CustomerFormPage(props: FormPageProps) {
+    const { slug } = await props.params;
 
-    const { data: tenant } = await supabase
+    // We are on a public route, so we use the admin client or standard client to fetch the tenant publicly.
+    // Assuming RLS allows read access to basic tenant info if slug matches, or we bypass. 
+    // Let's use the standard server client. If RLS blocks it, we may need a service role client just for this lookup.
+    const supabase = createSupabaseServerClient();
+    const { data: tenant, error } = await supabase
         .from('tenants')
-        .select('id, name, coupon_welcome')
+        .select('id, name')
         .eq('slug', slug)
         .single();
 
-    if (!tenant) {
+    if (error || !tenant) {
+        console.error('Tenant lookup failed:', error);
         notFound();
     }
 
     return (
-        <main className="flex min-h-screen items-start justify-center bg-gradient-to-br from-orange-50 via-white to-amber-50 p-4 pt-12">
+        <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-4">
             <div className="w-full max-w-md">
-                {/* Header */}
-                <div className="mb-8 text-center">
-                    <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500 text-3xl shadow-lg">
-                        🍽️
-                    </div>
-                    <h1 className="text-2xl font-bold text-gray-900">{tenant.name}</h1>
-                    <p className="mt-2 text-gray-500">
-                        Sign up and get{' '}
-                        <span className="font-semibold text-orange-500">
-                            ₹{tenant.coupon_welcome} off
-                        </span>{' '}
-                        your next visit!
-                    </p>
-                </div>
-
-                {/* Form Card */}
-                <div className="rounded-2xl bg-white p-6 shadow-xl ring-1 ring-gray-100">
-                    <CustomerForm
-                        slug={slug}
-                        restaurantName={tenant.name}
-                        welcomeDiscount={tenant.coupon_welcome}
-                    />
-                </div>
-
-                <p className="mt-6 text-center text-xs text-gray-400">
-                    By signing up you agree to receive WhatsApp messages from {tenant.name}.
-                    <br />
-                    Powered by{' '}
-                    <span className="font-medium text-orange-400">Restoloop</span>
-                </p>
+                <PublicIntakeForm tenantId={tenant.id} restaurantName={tenant.name} />
             </div>
-        </main>
+        </div>
     );
 }

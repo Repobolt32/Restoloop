@@ -3,8 +3,6 @@
 import type { Provider } from '@supabase/supabase-js';
 
 import { isBrowser } from '@kit/shared/utils';
-import { If } from '@kit/ui/if';
-import { Separator } from '@kit/ui/separator';
 
 import { MagicLinkAuthContainer } from './magic-link-auth-container';
 import { OauthProviders } from './oauth-providers';
@@ -28,37 +26,39 @@ export function SignUpMethodsContainer(props: {
   const defaultValues = getDefaultValues();
 
   return (
-    <>
-      <If condition={props.providers.password}>
+    <div className="flex flex-col gap-4">
+      {props.providers.password && (
         <EmailPasswordSignUpContainer
           emailRedirectTo={redirectUrl}
           defaultValues={defaultValues}
           displayTermsCheckbox={props.displayTermsCheckbox}
         />
-      </If>
+      )}
 
-      <If condition={props.providers.magicLink}>
+      {props.providers.magicLink && (
         <MagicLinkAuthContainer
           redirectUrl={redirectUrl}
           shouldCreateUser={true}
           defaultValues={defaultValues}
           displayTermsCheckbox={props.displayTermsCheckbox}
         />
-      </If>
+      )}
 
-      <If condition={props.providers.oAuth.length}>
-        <Separator />
+      {Boolean(props.providers.oAuth.length) && (
+        <>
+          <div className="h-px w-full bg-white/10 my-1" />
 
-        <OauthProviders
-          enabledProviders={props.providers.oAuth}
-          shouldCreateUser={true}
-          paths={{
-            callback: props.paths.callback,
-            returnPath: props.paths.appHome,
-          }}
-        />
-      </If>
-    </>
+          <OauthProviders
+            enabledProviders={props.providers.oAuth}
+            shouldCreateUser={true}
+            paths={{
+              callback: props.paths.callback,
+              returnPath: props.paths.appHome,
+            }}
+          />
+        </>
+      )}
+    </div>
   );
 }
 

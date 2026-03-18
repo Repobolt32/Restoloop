@@ -2,20 +2,8 @@
 
 import type { JwtPayload } from '@supabase/supabase-js';
 
-import { PersonalAccountDropdown } from '@kit/accounts/personal-account-dropdown';
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { useUser } from '@kit/supabase/hooks/use-user';
-
-import featuresFlagConfig from '~/config/feature-flags.config';
-import pathsConfig from '~/config/paths.config';
-
-const paths = {
-  home: pathsConfig.app.home,
-};
-
-const features = {
-  enableThemeToggle: featuresFlagConfig.enableThemeToggle,
-};
 
 export function ProfileAccountDropdownContainer(props: {
   user?: JwtPayload;
@@ -36,14 +24,18 @@ export function ProfileAccountDropdownContainer(props: {
   }
 
   return (
-    <PersonalAccountDropdown
-      className={'w-full'}
-      paths={paths}
-      features={features}
-      user={userData}
-      account={props.account}
-      signOutRequested={() => signOut.mutateAsync()}
-      showProfileName={props.showProfileName}
-    />
+    <div className="flex items-center space-x-4">
+      {props.showProfileName && (
+        <span className="text-sm font-medium">
+          {props.account?.name || userData.email}
+        </span>
+      )}
+      <button
+        onClick={() => signOut.mutateAsync()}
+        className="text-sm underline cursor-pointer"
+      >
+        Sign out
+      </button>
+    </div>
   );
 }

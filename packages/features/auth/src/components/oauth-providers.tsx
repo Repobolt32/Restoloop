@@ -5,9 +5,6 @@ import { useCallback } from 'react';
 import type { Provider } from '@supabase/supabase-js';
 
 import { useSignInWithProvider } from '@kit/supabase/hooks/use-sign-in-with-provider';
-import { If } from '@kit/ui/if';
-import { LoadingOverlay } from '@kit/ui/loading-overlay';
-import { Trans } from '@kit/ui/trans';
 
 import { AuthErrorAlert } from './auth-error-alert';
 import { AuthProviderButton } from './auth-provider-button';
@@ -59,9 +56,7 @@ export function OauthProviders(props: {
 
   return (
     <>
-      <If condition={loading}>
-        <LoadingOverlay />
-      </If>
+      {loading && <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">Loading...</div>}
 
       <div className={'flex w-full flex-1 flex-col space-y-3'}>
         <div className={'flex-col space-y-2'}>
@@ -100,12 +95,7 @@ export function OauthProviders(props: {
                   );
                 }}
               >
-                <Trans
-                  i18nKey={'auth:signInWithProvider'}
-                  values={{
-                    provider: getProviderName(provider),
-                  }}
-                />
+                Continue with {getProviderName(provider)}
               </AuthProviderButton>
             );
           })}

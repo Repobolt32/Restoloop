@@ -5,7 +5,6 @@ const ENABLE_REACT_COMPILER = process.env.ENABLE_REACT_COMPILER === 'true';
 const INTERNAL_PACKAGES = [
   '@kit/ui',
   '@kit/auth',
-  '@kit/accounts',
   '@kit/shared',
   '@kit/supabase',
   '@kit/i18n',
@@ -74,13 +73,13 @@ function getRemotePatterns() {
   return IS_PRODUCTION
     ? remotePatterns
     : [
-        {
-          protocol: 'http',
-          hostname: '127.0.0.1',
-        },
-        {
-          protocol: 'http',
-          hostname: 'localhost',
-        },
-      ];
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ];
 }

@@ -1,9 +1,6 @@
 import Link from 'next/link';
 
 import { SignUpMethodsContainer } from '@kit/auth/sign-up';
-import { Button } from '@kit/ui/button';
-import { Heading } from '@kit/ui/heading';
-import { Trans } from '@kit/ui/trans';
 
 import authConfig from '~/config/auth.config';
 import pathsConfig from '~/config/paths.config';
@@ -25,25 +22,25 @@ const paths = {
 
 function SignUpPage() {
   return (
-    <>
-      <Heading level={5} className={'tracking-tight'}>
-        <Trans i18nKey={'auth:signUpHeading'} />
-      </Heading>
+    <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8 p-8 max-w-md mx-auto w-full">
+      <h1 className="text-2xl font-bold tracking-tight text-center">
+        Create an Account
+      </h1>
 
-      <SignUpMethodsContainer
-        providers={authConfig.providers}
-        displayTermsCheckbox={authConfig.displayTermsCheckbox}
-        paths={paths}
-      />
-
-      <div className={'flex justify-center'}>
-        <Button asChild variant={'link'} size={'sm'}>
-          <Link href={pathsConfig.auth.signIn}>
-            <Trans i18nKey={'auth:alreadyHaveAnAccount'} />
-          </Link>
-        </Button>
+      <div className="w-full">
+        <SignUpMethodsContainer
+          providers={authConfig.providers}
+          displayTermsCheckbox={authConfig.displayTermsCheckbox}
+          paths={paths}
+        />
       </div>
-    </>
+
+      <div className={'flex justify-center mt-6'}>
+        <Link href={pathsConfig.auth.signIn} className="text-sm underline hover:text-gray-600 transition-colors">
+          Already have an account? Sign in
+        </Link>
+      </div>
+    </div>
   );
 }
 

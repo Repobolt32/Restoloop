@@ -1,16 +1,5 @@
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 
-import { Alert, AlertDescription, AlertTitle } from '@kit/ui/alert';
-import { Trans } from '@kit/ui/trans';
-
-/**
- * @name AuthErrorAlert
- * @param error This error comes from Supabase as the code returned on errors
- * This error is mapped from the translation auth:errors.{error}
- * To update the error messages, please update the translation file
- * https://github.com/supabase/gotrue-js/blob/master/src/lib/errors.ts
- * @constructor
- */
 export function AuthErrorAlert({
   error,
 }: {
@@ -20,24 +9,15 @@ export function AuthErrorAlert({
     return null;
   }
 
-  const DefaultError = <Trans i18nKey="auth:errors.default" />;
   const errorCode = error instanceof Error ? error.message : error;
 
   return (
-    <Alert variant={'destructive'}>
-      <ExclamationTriangleIcon className={'w-4'} />
-
-      <AlertTitle>
-        <Trans i18nKey={`auth:errorAlertHeading`} />
-      </AlertTitle>
-
-      <AlertDescription data-test={'auth-error-message'}>
-        <Trans
-          i18nKey={`auth:errors.${errorCode}`}
-          defaults={'<DefaultError />'}
-          components={{ DefaultError }}
-        />
-      </AlertDescription>
-    </Alert>
+    <div className="flex gap-2 p-3 border border-red-500/20 bg-red-500/10 text-red-500 text-sm rounded-lg" data-test="auth-error-message">
+      <ExclamationTriangleIcon className="w-4 h-4 mt-0.5" />
+      <div>
+        <div className="font-bold mb-1">Authentication Error</div>
+        <div>{errorCode}</div>
+      </div>
+    </div>
   );
 }

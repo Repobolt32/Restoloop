@@ -13,43 +13,65 @@ export function StitchPortal({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = `
-      /* Force-kill only the core Makerkit layout wrappers to prevent collision */
-      main > [class*="PageBody"], 
-      [class*="PageHeader"],
-      .flex.flex-col.flex-1.h-screen.overflow-hidden > header {
-        display: none !important;
-      }
-      body, html, #__next {
-        background: ${STITCH_TOKENS.colors.black} !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-      }
-      main {
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-      }
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(24px);
+    // We use a specific ID to prevent race conditions during Next.js route transitions
+    // where the new page mounts (adding the style) before the old page unmounts (removing it)
+    const styleId = 'stitch-portal-overrides';
+
+    // Check if it already exists from another StitchPortal instance
+    let style = document.getElementById(styleId) as HTMLStyleElement;
+    if (!style) {
+      style = document.createElement('style');
+      style.id = styleId;
+      style.innerHTML = `
+        /* Force-kill only the core Makerkit layout wrappers to prevent collision */
+        main > [class*="PageBody"], 
+        [class*="PageHeader"],
+        .flex.flex-col.flex-1.h-screen.overflow-hidden > header {
+          display: none !important;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+        body, html, #__next {
+          background: ${STITCH_TOKENS.colors.black} !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
         }
-      }
-      .animate-fade-in-up {
-        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-      }
-      .scrollbar-hide::-webkit-scrollbar { display: none; }
-      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    `;
-    document.head.appendChild(style);
+        main {
+          overflow-y: auto !important;
+          -webkit-overflow-scrolling: touch;
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(24px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Increment a reference counter on the style element to know when to safely remove
+    const currentCount = parseInt(style.getAttribute('data-ref-count') || '0', 10);
+    style.setAttribute('data-ref-count', (currentCount + 1).toString());
+
     return () => {
-      document.head.removeChild(style);
+      const el = document.getElementById(styleId);
+      if (el) {
+        const count = parseInt(el.getAttribute('data-ref-count') || '1', 10) - 1;
+        if (count <= 0) {
+          el.remove();
+        } else {
+          el.setAttribute('data-ref-count', count.toString());
+        }
+      }
     };
   }, []);
 
