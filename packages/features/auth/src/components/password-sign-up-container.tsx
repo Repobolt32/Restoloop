@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
@@ -212,5 +212,44 @@ function FactorsListContainer({
         ))}
       </div>
     </div>
+  );
+}
+
+export function EmailPasswordSignUpContainer(props: {
+  emailRedirectTo: string;
+  defaultValues?: { email: string };
+  displayTermsCheckbox?: boolean;
+}) {
+  const [email, setEmail] = useState(props.defaultValues?.email ?? '');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const supabase = useSupabase();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: props.emailRedirectTo }
+    });
+    setLoading(false);
+    if (error) {
+      alert(error.message);
+    } else {
+      // Auto redirect to bypass Nextjs cache lag
+      const nextPath = new URLSearchParams(window.location.search).get('next');
+      window.location.href = nextPath ?? props.emailRedirectTo ?? '/home';
+    }
+  };
+
+  return (
+    <form onSubmit={handleSignUp} className="flex flex-col space-y-4">
+      <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email Address" required className="w-full px-4 py-2 border border-border bg-background rounded-md text-sm outline-none focus:ring-2 focus:ring-primary" />
+      <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" minLength={8} required className="w-full px-4 py-2 border border-border bg-background rounded-md text-sm outline-none focus:ring-2 focus:ring-primary" />
+      <button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md disabled:opacity-50 transition-opacity">
+        {loading ? 'Accessing Secure Router...' : 'Create Account'}
+      </button>
+    </form>
   );
 }

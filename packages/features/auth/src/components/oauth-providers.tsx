@@ -56,7 +56,7 @@ export function OauthProviders(props: {
 
   return (
     <>
-      {loading && <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">Loading...</div>}
+      {loading && <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center text-[#FF6B00] font-black tracking-widest text-xl animate-pulse">AUTHORIZING...</div>}
 
       <div className={'flex w-full flex-1 flex-col space-y-3'}>
         <div className={'flex-col space-y-2'}>

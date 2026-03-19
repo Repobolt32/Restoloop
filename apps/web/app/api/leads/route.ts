@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/response';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createSupabaseServerClient } from '~/lib/supabase/server';
+import { createSupabaseServiceClient } from '~/lib/supabase/server';
+import { sendWelcomeMessage } from '~/lib/whatsapp';
 
 const leadSchema = z.object({
     tenantId: z.string().uuid(),
@@ -23,11 +24,11 @@ export async function POST(req: Request) {
         }
 
         const data = result.data;
-        const supabase = createSupabaseServerClient();
+        const supabase = createSupabaseServiceClient();
 
         // 1. Insert lead into `customers` table
-        const { data: customer, error: insertError } = await supabase
-            .from('customers')
+        const { data: customerData, error: insertError } = await supabase
+            .from('customers' as any)
             .insert({
                 tenant_id: data.tenantId,
                 name: data.name,
@@ -39,22 +40,24 @@ export async function POST(req: Request) {
             })
             .select()
             .single();
+        const customer = customerData as { id: string } | null;
 
-        if (insertError) {
+        if (insertError || !customer) {
             console.error('Supabase customer insert error:', insertError);
             // Handle unique constraint violations (e.g., phone number already exists for this tenant)
-            if (insertError.code === '23505') {
+            if (insertError && insertError.code === '23505') {
                 return NextResponse.json({ error: 'You have already signed up for this restaurant.' }, { status: 400 });
             }
             return NextResponse.json({ error: 'Database error' }, { status: 500 });
         }
 
         // 2. Fetch tenant coupon configuration to know WELCOME50 amount
-        const { data: tenant } = await supabase
-            .from('tenants')
+        const { data: tenantData } = await supabase
+            .from('tenants' as any)
             .select('coupon_welcome, name')
             .eq('id', data.tenantId)
             .single();
+        const tenant = tenantData as { coupon_welcome: number; name: string } | null;
 
         const discountAmount = tenant?.coupon_welcome || 50;
 
@@ -63,13 +66,13 @@ export async function POST(req: Request) {
         expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
 
         const { error: couponError } = await supabase
-            .from('coupons')
+            .from('coupons' as any)
             .insert({
                 tenant_id: data.tenantId,
                 customer_id: customer.id,
                 code: 'WELCOME50',
                 type: 'welcome',
-                discount_amount: discountAmount,
+                discount: discountAmount,
                 expires_at: expiresAt.toISOString(),
                 status: 'active'
             });
@@ -78,8 +81,20 @@ export async function POST(req: Request) {
             console.error('Coupon issue error:', couponError);
         }
 
-        // 4. TODO (Day 3): Trigger Meta Cloud API WhatsApp Welcome Message
-        // sendWhatsAppMessage(data.phone, 'welcome_template', ...);
+        // 4. Trigger Meta Cloud API WhatsApp Welcome Message
+        const waResult = await sendWelcomeMessage({
+            phone: data.phone,
+            name: data.name,
+            restaurantName: tenant?.name || 'Restoloop Beta',
+            couponCode: 'WELCOME50',
+            discount: discountAmount
+        });
+
+        if (!waResult.success) {
+            console.error('WhatsApp failed:', waResult.error);
+        } else {
+            console.log('WhatsApp delivered! ID:', waResult.messageId);
+        }
 
         return NextResponse.json({ success: true, message: 'Lead captured completely' }, { status: 200 });
 

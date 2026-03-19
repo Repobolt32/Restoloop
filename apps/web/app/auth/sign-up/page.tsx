@@ -22,12 +22,17 @@ const paths = {
 
 function SignUpPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8 p-8 max-w-md mx-auto w-full">
-      <h1 className="text-2xl font-bold tracking-tight text-center">
-        Create an Account
-      </h1>
+    <div className="flex flex-col w-full animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <div className="mb-2">
+        <h1 className="text-3xl font-black tracking-tighter text-white">
+          Initialize Account
+        </h1>
+        <p className="text-sm font-medium text-neutral-400 mt-1 tracking-wide">
+          SECURE PROTOCOL <span className="text-[#FF6B00]">ACTIVE</span>
+        </p>
+      </div>
 
-      <div className="w-full">
+      <div className="w-full mt-4">
         <SignUpMethodsContainer
           providers={authConfig.providers}
           displayTermsCheckbox={authConfig.displayTermsCheckbox}
@@ -35,9 +40,9 @@ function SignUpPage() {
         />
       </div>
 
-      <div className={'flex justify-center mt-6'}>
-        <Link href={pathsConfig.auth.signIn} className="text-sm underline hover:text-gray-600 transition-colors">
-          Already have an account? Sign in
+      <div className={'flex justify-center mt-8 pt-6 border-t border-white/10'}>
+        <Link href={pathsConfig.auth.signIn} className="text-sm font-semibold tracking-wider text-neutral-400 hover:text-white transition-colors">
+          ACCESS EXISTING PORTAL <span className="text-[#FF6B00] ml-1">→</span>
         </Link>
       </div>
     </div>

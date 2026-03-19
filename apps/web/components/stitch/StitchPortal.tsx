@@ -92,6 +92,14 @@ export function StitchPortal({ children }: { children: React.ReactNode }) {
       <div className="fixed top-[-20%] left-[-10%] w-[80%] h-[80%] bg-[#FF6B00] opacity-[0.08] blur-[180px] pointer-events-none" />
       <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#FFFFFF] opacity-[0.04] blur-[180px] pointer-events-none" />
 
+      {/* Mobile Backdrop Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm md:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar Integration */}
       <div
         className={`fixed inset-y-0 left-0 z-[100] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -114,7 +122,7 @@ export function StitchPortal({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area - Scrollable with premium framing */}
       <main
-        className={`flex-1 overflow-y-auto scrollbar-hide px-8 md:px-16 lg:px-24 py-16 md:py-24 relative z-10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'pl-[340px]' : 'pl-8 md:pl-16 lg:pl-24'
+        className={`flex-1 overflow-y-auto scrollbar-hide pr-8 md:pr-16 lg:pr-24 py-16 md:py-24 relative z-10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'pl-8 md:pl-[340px]' : 'pl-8 md:pl-16 lg:pl-24'
           }`}
       >
         <div className="max-w-[1400px] mx-auto">

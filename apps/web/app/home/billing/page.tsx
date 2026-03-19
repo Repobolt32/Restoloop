@@ -18,10 +18,7 @@ interface BillItem {
 }
 
 export default function BillingPage() {
-    const [items, setItems] = useState<BillItem[]>([
-        { id: 1, name: 'Butter Chicken', qty: 2, price: 280 },
-        { id: 2, name: 'Garlic Naan', qty: 4, price: 45 },
-    ]);
+    const [items, setItems] = useState<BillItem[]>([]);
 
     const [coupon, setCoupon] = useState('');
     const [couponStatus, setCouponStatus] = useState<'idle' | 'verifying' | 'valid' | 'invalid'>('idle');
@@ -117,54 +114,68 @@ export default function BillingPage() {
                             <span className="text-neutral-500 text-sm tracking-widest">{items.length} Active Items</span>
                         </div>
 
-                        <div className="px-10 py-6 bg-transparent">
-                            {/* Header for list */}
-                            <div className="grid grid-cols-12 gap-4 text-xs font-bold text-neutral-700 tracking-widest mb-6 px-4">
-                                <div className="col-span-5">Item Name</div>
-                                <div className="col-span-2 text-center">Qty</div>
-                                <div className="col-span-2 text-center">Price (₹)</div>
-                                <div className="col-span-3 text-right">Total</div>
-                            </div>
-
-                            {/* Items List */}
-                            <div className="space-y-5 mb-10">
-                                {items.map((item) => (
-                                    <div key={item.id} className="grid grid-cols-12 gap-4 items-center bg-white/[0.03] p-5 rounded-2xl border border-white/5 group hover:border-orange-500/20 transition-all">
-                                        <div className="col-span-5">
-                                            <StitchInput
-                                                value={item.name}
-                                                onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                                                className="bg-neutral-800/50 border-neutral-700/50 text-base py-4 px-6 rounded-xl hover:bg-neutral-800 transition-colors"
-                                            />
-                                        </div>
-                                        <div className="col-span-2 flex justify-center">
-                                            <StitchInput
-                                                type="number"
-                                                value={item.qty}
-                                                onChange={(e) => updateItem(item.id, 'qty', parseInt(e.target.value) || 0)}
-                                                className="bg-neutral-800/50 border-neutral-700/50 text-center w-full text-base py-4 px-0 rounded-xl hover:bg-neutral-800 transition-colors"
-                                            />
-                                        </div>
-                                        <div className="col-span-2 flex justify-center">
-                                            <StitchInput
-                                                type="number"
-                                                value={item.price}
-                                                onChange={(e) => updateItem(item.id, 'price', parseInt(e.target.value) || 0)}
-                                                className="bg-neutral-800/50 border-neutral-700/50 text-center w-full text-base py-4 px-0 rounded-xl hover:bg-neutral-800 transition-colors"
-                                            />
-                                        </div>
-                                        <div className="col-span-3 flex items-center justify-end gap-3 text-right">
-                                            <span className="font-bold text-2xl tracking-tight">₹{item.price * item.qty}</span>
-                                            <button
-                                                onClick={() => removeItem(item.id)}
-                                                className="text-red-900/40 hover:text-red-500 transition-colors w-12 h-12 flex items-center justify-center bg-red-500/5 rounded-lg border border-red-500/10 group-hover:opacity-100 opacity-0 transition-opacity"
-                                            >
-                                                <span className="text-xl">×</span>
-                                            </button>
-                                        </div>
+                        <div className="px-4 md:px-10 py-6 bg-transparent overflow-x-auto">
+                            {items.length === 0 ? (
+                                <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.01] mb-10">
+                                    <div className="w-24 h-24 mb-6 rounded-full bg-neutral-900 border border-white/10 flex items-center justify-center">
+                                        <span className="text-4xl opacity-50">🍽️</span>
                                     </div>
-                                ))}
-                            </div>
+                                    <h3 className="text-xl font-bold tracking-tight text-white mb-2">No items in this transaction</h3>
+                                    <p className="text-sm font-medium text-neutral-500 max-w-xs text-center">
+                                        Add an entry below to begin building the guest's bill.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="min-w-[600px]">
+                                    {/* Header for list */}
+                                    <div className="grid grid-cols-12 gap-4 text-xs font-bold text-neutral-700 tracking-widest mb-6 px-4">
+                                        <div className="col-span-5">Item Name</div>
+                                        <div className="col-span-2 text-center">Qty</div>
+                                        <div className="col-span-2 text-center">Price (₹)</div>
+                                        <div className="col-span-3 text-right">Total</div>
+                                    </div>
+
+                                    {/* Items List */}
+                                    <div className="space-y-5 mb-10">
+                                        {items.map((item) => (
+                                            <div key={item.id} className="grid grid-cols-12 gap-4 items-center bg-white/[0.03] p-5 rounded-2xl border border-white/5 group hover:border-orange-500/20 transition-all">
+                                                <div className="col-span-5">
+                                                    <StitchInput
+                                                        value={item.name}
+                                                        onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                                                        className="bg-neutral-800/50 border-neutral-700/50 text-base py-4 px-6 rounded-xl hover:bg-neutral-800 transition-colors"
+                                                    />
+                                                </div>
+                                                <div className="col-span-2 flex justify-center">
+                                                    <StitchInput
+                                                        type="number"
+                                                        value={item.qty}
+                                                        onChange={(e) => updateItem(item.id, 'qty', parseInt(e.target.value) || 0)}
+                                                        className="bg-neutral-800/50 border-neutral-700/50 text-center w-full text-base py-4 px-0 rounded-xl hover:bg-neutral-800 transition-colors"
+                                                    />
+                                                </div>
+                                                <div className="col-span-2 flex justify-center">
+                                                    <StitchInput
+                                                        type="number"
+                                                        value={item.price}
+                                                        onChange={(e) => updateItem(item.id, 'price', parseInt(e.target.value) || 0)}
+                                                        className="bg-neutral-800/50 border-neutral-700/50 text-center w-full text-base py-4 px-0 rounded-xl hover:bg-neutral-800 transition-colors"
+                                                    />
+                                                </div>
+                                                <div className="col-span-3 flex items-center justify-end gap-3 text-right">
+                                                    <span className="font-bold text-lg md:text-2xl tracking-tight">₹{item.price * item.qty}</span>
+                                                    <button
+                                                        onClick={() => removeItem(item.id)}
+                                                        className="text-red-900/40 hover:text-red-500 transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-red-500/5 rounded-lg border border-red-500/10 md:opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <span className="text-xl">×</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Add Item & Subtotal line */}
                             <div className="flex flex-col md:flex-row justify-between items-center mt-12 pb-10 px-4 gap-8">

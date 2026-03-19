@@ -39,6 +39,7 @@ export function StitchSidebar() {
         return (
             <Link
                 href={item.href}
+                prefetch={true}
                 className={`flex items-center gap-4 px-6 py-4 rounded-xl transition-all group relative ${isActive
                     ? 'bg-orange-500/10 text-white'
                     : 'text-neutral-500 hover:text-white hover:bg-white/[0.02]'

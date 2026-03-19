@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { createSupabaseServerClient } from '~/lib/supabase/server';
+import { createSupabaseServiceClient } from '~/lib/supabase/server';
 import { PublicIntakeForm } from './_components/PublicIntakeForm';
 
 interface FormPageProps {
@@ -10,12 +10,13 @@ interface FormPageProps {
 
 export async function generateMetadata(props: FormPageProps) {
     const { slug } = await props.params;
-    const supabase = createSupabaseServerClient();
-    const { data: tenant } = await supabase
-        .from('tenants')
+    const supabase = createSupabaseServiceClient();
+    const { data } = await supabase
+        .from('tenants' as any)
         .select('name')
         .eq('slug', slug)
         .single();
+    const tenant = data as { name: string } | null;
 
     if (!tenant) {
         return { title: 'Not Found' };
@@ -30,15 +31,15 @@ export async function generateMetadata(props: FormPageProps) {
 export default async function CustomerFormPage(props: FormPageProps) {
     const { slug } = await props.params;
 
-    // We are on a public route, so we use the admin client or standard client to fetch the tenant publicly.
-    // Assuming RLS allows read access to basic tenant info if slug matches, or we bypass. 
-    // Let's use the standard server client. If RLS blocks it, we may need a service role client just for this lookup.
-    const supabase = createSupabaseServerClient();
-    const { data: tenant, error } = await supabase
-        .from('tenants')
+    // Using the admin/service role client to bypass RLS since unauthenticated
+    // public intake lookups are blocked by default tenant policies.
+    const supabase = createSupabaseServiceClient();
+    const { data, error } = await supabase
+        .from('tenants' as any)
         .select('id, name')
         .eq('slug', slug)
         .single();
+    const tenant = data as { id: string; name: string } | null;
 
     if (error || !tenant) {
         console.error('Tenant lookup failed:', error);

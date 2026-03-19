@@ -75,20 +75,11 @@ async function sendMetaMessage(phone: string, templateName: string, discount: st
             },
             body: JSON.stringify({
                 messaging_product: "whatsapp",
-                to: phone,
+                to: phone.replace('+', ''),
                 type: "template",
                 template: {
-                    name: templateName,
-                    language: { code: "en_US" },
-                    components: [
-                        {
-                            type: "body",
-                            parameters: [
-                                { type: "text", text: discount },
-                                { type: "text", text: couponCode }
-                            ]
-                        }
-                    ]
+                    name: "hello_world",
+                    language: { code: "en_US" }
                 }
             })
         });

@@ -22,18 +22,23 @@ const paths = {
 
 function SignInPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8 p-8 max-w-md mx-auto w-full">
-      <h1 className="text-2xl font-bold tracking-tight text-center">
-        Sign In
-      </h1>
+    <div className="flex flex-col w-full animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <div className="mb-2">
+        <h1 className="text-3xl font-black tracking-tighter text-white">
+          Access Portal
+        </h1>
+        <p className="text-sm font-medium text-neutral-400 mt-1 tracking-wide">
+          SYSTEM: <span className="text-[#FF6B00]">ONLINE</span>
+        </p>
+      </div>
 
-      <div className="w-full">
+      <div className="w-full mt-4">
         <SignInMethodsContainer paths={paths} providers={authConfig.providers} />
       </div>
 
-      <div className={'flex justify-center mt-6'}>
-        <Link href={pathsConfig.auth.signUp} className="text-sm underline hover:text-gray-600 transition-colors">
-          Don't have an account yet? Sign up
+      <div className={'flex justify-center mt-8 pt-6 border-t border-white/10'}>
+        <Link href={pathsConfig.auth.signUp} className="text-sm font-semibold tracking-wider text-neutral-400 hover:text-white transition-colors">
+          REQUEST ACCESS <span className="text-[#FF6B00] ml-1">→</span>
         </Link>
       </div>
     </div>
