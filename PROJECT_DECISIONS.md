@@ -53,26 +53,46 @@ Plus **Public Intake Form** at `/form/[slug]` — unauthenticated landing page w
 - All legacy packages deleted from monorepo
 
 ### Color Palette Decision
-Research showed coral/navy combo performs better for Indian SaaS than neon orange:
-- **Primary:** `#E8634A` (coral) — replaces `#FF6B00` neon
-- **Dark bg:** `#1A1A2E` (deep navy) — replaces pure black
-- **Card bg:** `#121212` — stays
-- **Text:** white/neutral-400/neutral-500 gradient
+Research showed light-mode card-based UI dominates restaurant SaaS in 2026 (Tasty Station, V0 POS, Behance POS dashboards). RestroBit screenshot confirms: white cards, light gray bg, orange primary.
 
-Not yet applied everywhere. Only StitchSidebar and Portal updated. Auth pages and admin page still need palette swap.
+- **Primary:** `#F97316` (orange) — CTA buttons, active tabs, accents
+- **Page bg:** `#F3F4F6` (light gray)
+- **Card bg:** `#FFFFFF` (white)
+- **Sidebar:** `#FFFFFF` (white)
+- **Text:** `#111827` (slate-900) primary, `#6B7280` (gray-500) secondary
+- **Border:** `#E5E7EB` (gray-200)
+- **Shadow:** `0 1px 3px rgba(0,0,0,0.08)` — minimal
+- **Success CTA:** `#22C55E` (green) for redeem/confirm actions
+- **Danger:** `#EF4444` (red) for delete/remove
+
+Old coral/navy dark-mode palette abandoned. Not applied anywhere yet.
+
+### Layout Decision
+- Left sidebar: 240px, white bg, icon + text nav
+- Active nav item: light orange bg `#FFF7ED`, orange text `#F97316`
+- Top toolbar: white, breadcrumb left, search center, avatar right
+- Content: max-width 1200px, padding 24px
+- Three-column layout where needed: content grid + sticky side panel
+
+### Component Patterns
+- **White cards**: rounded-lg, minimal shadow, clean borders
+- **Category tabs/pills**: horizontal scroll, active tab orange bg + white text
+- **Tables**: simple, no zebra striping, light headers, generous cell padding
+- **CTA buttons**: orange primary, green for confirm/success, red for danger
+- **Badges**: soft pastel pills (blue, pink, yellow, green) for types/tags
+- **Forms**: white card container, 2-column grid on desktop, labeled inputs
 
 ### Typography Decision
-- No more 7xl/9xl anywhere. Max heading size: text-4xl for admin, text-3xl for auth.
-- No more `tracking-tighter` on giant headers. Use `tracking-tight` max.
-- No more uppercase `tracking-[0.4em]` labels unless absolutely necessary.
+- Inter (system fallback), no custom fonts
+- Max heading: text-2xl (admin), text-xl (auth)
+- Body: text-sm
+- Labels: text-xs, medium weight
 
-### Sidebar Navigation Final
-`[Home, Dashboard, Customers, Coupons, Profile]`
-- Removed Settings (was 404)
-- Removed Billing (destroyed)
-- Width: 260px
-- Active indicator: orange pill
-- No footer status text
+### Responsive Decision
+- Tablet-first: 768px minimum usable width
+- Sidebar collapses to hamburger on mobile
+- Cards stack vertically on < 768px
+- Tables horizontal scroll on mobile, no card flip
 
 ### Auth Decision
 - Plain HTML forms, no fancy containers.
