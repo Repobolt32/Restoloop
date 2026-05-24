@@ -1,4 +1,4 @@
-# Restoloop
+﻿# Restoloop
 
 WhatsApp-first customer outreach SaaS for Indian restaurants. Frontend rebuild over existing Supabase + WhatsApp backend.
 
