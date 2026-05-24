@@ -1,26 +1,35 @@
 # UI/UX Design Spec
 
-## Color Palette
+## Color Palette (Petpooja-Inspired Light Mode)
 
 | Token | Hex | Usage |
 |-------|-----|-------|
 | `--color-primary` | `#E8634A` | Buttons, active states, links, KPI accents |
-| `--color-dark-bg` | `#1A1A2E` | Page background, sidebar |
-| `--color-card-bg` | `#121212` | Cards, panels, table rows |
-| `--color-text-primary` | `#FFFFFF` | Headings, primary text |
-| `--color-text-secondary` | `#A3A3A3` | Labels, captions, muted text (neutral-400) |
-| `--color-text-tertiary` | `#737373` | Placeholders, disabled (neutral-500) |
-| `--color-border` | `#262626` | Dividers, table borders (neutral-800) |
+| `--color-page-bg` | `#F3F4F6` | Page background (light gray) |
+| `--color-card-bg` | `#FFFFFF` | Cards, panels, table rows |
+| `--color-text-primary` | `#111827` | Headings, primary text (slate-900) |
+| `--color-text-secondary` | `#6B7280` | Labels, captions, muted text (gray-500) |
+| `--color-text-tertiary` | `#9CA3AF` | Placeholders, disabled (gray-400) |
+| `--color-border` | `#E5E7EB` | Dividers, table borders (gray-200) |
 | `--color-success` | `#22C55E` | Success states, active coupons |
 | `--color-warning` | `#EAB308` | Low credit alert |
 | `--color-danger` | `#EF4444` | Errors, expired coupons |
+
+## Tag Colors (Soft Pastel Pills)
+
+| Tag | Background | Text |
+|-----|-----------|------|
+| VIP | `#FEF3C7` | `#B45309` |
+| Regular | `#DBEAFE` | `#1E40AF` |
+| First-Timer | `#D1FAE5` | `#047857` |
+| Winback | `#FCE7F3` | `#BE185D` |
 
 ## Typography
 
 | Element | Size | Weight | Tracking | Line Height |
 |---------|------|--------|----------|-------------|
-| Page title | `text-3xl` | 700 | `tight` | 1.2 |
-| Card title | `text-lg` | 600 | normal | 1.4 |
+| Page title | `text-2xl` | 700 | `tight` | 1.2 |
+| Card title | `text-base` | 600 | normal | 1.4 |
 | Body | `text-sm` | 400 | normal | 1.5 |
 | Label | `text-xs` | 500 | normal | 1.4 |
 | Table header | `text-xs` | 500 | normal | 1.4 |
@@ -28,7 +37,7 @@
 | KPI label | `text-sm` | 400 | normal | 1.4 |
 
 **Rules:**
-- Max heading: `text-4xl` (admin), `text-3xl` (auth)
+- Max heading: `text-3xl` (admin), `text-2xl` (auth)
 - No `tracking-tighter` on giant headers
 - No uppercase `tracking-[0.4em]` labels
 - Font: Inter (system fallback)
@@ -45,12 +54,12 @@
 ## Component Inventory
 
 ### Layout
-- `Sidebar` — 260px fixed left, nav items with orange pill active indicator
+- `Sidebar` — 260px fixed left, white bg, subtle right border. Nav items with coral pill active indicator.
 - `TopBar` — mobile hamburger + page title
 - `PageContainer` — max-width 1200px, centered
 
 ### Dashboard
-- `KpiCard` — icon + value + label, primary accent border-top
+- `KpiCard` — white card, subtle shadow, icon + value + label, primary accent border-left 4px
 - `ActivityFeed` — list of recent events with timestamp
 - `LineChart` (optional) — Recharts, 30-day message sends
 
@@ -104,7 +113,7 @@ Sign in → /home → Fetch /api/dashboard/stats → Render KPIs + activity feed
 
 ### Dashboard Page
 ```
-[Sidebar] | [TopBar: Dashboard]
+[Sidebar: white bg] | [TopBar: Dashboard]
           |
           | [KPI Card: Total Customers] [KPI: Coupons Sent] [KPI: Credits Remaining]
           |
@@ -118,7 +127,7 @@ Sign in → /home → Fetch /api/dashboard/stats → Render KPIs + activity feed
 
 ### Active Guests Page
 ```
-[Sidebar] | [TopBar: Active Guests]
+[Sidebar: white bg] | [TopBar: Active Guests]
           |
           | Name      | Phone       | Code     | Discount | Expires In | Type
           | Rajesh    | +91 98...   | AMXK7R2Q | ₹50 OFF  | 2 days     | Welcome
@@ -128,7 +137,7 @@ Sign in → /home → Fetch /api/dashboard/stats → Render KPIs + activity feed
 
 ### Coupons Page
 ```
-[Sidebar] | [TopBar: Coupons]
+[Sidebar: white bg] | [TopBar: Coupons]
           |
           | [Filter: All ▼]
           |
@@ -140,7 +149,7 @@ Sign in → /home → Fetch /api/dashboard/stats → Render KPIs + activity feed
 
 ### Profile Page
 ```
-[Sidebar] | [TopBar: Profile]
+[Sidebar: white bg] | [TopBar: Profile]
           |
           | Restaurant Name  [__________]
           | Address        [__________]
