@@ -30,6 +30,7 @@ yarn-error.log*
 .env
 .env.*
 !.env.example
+
 # vercel
 .vercel
 
@@ -44,5 +45,11 @@ yarn-error.log*
 .vscode/
 .zed
 
-# contentlayer
-.contentlayer/
+# playwright
+playwright-report/
+test-results/
+storage-state.json
+
+# agent-generated
+.planning/
+.claude/
