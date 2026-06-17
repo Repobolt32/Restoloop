@@ -1,0 +1,14 @@
+import { redirect } from 'next/navigation';
+
+import { createClient } from '~/lib/supabase/server';
+
+export default async function RootIndexPage() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error || !data.user) {
+    redirect('https://restoloop.com');
+  }
+
+  redirect('/home');
+}

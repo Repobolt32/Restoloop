@@ -1,3 +1,5 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # dependencies
 node_modules
 .pnp
@@ -43,22 +45,11 @@ yarn-error.log*
 .vscode/
 .zed
 
-# contentlayer
-.contentlayer/
+# playwright
+playwright-report/
+test-results/
+storage-state.json
 
-# Claude / Gemini / agent files
-.claude/
-.gemini/
-.agent/
-.openclaude/
-.graphify_uncached.txt
-
-# graphify output
-graphify-out/
-
-# docs (generated plans/specs)
-docs/
-
-# OS files
-Thumbs.db
+# agent-generated
 .planning/
+.claude/

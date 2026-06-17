@@ -1,0 +1,434 @@
+{
+  "E:\\desktop\\Restoloop\\eslint.config.mjs": {
+    "mtime": 1779457951.335688,
+    "hash": "4da222ad7133fcca73b2af82f9abcbc3"
+  },
+  "E:\\desktop\\Restoloop\\global-setup.ts": {
+    "mtime": 1779630593.996957,
+    "hash": "1fe9542aee572938f56bbb7621bde9aa"
+  },
+  "E:\\desktop\\Restoloop\\instrumentation.ts": {
+    "mtime": 1772877331.4367013,
+    "hash": "ff2a37be93915bdfb9c9de068b3e7178"
+  },
+  "E:\\desktop\\Restoloop\\middleware.ts": {
+    "mtime": 1779457444.82866,
+    "hash": "9eb109e98d70b1ed1900d2080575cec2"
+  },
+  "E:\\desktop\\Restoloop\\next-env.d.ts": {
+    "mtime": 1772879874.0889554,
+    "hash": "90426577ad8f38459f3e566411c85589"
+  },
+  "E:\\desktop\\Restoloop\\next.config.mjs": {
+    "mtime": 1779461390.7437613,
+    "hash": "0ad7093009d176a832b9a5527efdf768"
+  },
+  "E:\\desktop\\Restoloop\\playwright.config.ts": {
+    "mtime": 1779630574.2526927,
+    "hash": "a133851354f55fefd205bf6558f6f02f"
+  },
+  "E:\\desktop\\Restoloop\\postcss.config.mjs": {
+    "mtime": 1772877331.4447005,
+    "hash": "1cf44d2e5dab994abff0a38fa6692ea0"
+  },
+  "E:\\desktop\\Restoloop\\vitest.config.ts": {
+    "mtime": 1779625054.9572353,
+    "hash": "75d4483aaa50d11f2e1ee9109d8b2af7"
+  },
+  "E:\\desktop\\Restoloop\\vitest.setup.ts": {
+    "mtime": 1779624994.759665,
+    "hash": "3709e3aa95abf0544678f0f2d9b46702"
+  },
+  "E:\\desktop\\Restoloop\\app\\error.tsx": {
+    "mtime": 1773831985.8320928,
+    "hash": "9eb13bd3f8a102eea4b6c4378e6a1fc0"
+  },
+  "E:\\desktop\\Restoloop\\app\\global-error.tsx": {
+    "mtime": 1773831983.179629,
+    "hash": "38e3074891b5c619d239a21bb7abfc94"
+  },
+  "E:\\desktop\\Restoloop\\app\\layout.tsx": {
+    "mtime": 1779457632.2210562,
+    "hash": "9127c3db7afe06d38be9403f396408e9"
+  },
+  "E:\\desktop\\Restoloop\\app\\not-found.tsx": {
+    "mtime": 1779457473.5269177,
+    "hash": "9d3334e4801563fc9cf8ff5367eaf581"
+  },
+  "E:\\desktop\\Restoloop\\app\\page.tsx": {
+    "mtime": 1779457472.5049329,
+    "hash": "e7a5038c6684ced2fc6f80256a59b4ef"
+  },
+  "E:\\desktop\\Restoloop\\app\\robots.ts": {
+    "mtime": 1772877331.4224398,
+    "hash": "d86761d21ba77e2e949dc3a8914688ba"
+  },
+  "E:\\desktop\\Restoloop\\app\\admin\\layout.tsx": {
+    "mtime": 1779462057.5919266,
+    "hash": "8073bd6079a6593bd71d3d8f25f72403"
+  },
+  "E:\\desktop\\Restoloop\\app\\admin\\page.tsx": {
+    "mtime": 1779618964.073524,
+    "hash": "e7f434464ae2342ea32304b81674977e"
+  },
+  "E:\\desktop\\Restoloop\\app\\admin\\_components\\admin-navigation.tsx": {
+    "mtime": 1773827518.453934,
+    "hash": "79f2cf56a989ebe5a151454b378189b3"
+  },
+  "E:\\desktop\\Restoloop\\app\\admin\\_components\\admin-tenant-table.tsx": {
+    "mtime": 1773829149.8674297,
+    "hash": "4e251c26e579955b7eba7391b4a0ab23"
+  },
+  "E:\\desktop\\Restoloop\\app\\admin\\_lib\\server-actions.ts": {
+    "mtime": 1779457698.2013383,
+    "hash": "1ceec1074f678ebcbd424ac22df92ba7"
+  },
+  "E:\\desktop\\Restoloop\\app\\api\\coupons\\validate\\route.ts": {
+    "mtime": 1779462059.632004,
+    "hash": "1cb83d6ff2a65539fb7cb45c8bda6c34"
+  },
+  "E:\\desktop\\Restoloop\\app\\api\\cron\\process-campaigns\\route.ts": {
+    "mtime": 1772910844.1897168,
+    "hash": "9b7ce64b7e8a00460289f73a1781c24c"
+  },
+  "E:\\desktop\\Restoloop\\app\\api\\leads\\route.ts": {
+    "mtime": 1779457694.1056259,
+    "hash": "48e81ca8a87c2e5f37dc8621ee0b7f14"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\layout.tsx": {
+    "mtime": 1779364451.6579788,
+    "hash": "579f3a90df372ba7300e5ec046d46109"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\loading.tsx": {
+    "mtime": 1773831987.2966814,
+    "hash": "6b41ce5f5ad683f0ac8da2dd1bf498e5"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\callback\\route.ts": {
+    "mtime": 1779457474.5555027,
+    "hash": "270416dbffb5b3a0679dbd61c5808b6c"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\callback\\error\\page.tsx": {
+    "mtime": 1779457572.4355264,
+    "hash": "357af847221a8112d3b46690626f3f72"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\confirm\\route.ts": {
+    "mtime": 1779457475.585831,
+    "hash": "0db2f6d0d5a8c5421847781d441be3fc"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\password-reset\\actions.ts": {
+    "mtime": 1779457492.225014,
+    "hash": "7638fcc4912849679f05427196644a63"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\password-reset\\page.tsx": {
+    "mtime": 1779457570.345551,
+    "hash": "cdc466a879e365e907805c71ceb797d8"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\sign-in\\actions.ts": {
+    "mtime": 1779457490.0889478,
+    "hash": "3f4d6a79cda8f18f84c829ec860a79b9"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\sign-in\\page.tsx": {
+    "mtime": 1779457568.2612064,
+    "hash": "24a8f19d453a412fd1be74142ee34bc2"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\sign-up\\actions.ts": {
+    "mtime": 1779457491.1249743,
+    "hash": "f6ce2e8e6aeefd96cf48c944df3d4cdb"
+  },
+  "E:\\desktop\\Restoloop\\app\\auth\\sign-up\\page.tsx": {
+    "mtime": 1779457569.3054142,
+    "hash": "39cd9822220500ad907b98cd5e62fe6e"
+  },
+  "E:\\desktop\\Restoloop\\app\\form\\[slug]\\not-found.tsx": {
+    "mtime": 1772880311.6155396,
+    "hash": "54086f2e3db2086146b0bb98ba7c7804"
+  },
+  "E:\\desktop\\Restoloop\\app\\form\\[slug]\\page.tsx": {
+    "mtime": 1779457703.3251991,
+    "hash": "e9df94e342ac7ca6841869e0158defff"
+  },
+  "E:\\desktop\\Restoloop\\app\\form\\[slug]\\_components\\CustomerForm.tsx": {
+    "mtime": 1779455021.0447514,
+    "hash": "2ff3ce30dbb75aa4072b31ac7638a21d"
+  },
+  "E:\\desktop\\Restoloop\\app\\form\\[slug]\\_components\\PublicIntakeForm.tsx": {
+    "mtime": 1779014628.5233543,
+    "hash": "72ba22a298f48cf6c2df18a8c4b31a94"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\layout.tsx": {
+    "mtime": 1779629530.0233946,
+    "hash": "fd79946bfecf88156053341a76f0a618"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\loading.tsx": {
+    "mtime": 1773831992.201137,
+    "hash": "6b41ce5f5ad683f0ac8da2dd1bf498e5"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\page.tsx": {
+    "mtime": 1779618929.6684434,
+    "hash": "ac558feceb76b2345a27e87730267aa4"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\coupons\\coupons-content.tsx": {
+    "mtime": 1779632220.6342418,
+    "hash": "6fd57a8d9eb9ddd3e726ddc7342966ff"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\coupons\\loading.tsx": {
+    "mtime": 1779632219.60958,
+    "hash": "1129563222e1e730b40eb2df8b4e6100"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\coupons\\page.tsx": {
+    "mtime": 1779631840.4521863,
+    "hash": "3f35834410d1a894b4d18b37586ee387"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\customers\\page.tsx": {
+    "mtime": 1779586217.448956,
+    "hash": "b5f4b5fd5d281c0f2a9560594646467c"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\dashboard\\dashboard-content.tsx": {
+    "mtime": 1779628858.4793682,
+    "hash": "d4aaa76a1670b71e82db0c0a414d57de"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\dashboard\\loading.tsx": {
+    "mtime": 1779599983.4217165,
+    "hash": "d7e8c7890495d16e54fe667acb94f89f"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\dashboard\\page.tsx": {
+    "mtime": 1779816585.2132747,
+    "hash": "263453beed5d57ba22af729856307d2c"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\restaurant-profile\\loading.tsx": {
+    "mtime": 1779599979.5819318,
+    "hash": "d7e8c7890495d16e54fe667acb94f89f"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\restaurant-profile\\page.tsx": {
+    "mtime": 1779618931.7422001,
+    "hash": "71d4dfb4bb7a5e658a19c1aae79bbccf"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\restaurant-profile\\_actions\\update-profile.ts": {
+    "mtime": 1779457704.3584075,
+    "hash": "bd0a8f622b25796ae4c1dd87c6d8f9b8"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\restaurant-profile\\_components\\ProfileForm.tsx": {
+    "mtime": 1779619135.6640935,
+    "hash": "a1b49c3d0799beb3e7929f0b90b6715a"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\restaurant-profile\\_components\\QrFlyerCard.tsx": {
+    "mtime": 1779599975.647299,
+    "hash": "d4ca555428a8bf69a06d49f74bfe215b"
+  },
+  "E:\\desktop\\Restoloop\\app\\home\\restaurant-profile\\_components\\QrFlyerPrintView.tsx": {
+    "mtime": 1779088243.3316677,
+    "hash": "4fd1384a41c6a8b9b127109575272fbe"
+  },
+  "E:\\desktop\\Restoloop\\app\\update-password\\page.tsx": {
+    "mtime": 1779458329.4615977,
+    "hash": "588bbf89d06853d7a0fd7c39ff2e79d0"
+  },
+  "E:\\desktop\\Restoloop\\components\\app-logo.tsx": {
+    "mtime": 1779618932.762604,
+    "hash": "354ee13797b565ae116ebb955ed5c36b"
+  },
+  "E:\\desktop\\Restoloop\\components\\root-providers.tsx": {
+    "mtime": 1779816551.241635,
+    "hash": "59989d668f5cc6ed26407f8044c31672"
+  },
+  "E:\\desktop\\Restoloop\\components\\ui\\button.tsx": {
+    "mtime": 1779631134.022125,
+    "hash": "5293770ef356a19e0f18ff8b9191a8a6"
+  },
+  "E:\\desktop\\Restoloop\\components\\ui\\input.tsx": {
+    "mtime": 1779599085.067726,
+    "hash": "e8692a0413da22ba66178d2f088cbc68"
+  },
+  "E:\\desktop\\Restoloop\\config\\app.config.ts": {
+    "mtime": 1779363184.8751993,
+    "hash": "43ec438b48b17f4c094246cbc9e39d07"
+  },
+  "E:\\desktop\\Restoloop\\config\\auth.config.ts": {
+    "mtime": 1772877331.4318738,
+    "hash": "d27b4d557fb6e9a3f1d2f54d2b7ac895"
+  },
+  "E:\\desktop\\Restoloop\\config\\navigation.config.tsx": {
+    "mtime": 1779455018.9643562,
+    "hash": "3522cefbb2da526cc2fdc222ca818223"
+  },
+  "E:\\desktop\\Restoloop\\config\\paths.config.ts": {
+    "mtime": 1779455017.7369237,
+    "hash": "a8708daaad88652e2ec0e8a9eb6fe03e"
+  },
+  "E:\\desktop\\Restoloop\\lib\\campaigns.ts": {
+    "mtime": 1779457692.0445206,
+    "hash": "4d7fecd4dae57df489dcb1bfb3a29c73"
+  },
+  "E:\\desktop\\Restoloop\\lib\\coupons.ts": {
+    "mtime": 1772880224.8657167,
+    "hash": "2bbd7e58a582ae50a7a3933d279aea7a"
+  },
+  "E:\\desktop\\Restoloop\\lib\\fonts.ts": {
+    "mtime": 1773741550.6261857,
+    "hash": "4d96943ee9301dd9054cb2f3bf99ec1e"
+  },
+  "E:\\desktop\\Restoloop\\lib\\restoloop.types.ts": {
+    "mtime": 1779591671.6936924,
+    "hash": "42b2c61971c5964c23710c42d8669616"
+  },
+  "E:\\desktop\\Restoloop\\lib\\slug.ts": {
+    "mtime": 1773774359.3564289,
+    "hash": "14ce7d8c75440a99e6104dba3f757401"
+  },
+  "E:\\desktop\\Restoloop\\lib\\tenant.ts": {
+    "mtime": 1779457634.3028293,
+    "hash": "2ae1268ac78a83fef0d9e7351c82d4f7"
+  },
+  "E:\\desktop\\Restoloop\\lib\\utils.ts": {
+    "mtime": 1779599053.6715455,
+    "hash": "5a6fd53fdcf2be529e9cc0b718fde352"
+  },
+  "E:\\desktop\\Restoloop\\lib\\whatsapp.ts": {
+    "mtime": 1779014616.525809,
+    "hash": "b3ed35fa2b60d28cda82da93154dc9a1"
+  },
+  "E:\\desktop\\Restoloop\\lib\\server\\require-user-in-server-component.ts": {
+    "mtime": 1779457471.480609,
+    "hash": "0942f10f1f66345c4159f9e54acc9342"
+  },
+  "E:\\desktop\\Restoloop\\lib\\supabase\\client.ts": {
+    "mtime": 1779457420.451772,
+    "hash": "653f67e1a28c9bf8cd59e605c0b0aee6"
+  },
+  "E:\\desktop\\Restoloop\\lib\\supabase\\server.ts": {
+    "mtime": 1779625447.5695179,
+    "hash": "49a08a89aba7f96aa83c740293160354"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\migrations\\20241219010757_schema.sql": {
+    "mtime": 1772877331.4941335,
+    "hash": "d2d57e1761771a8ddc4813fe7632b665"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\migrations\\20260308_add_billing_columns.sql": {
+    "mtime": 1772952621.5020907,
+    "hash": "7f846dbec9c43f15158e73b16459644e"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\migrations\\20260308_restoloop_v1_schema.sql": {
+    "mtime": 1779455133.2724214,
+    "hash": "9ba44a40a25023342b1eb9e3ccfb073f"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\migrations\\20260318_add_contact_info.sql": {
+    "mtime": 1773773320.5479023,
+    "hash": "2fa6b63ef9527eeb712c57c7ad652903"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\migrations\\20260318_drop_leaking_coupon_policy.sql": {
+    "mtime": 1773839346.8017874,
+    "hash": "954467f9cf5a022c5633863d663e90c4"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\migrations\\20260319_add_food_pref_column.sql": {
+    "mtime": 1773936924.468537,
+    "hash": "fbf980d2e66c1d166f84dc2b67c4047f"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\coupons\\page.test.tsx": {
+    "mtime": 1779631371.5390594,
+    "hash": "c9fdb92eb85b49d247f7db42ac9c3463"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\dashboard\\page.test.tsx": {
+    "mtime": 1779816598.4950936,
+    "hash": "ae748f4d18a4a70a3759059302d29147"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\admin.spec.ts": {
+    "mtime": 1779371489.400558,
+    "hash": "c09fe5231a036512d7192c873de6757d"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\api-routes.spec.ts": {
+    "mtime": 1779816646.396759,
+    "hash": "bebf0eb964e0952e64343dfdb268459a"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\auth-callback-error.spec.ts": {
+    "mtime": 1779371427.1739683,
+    "hash": "fb0eec9c715d40c6db2fbc06a55a3808"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\auth-guards.spec.ts": {
+    "mtime": 1779369805.2246969,
+    "hash": "ef6ecad7d67f439a1fb4a6d6dc4513bc"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\billing.spec.ts": {
+    "mtime": 1779360144.8956506,
+    "hash": "b7173af045d4968c4c5ce7a4f4dbdd55"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\coupons.spec.ts": {
+    "mtime": 1779630456.5754755,
+    "hash": "9b2f19ad0655a3b336566a9a6aa4344f"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\dashboard.spec.ts": {
+    "mtime": 1779629552.8151858,
+    "hash": "c7f73451cc0251e0232554b278b74d06"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\error-pages.spec.ts": {
+    "mtime": 1779369816.9372392,
+    "hash": "2759af3751306c4f0531e29b8e653300"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\home.spec.ts": {
+    "mtime": 1779361190.9150565,
+    "hash": "7387a06097881a745f67d1ae4d0595b9"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\intake-form.spec.ts": {
+    "mtime": 1779373787.739271,
+    "hash": "e1f189a3a464fcfc8f2b967f84f9beef"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\navigation.spec.ts": {
+    "mtime": 1779373420.3357553,
+    "hash": "8c5b18aa319d228632dbafcf70a552e7"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\profile.spec.ts": {
+    "mtime": 1779360179.7276082,
+    "hash": "aa1b214b5abaf2239716afc528fc59ed"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\root-redirect.spec.ts": {
+    "mtime": 1779361192.2857895,
+    "hash": "6b23707406807b2f4a8b6db49437d7f1"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\sign-in.spec.ts": {
+    "mtime": 1779356599.5562496,
+    "hash": "4e3311b0a4563bdbb712f2e7881aa6a7"
+  },
+  "E:\\desktop\\Restoloop\\__tests__\\e2e\\sign-up.spec.ts": {
+    "mtime": 1779358463.6269293,
+    "hash": "2eccf30af3c4f0d09ced04bffd295e6f"
+  },
+  "E:\\desktop\\Restoloop\\README.md": {
+    "mtime": 1779462202.3986514,
+    "hash": "f3bf44a1bd44fdb3244522b61a8a6167"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\templates\\change-email-address.html": {
+    "mtime": 1779363183.7940598,
+    "hash": "8abb7e8c3946fa9974fa751242605672"
+  },
+  "E:\\desktop\\Restoloop\\supabase\\templates\\confirm-email.html": {
+    "mtime": 1779363183.6352055,
+    "hash": "4fca7ad15667003a5369460df2a2828e"
+  },
+  "E:\\desktop\\Restoloop\\public\\images\\favicon\\android-chrome-192x192.png": {
+    "mtime": 1772877331.4519596,
+    "hash": "b194aeafe606172b352957410062efaf"
+  },
+  "E:\\desktop\\Restoloop\\public\\images\\favicon\\android-chrome-512x512.png": {
+    "mtime": 1772877331.4539697,
+    "hash": "f171829ddbc9edc6e9aa1bf1a48c2ab6"
+  },
+  "E:\\desktop\\Restoloop\\public\\images\\favicon\\apple-touch-icon.png": {
+    "mtime": 1772877331.4539697,
+    "hash": "0b5a4ada9b5cd5d0505a22094ec302d5"
+  },
+  "E:\\desktop\\Restoloop\\public\\images\\favicon\\favicon-16x16.png": {
+    "mtime": 1772877331.455415,
+    "hash": "6047efc752a7f04a5e2c578d796a9fe0"
+  },
+  "E:\\desktop\\Restoloop\\public\\images\\favicon\\favicon-32x32.png": {
+    "mtime": 1772877331.4559247,
+    "hash": "f9b56cdd4e6c5c961a04be5c0908949c"
+  },
+  "E:\\desktop\\Restoloop\\public\\images\\favicon\\mstile-150x150.png": {
+    "mtime": 1772877331.456935,
+    "hash": "1d0a63851e2b474a300c0783c849912d"
+  },
+  "E:\\desktop\\Restoloop\\public\\images\\favicon\\safari-pinned-tab.svg": {
+    "mtime": 1772877331.458948,
+    "hash": "7102030234401ca1a0ed2e9500a7aede"
+  }
+}
