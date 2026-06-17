@@ -312,7 +312,8 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
             messageStatus = 'failed';
         }
     } else {
-        console.warn('Missing WA credentials or customer phone. Simulating send based on mock.');
+        console.warn('Missing WA credentials or customer phone. Marking message as failed.');
+        messageStatus = 'failed';
     }
 
     // 3. Insert Message Log
