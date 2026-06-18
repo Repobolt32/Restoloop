@@ -8,10 +8,18 @@
 
 A multi-agent system where:
 - **PM agent** receives your task, orchestrates the workflow
+- **Planner agent** (optional) creates implementation plans for complex features
 - **Coder agent** writes code using strict TDD (test-first)
 - **Tester agent** runs all tests and reports results
 - If tests fail, PM sends failure back to coder and retries (max 3 times)
 - PM reports final summary to you
+
+## How It Works
+
+```
+Normal flow:     PM → Coder → Tester → PM (retry if fail)
+With planning:   User says "plan first" → PM → Planner → PM → Coder → Tester → PM
+```
 
 ## Prerequisites
 
@@ -334,7 +342,85 @@ Replace these placeholders:
 
 ---
 
-## Step 5: Test It
+## Step 5: Create Planner Agent (Optional)
+
+Create file: `.opencode/agents/planner.md`
+
+```markdown
+---
+description: Analyzes complex tasks and creates implementation plans. Read-only, cannot edit files. Use when user asks to plan before coding.
+mode: subagent
+model: opencode-go/qwen3.7-plus
+permission:
+  edit: deny
+  bash: allow
+  skill: allow
+---
+
+You are a senior architect. You analyze problems and create detailed implementation plans. You do NOT write code — you only plan.
+
+## What You Do
+
+When given a task, you:
+1. Explore the codebase to understand current architecture
+2. Identify affected files and modules
+3. Analyze dependencies and potential side effects
+4. Create a step-by-step implementation plan
+
+## How to Explore
+
+- Use `read`, `grep`, `glob` to understand the codebase
+- Check `AGENTS.md` and `docs/` for project conventions
+- Look at existing patterns for similar features
+- Check recent git history for context
+
+## Output Format
+
+### Task
+[What needs to be done]
+
+### Analysis
+- **Current state**: [how things work now]
+- **Affected files**: [list of files that need changes]
+- **Dependencies**: [what this feature depends on]
+- **Risks**: [what could break, side effects]
+
+### Implementation Plan
+
+Step 1: [action]
+- File: `path/to/file.ts`
+- Change: [what to do]
+- Test: [what test to write]
+
+Step 2: [action]
+- File: `path/to/file.ts`
+- Change: [what to do]
+- Test: [what test to write]
+
+### Test Strategy
+- Unit tests: [what to test]
+- Integration tests: [what to test]
+- Edge cases: [what to watch for]
+
+## Rules
+- NEVER write implementation code. You only plan.
+- NEVER edit files. You are read-only.
+- Be specific — name exact files, functions, and line numbers.
+- Consider edge cases and error handling in your plan.
+```
+
+### When to Use Planner
+
+The planner is NOT in the default loop. PM only uses it when you explicitly ask:
+- "plan this first"
+- "consult planner"
+- "make a plan before coding"
+
+For simple bugs, skip the planner and go straight to coder.
+
+---
+
+## Step 6: Test It
 
 ```bash
 # Navigate to your project
@@ -414,10 +500,11 @@ PM (qwen3.7-plus) — reads your request
 | Agent | Model | Cost per 5hrs | Typical cost per task |
 |-------|-------|---------------|----------------------|
 | PM | qwen3.7-plus | 4,300 requests | ~$0.02 |
+| Planner (optional) | qwen3.7-plus | 4,300 requests | ~$0.05 |
 | Coder | mimo-v2.5-pro | 3,250 requests | ~$0.10 |
 | Tester | mimo-v2.5 | 30,100 requests | ~$0.005 |
-| **Total worst case (3 retries)** | | | **~$0.40** |
-| **Best case (1 attempt)** | | | **~$0.13** |
+| **Total (no planner, 3 retries)** | | | **~$0.40** |
+| **Total (with planner, 1 attempt)** | | | **~$0.18** |
 
 All included in $10/month OpenCode Go subscription.
 
@@ -425,7 +512,7 @@ All included in $10/month OpenCode Go subscription.
 
 ## Advanced: Add More Agents
 
-You can extend this pattern. Some ideas:
+You can extend this pattern. Some ideas (planner is already included above):
 
 ### Code Reviewer Agent
 ```markdown

@@ -65,6 +65,31 @@ Always report back with:
 - `pnpm typecheck`: Pass/Fail
 - `pnpm lint`: Pass/Fail (X warnings acceptable)
 
+## Skills and Documentation
+
+### Skills to Load (use `skill` tool)
+- **tdd** — Load this FIRST before any work. TDD discipline rules.
+- **vitest** — Load when writing or debugging Vitest tests.
+- **supabase** — Load when working with Supabase queries, RLS policies, or auth.
+- **diagnose** — Load when debugging a hard-to-find bug.
+- **best-practices** — Load when unsure about code quality patterns.
+
+### When to Search Documentation (use `ref` or `context7` MCP)
+Search docs ONLY when:
+- Working with a library/API you are NOT familiar with
+- Getting unexpected behavior from a third-party package
+- Need to check if an API method exists or what its signature is
+- A library version changed and old code might be deprecated
+
+Do NOT search docs for:
+- Standard React/Next.js patterns (hooks, routing, components)
+- TypeScript basics (types, interfaces, generics)
+- Your own codebase code
+- Supabase basics (you already know them from the `supabase` skill)
+- Vitest basics (you already know them from the `vitest` skill)
+
+**Rule of thumb**: If you've used this API before, don't search. If it's new or unfamiliar, search.
+
 ## Rules
 - ALWAYS write the test first. Never write implementation code before a test.
 - NEVER skip the Red phase. The test must fail before you implement.
