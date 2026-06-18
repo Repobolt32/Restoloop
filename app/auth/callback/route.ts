@@ -3,11 +3,13 @@ import type { NextRequest } from 'next/server';
 
 import { createClient } from '~/lib/supabase/server';
 import pathsConfig from '~/config/paths.config';
+import { isSafeRedirect } from '~/lib/urls';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? pathsConfig.app.home;
+  const rawNext = searchParams.get('next') ?? pathsConfig.app.home;
+  const next = isSafeRedirect(rawNext) ? rawNext : pathsConfig.app.home;
 
   if (code) {
     const supabase = await createClient();

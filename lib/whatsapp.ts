@@ -78,7 +78,7 @@ async function sendMetaMessage(phone: string, templateName: string, discount: st
                 to: phone.replace('+', ''),
                 type: "template",
                 template: {
-                    name: "hello_world",
+                    name: templateName,
                     language: { code: "en_US" }
                 }
             }),

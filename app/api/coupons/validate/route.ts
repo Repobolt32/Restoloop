@@ -84,7 +84,13 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
-        // 6. Success
+        // 6. Mark coupon as redeemed
+        await supabase
+            .from('coupons' as any)
+            .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
+            .eq('id', coupon.id);
+
+        // 7. Success
         const customerInfo = Array.isArray(coupon.customers) ? coupon.customers[0] : coupon.customers;
 
         return NextResponse.json({

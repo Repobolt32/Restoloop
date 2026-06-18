@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '~/lib/supabase/server';
 import pathsConfig from '~/config/paths.config';
+import { isSafeRedirect } from '~/lib/urls';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as 'email' | 'recovery' | null;
-  const next = searchParams.get('next') ?? pathsConfig.app.home;
+  const rawNext = searchParams.get('next') ?? pathsConfig.app.home;
+  const next = isSafeRedirect(rawNext) ? rawNext : pathsConfig.app.home;
 
   if (token_hash && type) {
     const supabase = await createClient();

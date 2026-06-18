@@ -269,7 +269,7 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
     if (couponErr) throw couponErr;
 
     // 2. Transmit via Meta Cloud API
-    let messageStatus = 'sent';
+    let messageStatus = 'failed'; // Default to failed; only set 'sent' on confirmed delivery
     const waPhoneId = process.env.WA_PHONE_ID;
     const waToken = process.env.WA_TOKEN;
 
@@ -302,18 +302,17 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
                 signal: AbortSignal.timeout(10000)
             });
 
-            if (!response.ok) {
+            if (response.ok) {
+                messageStatus = 'sent';
+            } else {
                 const errBody = await response.text();
                 console.error('WhatsApp API sending failed:', errBody);
-                messageStatus = 'failed';
             }
         } catch (apiErr) {
             console.error('Failed to reach WhatsApp API:', apiErr);
-            messageStatus = 'failed';
         }
     } else {
         console.warn('Missing WA credentials or customer phone. Marking message as failed.');
-        messageStatus = 'failed';
     }
 
     // 3. Insert Message Log

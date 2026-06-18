@@ -2,6 +2,7 @@
 
 **Date:** June 18, 2026
 **Overall Score:** 7.5/10 — Functional MVP with technical debt
+**Frontend Score:** 6.5/10 — Functional but unpolished, needs theme/styling cleanup
 
 ---
 
@@ -15,7 +16,7 @@
 | Server Actions | ✅ 95% | All 5 actions working: sign-in, sign-up, password reset, profile update, admin credits |
 | Business Logic | ✅ 90% | Campaign engine (winback/birthday/welcome), coupon generation, WhatsApp integration, multi-tenant RLS |
 | Unit Tests | ✅ 18 tests | 3 test files, all meaningful with proper assertions |
-| Styling | ✅ 100% | Full theme system, dark/light mode, Tailwind v4, Shadcn UI |
+| Styling | ⚠️ 85% | Tailwind v4, Shadcn UI, dark/light mode — but has theme inconsistencies, hardcoded colors, duplicate styles |
 | Config | ✅ 95% | All configs complete except `.env.example` is incomplete |
 | Database | ✅ 100% | 7 migrations, RLS policies, indexes, RPC functions |
 
@@ -31,6 +32,63 @@
 | Type Safety | ⚠️ Weak | 28+ `as any` casts — missing `lib/database.types.ts` (Supabase types not generated) |
 | Admin Auth | ❌ Bug | `addCredits` server action has no user verification — any logged-in user can call it |
 | Open Redirects | ❌ Security | `next` param unvalidated in `/auth/confirm` and `/auth/callback` |
+| Frontend Theme | ⚠️ Visual | `coupons-content.tsx` uses light styles while rest of app is dark — looks broken |
+| Hardcoded Colors | ⚠️ Styling | Brand colors (`#E8634A`, `#FF6B00`, `#25D366`) not in Tailwind config |
+| Dead Component | ⚠️ Cleanup | `CustomerForm.tsx` — unused, superseded by `PublicIntakeForm.tsx` |
+
+---
+
+## Frontend Issues (NEW)
+
+### Theme & Styling — HIGH
+
+| Issue | Location | Severity |
+|-------|----------|----------|
+| **Light/dark theme inconsistency** | `coupons-content.tsx` uses light styles (`bg-neutral-50`, `text-neutral-900`) while rest of app is dark (`bg-neutral-900/40`, `text-white`) | High |
+| **Hardcoded brand colors** | `#E8634A`, `#FF6B00`, `#25D366` scattered in components — not defined as Tailwind tokens | High |
+| **Duplicate card styles** | Same `bg-neutral-900/40 border border-white/5 rounded-xl` repeated in 5+ files — no extraction | Medium |
+| **No design tokens** | Brand orange, WhatsApp green not in Tailwind config — inconsistent usage across files | Medium |
+
+### Architectural & Logic Bugs — CRITICAL
+
+| Issue | Location | Severity | Description |
+|-------|----------|----------|-------------|
+| **Dashboard Stats Truncation** | `dashboard/page.tsx` (L31-35) | Critical | Hardcoded `.limit(50)` on `coupons` query means dashboard stats freeze permanently once 50 coupons are sent. |
+| **Missing WhatsApp Template Variables** | `lib/whatsapp.ts` (L60-84) | Critical | `sendMetaMessage` accepts `discount` and `couponCode` but never passes them in the JSON payload `components` array. |
+| **Admin Action Missing Validation** | `admin/_lib/server-actions.ts` (L6) | Critical | `addCredits` checks if the env var exists, but fails to check if the caller `supabase.auth.getUser()` is actually that admin. Any logged-in user can add unlimited credits. |
+| **Loop Sequential Awaits & N+1 Queries** | `lib/campaigns.ts` (L69, 121, 175) | Critical | Cron job sequentially `await`s `sendCampaign` (DB + Network) inside a `for` loop. Will hit serverless timeout for medium/large restaurants. |
+| **Atomic RPC Called Inside Loop** | `lib/campaigns.ts` (L234-237) | Critical | Loops `totalSent` times to call `decrement_platform_credits` RPC. Sends N individual DB queries instead of passing N as an argument. |
+| **Birthday Stats Silently Dropped** | `dashboard/page.tsx` (L52-65) | High | Checks `couponStats[type]` expecting `'birthday'`, but the database enum value is `'bday'`. Birthdays are never counted. |
+| **Fake Retry Server Action** | `dashboard/page.tsx` (L111-113) | Medium | The `onRetry` prop is an empty server action `async () => { 'use server'; }`. Clicking retry does absolutely nothing. |
+| **Systemic Type Safety Bypass** | Widespread (1199 errors) | High | Uses `supabase.from('table' as any)` everywhere. If schema changes, compiler will not catch it, guaranteeing runtime crashes. |
+
+| Issue | Location | Severity |
+|-------|----------|----------|
+| **`as any` type assertions** | `dashboard/page.tsx`, `form/[slug]/page.tsx`, `customers/page.tsx` — 6+ instances | Medium |
+| **Console.log in production** | `app/home/coupons/page.tsx` lines 20, 42 | Low |
+| **Unused imports** | `app/home/page.tsx` — `ExternalLink` and `Sparkles` imported but never used | Low |
+| **Hardcoded magic numbers** | ₹50 discount, 45-day winback, +91 country code — not extracted to config | Medium |
+
+### Component Structure — MEDIUM
+
+| Issue | Location | Severity |
+|-------|----------|----------|
+| **Business logic in page component** | `dashboard/page.tsx` has 100+ lines of data transformation — should be utility | Medium |
+| **Duplicate header markup** | `coupons/page.tsx` — header section repeated in success and error paths | Low |
+| **Inconsistent auth patterns** | `customers/page.tsx` uses manual redirect, `coupons/page.tsx` uses `requireUserInServerComponent()` | Medium |
+| **No shared data-fetching hook** | Each page independently fetches tenant data with slightly different patterns | Medium |
+| **Indian-only phone validation** | `PublicIntakeForm.tsx` — hardcoded `+91` regex, won't work for international restaurants | Medium |
+| **Hardcoded discount in form** | `PublicIntakeForm.tsx` — ₹50 coupon amount hardcoded, should come from tenant config | Medium |
+
+### Missing Frontend Infrastructure
+
+| Feature | Priority | Notes |
+|---------|----------|-------|
+| Per-route `error.tsx` | Medium | Only global `app/error.tsx` exists — no route-level error boundaries |
+| Per-route `loading.tsx` | Medium | Only `app/home/dashboard/loading.tsx` — others flash empty |
+| Shared `useTenant()` hook | Medium | Each page re-fetches tenant independently |
+| Brand color tokens | High | Define `brand-orange`, `wa-green` etc. in Tailwind config |
+| Dead component cleanup | Low | Delete `app/form/[slug]/_components/CustomerForm.tsx` (unused) |
 
 ---
 
@@ -51,9 +109,10 @@
 | Severity | Count |
 |----------|-------|
 | Critical | 7 |
-| High | 13 |
-| Medium | 12 |
-| **Total** | **32** |
+| High | 17 |
+| Medium | 21 |
+| Low | 4 |
+| **Total** | **49** |
 
 ---
 
@@ -228,6 +287,9 @@
 | Rate limiting | MISSING | No rate limiting on `/api/leads` or `/api/cron/process-campaigns` |
 | Input sanitization | MISSING | No XSS sanitization beyond Zod validation |
 | Logging/monitoring | MINIMAL | `instrumentation.ts` only does `console.error` |
+| Brand color tokens | MISSING | Hardcoded hex colors in components — no Tailwind design tokens |
+| Shared tenant hook | MISSING | Each page independently fetches tenant data |
+| Dead component cleanup | MISSING | `CustomerForm.tsx` should be deleted |
 
 ---
 
@@ -236,6 +298,8 @@
 1. **Fix `sendMetaMessage` WhatsApp template bug** — campaign messages use wrong template
 2. **Regenerate Supabase types** (`supabase gen types`) and remove all `as any` casts
 3. **Update or remove stale E2E tests** — bring in sync with current UI or delete
+4. **Fix frontend theme inconsistency** — coupons-content uses light theme while rest of app is dark (HIGH visual bug)
+5. **Extract brand colors to Tailwind config** — define `brand-orange`, `wa-green` as tokens
 
 ---
 

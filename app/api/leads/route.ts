@@ -36,7 +36,6 @@ export async function POST(req: Request) {
                 phone: data.phone,
                 birthday: data.birthday ? data.birthday : null,
                 food_pref: data.favouriteDish ? data.favouriteDish : null,
-                visit_count: 1,
                 last_visit: new Date().toISOString(),
             })
             .select()
