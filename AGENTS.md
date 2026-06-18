@@ -38,6 +38,41 @@ NEXT_PUBLIC_CI=1 pnpm build
 - **Playwright**: `@playwright/test` is NOT in package.json. E2E tests exist in `__tests__/e2e/` but cannot run.
 - Don't run `npx playwright test` — it will fail.
 
+## OpenCode Multi-Agent Setup
+
+This project uses OpenCode's PM → Coder → Tester agent system.
+
+### Post-Clone Setup (Required)
+
+After cloning, install the OpenCode plugin:
+
+```bash
+cd .opencode && npm install
+```
+
+### Agents
+
+| Agent | File | Mode | Model | Purpose |
+|-------|------|------|-------|---------|
+| PM | `.opencode/agents/pm.md` | primary | qwen3.7-plus | Orchestrates fixes, spawns coder/tester |
+| Coder | `.opencode/agents/coder.md` | subagent | mimo-v2.5-pro | TDD bug fixes, writes tests first |
+| Tester | `.opencode/agents/tester.md` | subagent | mimo-v2.5 | Runs all tests, reports results |
+| Planner | `.opencode/agents/planner.md` | subagent | qwen3.7-plus | Creates implementation plans (optional) |
+
+### Config
+
+Agent registration: `opencode.json` (project root)
+TDD rules: `.opencode/prompts/tdd-rules.md`
+Setup guide: `.opencode/MULTI_AGENT_SETUP_GUIDE.md`
+
+### Usage
+
+```bash
+opencode              # Start OpenCode TUI
+# Press Tab to switch to PM agent
+# Type your task: "fix the login bug"
+```
+
 ## Project Structure
 
 ```

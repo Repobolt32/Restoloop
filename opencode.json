@@ -1,0 +1,19 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "name": "Restoloop",
+  "agents": {
+    "pm": {
+      "path": ".opencode/agents/pm.md"
+    },
+    "coder": {
+      "path": ".opencode/agents/coder.md"
+    },
+    "tester": {
+      "path": ".opencode/agents/tester.md"
+    },
+    "planner": {
+      "path": ".opencode/agents/planner.md"
+    }
+  },
+  "mcp": {}
+}
