@@ -11,11 +11,11 @@ export default defineConfig({
     passWithNoTests: true,
   },
   resolve: {
-    alias: {
-      "~": path.resolve(__dirname, "./app"),
-      "~/config": path.resolve(__dirname, "./config"),
-      "~/components": path.resolve(__dirname, "./components"),
-      "~/lib": path.resolve(__dirname, "./lib"),
-    },
+    alias: [
+      { find: "~/lib", replacement: path.resolve(__dirname, "./lib") },
+      { find: "~/config", replacement: path.resolve(__dirname, "./config") },
+      { find: "~/components", replacement: path.resolve(__dirname, "./components") },
+      { find: "~", replacement: path.resolve(__dirname, "./app") },
+    ],
   },
 });

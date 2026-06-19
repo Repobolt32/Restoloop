@@ -9,16 +9,16 @@ export default async function AdminDashboardPage() {
 
     // Fetch all tenants with their owners' emails
     const { data: tenants, error } = await supabase
-        .from('tenants' as any)
+        .from('tenants')
         .select('*')
-        .order('created_at', { ascending: false }) as any;
+        .order('created_at', { ascending: false });
 
     const { data: platformData } = await supabase
-        .from('platform_credits' as any)
+        .from('platform_credits')
         .select('balance')
-        .single() as any;
+        .single();
 
-    const totalTenantCredits = (tenants || []).reduce((acc: number, t: any) => acc + (t.credits_balance || 0), 0);
+    const totalTenantCredits = (tenants || []).reduce((acc: number, t: { credits_balance: number | null }) => acc + (t.credits_balance || 0), 0);
     const platformCredits = platformData?.balance || 0;
 
     return (

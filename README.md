@@ -1,5 +1,7 @@
 # Restoloop
 
+<!-- This project uses multi-agent development workflow -->
+
 Customer retention platform for restaurants — QR-based intake, coupon engine, billing terminal, and guest analytics.
 
 ## Tech Stack

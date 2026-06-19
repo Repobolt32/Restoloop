@@ -4,7 +4,7 @@ import { getTenantForUser } from '~/lib/tenant';
 import DashboardContent, { DashboardStats } from './dashboard-content';
 
 export default async function DashboardPage() {
-    const supabase = await createClient() as any;
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     let stats: DashboardStats | undefined;
@@ -23,17 +23,24 @@ export default async function DashboardPage() {
 
             // Get total customers
             const { count: customersCount } = await supabase
-                .from('customers' as any)
+                .from('customers')
                 .select('*', { count: 'exact', head: true })
                 .eq('tenant_id', tenantId);
 
             // Fetch all coupons for the tenant to calculate multiple aggregate stats
             const { data: allCoupons } = await supabase
-                .from('coupons' as any)
+                .from('coupons')
                 .select('id, type, status, redeemed_at')
                 .eq('tenant_id', tenantId);
 
             // Filter coupons for active stats
+            // DB enum uses 'bday', but UI displays 'birthday'
+            const typeMap: Record<string, 'welcome' | 'birthday' | 'winback'> = {
+                welcome: 'welcome',
+                bday: 'birthday',
+                winback: 'winback',
+            };
+
             const couponStats = {
                 welcome: { sent: 0, redeemed: 0 },
                 birthday: { sent: 0, redeemed: 0 },
@@ -43,9 +50,9 @@ export default async function DashboardPage() {
             let redeemedCount = 0;
 
             if (allCoupons) {
-                allCoupons.forEach((c: any) => {
-                    const type = c.type as 'welcome' | 'birthday' | 'winback';
-                    if (couponStats[type]) {
+                allCoupons.forEach((c) => {
+                    const type = typeMap[c.type];
+                    if (type && couponStats[type]) {
                         couponStats[type].sent += 1;
                         if (c.status === 'redeemed') {
                             couponStats[type].redeemed += 1;
@@ -69,7 +76,7 @@ export default async function DashboardPage() {
 
             // Recent Activity Feed
             const { data: recentSignups } = await supabase
-                .from('customers' as any)
+                .from('customers')
                 .select('id, name, created_at')
                 .eq('tenant_id', tenantId)
                 .order('created_at', { ascending: false })
@@ -78,7 +85,7 @@ export default async function DashboardPage() {
             const activityFeed: any[] = [];
 
             if (recentSignups) {
-                recentSignups.forEach((s: any) => {
+                recentSignups.forEach((s) => {
                     activityFeed.push({
                         id: `signup-${s.id}`,
                         name: s.name,

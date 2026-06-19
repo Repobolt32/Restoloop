@@ -1,7 +1,9 @@
 import { createServiceClient } from '~/lib/supabase/server';
 import { generateCouponCode, generateExpiryDate } from './coupons';
-import { Customer, Tenant } from './restoloop.types';
+import type { Customer, Tenant } from './restoloop.types';
 import { sendThirdPartyMessage } from './whatsapp';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '~/lib/database.types';
 
 export async function processCampaigns() {
     const supabase = await createServiceClient();
@@ -15,8 +17,8 @@ export async function processCampaigns() {
     try {
         // Fetch all tenants
         const { data: tenants, error: tenantsError } = await supabase
-            .from('tenants' as any)
-            .select('*') as any;
+            .from('tenants')
+            .select('*');
 
         if (tenantsError) throw tenantsError;
 
@@ -44,100 +46,145 @@ export async function processCampaigns() {
 
         const todayMonthDay = todayStr.substring(5); // "MM-DD"
 
-        for (const tenant of tenants as Tenant[]) {
+        // Track total sends across all tenants for single platform credit deduction (Bug 5)
+        let totalSent = 0;
+
+        for (const tenant of tenants) {
+            let availableCredits = tenant.credits_balance;
+
+            // ═══════════════════════════════════════════════════════
             // 1. Process Winbacks
+            // ═══════════════════════════════════════════════════════
             const { data: winbackCustomers, error: winbackErr } = await supabase
-                .from('customers' as any)
+                .from('customers')
                 .select('*')
                 .eq('tenant_id', tenant.id)
                 .gte('last_visit', winbackStart)
-                .lte('last_visit', winbackEnd) as any;
+                .lte('last_visit', winbackEnd);
 
-            if (!winbackErr && winbackCustomers) {
-                // Determine how many we can process based on available credits
-                let availableCredits = tenant.credits_balance;
-                for (const customer of (winbackCustomers as Customer[])) {
-                    // Check if a winback coupon was already sent recently (to avoid duplicates)
-                    const { data: existingCoupon } = await supabase
-                        .from('coupons' as any)
-                        .select('id')
-                        .eq('customer_id', customer.id)
-                        .eq('type', 'winback')
-                        .gte('created_at', winbackStart)
-                        .limit(1);
+            if (!winbackErr && winbackCustomers && winbackCustomers.length > 0) {
+                // Bug 4 fix: Batch duplicate-check (1 query instead of N)
+                const { data: existingWinbackCoupons } = await supabase
+                    .from('coupons')
+                    .select('customer_id')
+                    .eq('type', 'winback')
+                    .eq('tenant_id', tenant.id)
+                    .gte('created_at', winbackStart)
+                    .in('customer_id', winbackCustomers.map(c => c.id));
 
-                    if (existingCoupon && existingCoupon.length > 0) continue;
+                const existingWinbackIds = new Set(
+                    (existingWinbackCoupons || []).map((c: { customer_id: string }) => c.customer_id)
+                );
 
-                    if (availableCredits <= 0) {
-                        await supabase.from('message_log' as any).insert({
+                // Filter eligible customers (no duplicates)
+                const eligibleWinbacks = winbackCustomers
+                    .filter(c => !existingWinbackIds.has(c.id));
+
+                // Split: those we can send vs blocked by credit limit
+                const toSend = eligibleWinbacks.slice(0, availableCredits);
+                const blocked = eligibleWinbacks.slice(availableCredits);
+
+                // Log blocked messages (credits exhausted)
+                for (const customer of blocked) {
+                    await supabase.from('message_log').insert({
+                        tenant_id: tenant.id,
+                        customer_id: customer.id,
+                        status: 'blocked',
+                        sent_at: new Date().toISOString()
+                    });
+                }
+
+                // Bug 4 fix: Parallelize sendCampaign calls with Promise.allSettled
+                if (toSend.length > 0) {
+                    const settled = await Promise.allSettled(
+                        toSend.map(customer => sendCampaign(supabase, tenant, customer, 'winback'))
+                    );
+
+                    for (const result of settled) {
+                        if (result.status === 'fulfilled') {
+                            availableCredits--;
+                            results.winbackSent++;
+                            totalSent++;
+                        } else {
+                            console.error('Failed to send winback:', result.reason);
+                            results.errors++;
+                        }
+                    }
+                }
+
+                // Update tenant credits for next section
+                tenant.credits_balance = availableCredits;
+            }
+
+            // ═══════════════════════════════════════════════════════
+            // 2. Process Birthdays
+            // ═══════════════════════════════════════════════════════
+            const { data: allCustomers, error: bdayErr } = await supabase
+                .from('customers')
+                .select('*')
+                .eq('tenant_id', tenant.id)
+                .not('birthday', 'is', null);
+
+            if (!bdayErr && allCustomers) {
+                const birthdayCustomers = allCustomers
+                    .filter(c => c.birthday && c.birthday.includes(todayMonthDay));
+
+                if (birthdayCustomers.length > 0) {
+                    // Bug 4 fix: Batch duplicate-check (1 query instead of N)
+                    const { data: existingBdayCoupons } = await supabase
+                        .from('coupons')
+                        .select('customer_id')
+                        .eq('type', 'bday')
+                        .eq('tenant_id', tenant.id)
+                        .gte('created_at', `${todayStr.substring(0, 4)}-01-01T00:00:00.000Z`)
+                        .in('customer_id', birthdayCustomers.map(c => c.id));
+
+                const existingBdayIds = new Set(
+                    (existingBdayCoupons || []).map((c: { customer_id: string }) => c.customer_id)
+                );
+
+                    const eligibleBdays = birthdayCustomers
+                        .filter(c => !existingBdayIds.has(c.id));
+
+                    const toSend = eligibleBdays.slice(0, availableCredits);
+                    const blocked = eligibleBdays.slice(availableCredits);
+
+                    for (const customer of blocked) {
+                        await supabase.from('message_log').insert({
                             tenant_id: tenant.id,
                             customer_id: customer.id,
                             status: 'blocked',
                             sent_at: new Date().toISOString()
                         });
-                        continue;
                     }
 
-                    try {
-                        await sendCampaign(supabase, tenant, customer, 'winback');
-                        availableCredits--;
-                        results.winbackSent++;
-                    } catch (e) {
-                        console.error(`Failed to send winback to customer ${customer.id}`, e);
-                        results.errors++;
-                    }
-                }
-                // Update the tenant's remaining credits memory for the next loop
-                tenant.credits_balance = availableCredits;
-            }
+                    // Bug 4 fix: Parallelize sendCampaign calls with Promise.allSettled
+                    if (toSend.length > 0) {
+                        const settled = await Promise.allSettled(
+                            toSend.map(customer => sendCampaign(supabase, tenant, customer, 'bday'))
+                        );
 
-            // 2. Process Birthdays
-            const { data: allCustomers, error: bdayErr } = await supabase
-                .from('customers' as any)
-                .select('*')
-                .eq('tenant_id', tenant.id)
-                .not('birthday', 'is', null) as any;
-
-            if (!bdayErr && allCustomers) {
-                let availableCredits = tenant.credits_balance;
-                for (const customer of (allCustomers as Customer[])) {
-                    if (customer.birthday && customer.birthday.includes(todayMonthDay)) {
-                        // Check duplicate for this year
-                        const { data: existingCoupon } = await supabase
-                            .from('coupons' as any)
-                            .select('id')
-                            .eq('customer_id', customer.id)
-                            .eq('type', 'bday')
-                            .gte('created_at', `${todayStr.substring(0, 4)}-01-01T00:00:00.000Z`) // generated this year
-                            .limit(1);
-
-                        if (existingCoupon && existingCoupon.length > 0) continue;
-
-                        if (availableCredits <= 0) {
-                            await supabase.from('message_log' as any).insert({
-                                tenant_id: tenant.id,
-                                customer_id: customer.id,
-                                status: 'blocked',
-                                sent_at: new Date().toISOString()
-                            });
-                            continue;
-                        }
-
-                        try {
-                            await sendCampaign(supabase, tenant, customer, 'bday');
-                            availableCredits--;
-                            results.bdaySent++;
-                        } catch (e) {
-                            console.error(`Failed to send bday to customer ${customer.id}`, e);
-                            results.errors++;
+                        for (const result of settled) {
+                            if (result.status === 'fulfilled') {
+                                availableCredits--;
+                                results.bdaySent++;
+                                totalSent++;
+                            } else {
+                                console.error('Failed to send bday:', result.reason);
+                                results.errors++;
+                            }
                         }
                     }
+
+                    tenant.credits_balance = availableCredits;
                 }
             }
 
+            // ═══════════════════════════════════════════════════════
             // 3. Process 15-Day Welcome Reminders (v1 Outreach Campaign)
+            // ═══════════════════════════════════════════════════════
             const { data: welcomeCoupons, error: welcomeErr } = await supabase
-                .from('coupons' as any)
+                .from('coupons')
                 .select(`
                     id,
                     code,
@@ -150,84 +197,96 @@ export async function processCampaigns() {
                 .eq('type', 'welcome')
                 .eq('status', 'sent')
                 .gte('created_at', reminderStart)
-                .lte('created_at', reminderEnd) as any;
+                .lte('created_at', reminderEnd);
 
-            if (!welcomeErr && welcomeCoupons) {
-                let availableCredits = tenant.credits_balance;
-                for (const coupon of welcomeCoupons) {
+            if (!welcomeErr && welcomeCoupons && welcomeCoupons.length > 0) {
+                // Bug 4 fix: Batch duplicate-check (1 query instead of N)
+                const { data: existingLogs } = await supabase
+                    .from('message_log')
+                    .select('coupon_id')
+                    .in('coupon_id', welcomeCoupons.map((c: { id: string }) => c.id));
+
+                const existingLogCouponIds = new Set(
+                    (existingLogs || []).map((l: { coupon_id: string | null }) => l.coupon_id)
+                );
+
+                // Filter eligible coupons (no duplicates + has customer info)
+                const eligibleReminders = welcomeCoupons
+                    .filter((coupon) => {
+                        if (existingLogCouponIds.has(coupon.id)) return false;
+                        const customerInfo = Array.isArray(coupon.customers) ? coupon.customers[0] : coupon.customers;
+                        return customerInfo && customerInfo.phone;
+                    });
+
+                const toSend = eligibleReminders.slice(0, availableCredits);
+                const blocked = eligibleReminders.slice(availableCredits);
+
+                // Log blocked
+                for (const coupon of blocked) {
                     const customerInfo = Array.isArray(coupon.customers) ? coupon.customers[0] : coupon.customers;
-                    if (!customerInfo || !customerInfo.phone) continue;
+                    await supabase.from('message_log').insert({
+                        tenant_id: tenant.id,
+                        customer_id: customerInfo.id,
+                        coupon_id: coupon.id,
+                        status: 'blocked',
+                        sent_at: new Date().toISOString()
+                    });
+                }
 
-                    // Double-check duplicate reminder send
-                    const { data: existingLog } = await supabase
-                        .from('message_log' as any)
-                        .select('id')
-                        .eq('coupon_id', coupon.id)
-                        .limit(1);
+                // Bug 4 fix: Parallelize reminder sends with Promise.allSettled
+                if (toSend.length > 0) {
+                    const settled = await Promise.allSettled(
+                        toSend.map(async (coupon) => {
+                            const customerInfo = Array.isArray(coupon.customers) ? coupon.customers[0] : coupon.customers;
+                            const customerName = customerInfo.name || 'Friend';
+                            const reminderText = `*Hey ${customerName}!* 🍕\n\nYour welcome coupon code *${coupon.code}* for *${tenant.name}* is still active!\n\n🎫 *Code: ${coupon.code}*\n💰 *Discount: ₹${coupon.discount} OFF*\n\nDon't let it expire! Visit us soon to claim your discount. See you soon!`;
+                            
+                            const sendRes = await sendThirdPartyMessage(customerInfo.phone, reminderText);
+                            
+                            const messageStatus = sendRes.success ? 'sent' : 'failed';
+                            const nowTime = new Date().toISOString();
 
-                    if (existingLog && existingLog.length > 0) continue;
+                            // Log message send
+                            await supabase.from('message_log').insert({
+                                tenant_id: tenant.id,
+                                customer_id: customerInfo.id,
+                                coupon_id: coupon.id,
+                                status: messageStatus,
+                                sent_at: nowTime
+                            });
 
-                    if (availableCredits <= 0) {
-                        await supabase.from('message_log' as any).insert({
-                            tenant_id: tenant.id,
-                            customer_id: customerInfo.id,
-                            coupon_id: coupon.id,
-                            status: 'blocked',
-                            sent_at: new Date().toISOString()
-                        });
-                        continue;
-                    }
+                            if (!sendRes.success) {
+                                throw new Error(`Failed to send reminder to customer ${customerInfo.id}`);
+                            }
+                        })
+                    );
 
-                    try {
-                        const customerName = customerInfo.name || 'Friend';
-                        const reminderText = `*Hey ${customerName}!* 🍕\n\nYour welcome coupon code *${coupon.code}* for *${tenant.name}* is still active!\n\n🎫 *Code: ${coupon.code}*\n💰 *Discount: ₹${coupon.discount} OFF*\n\nDon't let it expire! Visit us soon to claim your discount. See you soon!`;
-                        
-                        const sendRes = await sendThirdPartyMessage(customerInfo.phone, reminderText);
-                        
-                        let messageStatus = sendRes.success ? 'sent' : 'failed';
-                        const nowTime = new Date().toISOString();
-
-                        // Log message send
-                        await supabase.from('message_log' as any).insert({
-                            tenant_id: tenant.id,
-                            customer_id: customerInfo.id,
-                            coupon_id: coupon.id,
-                            status: messageStatus,
-                            sent_at: nowTime
-                        });
-
-                        if (sendRes.success) {
+                    for (const result of settled) {
+                        if (result.status === 'fulfilled') {
                             availableCredits--;
                             results.reminderSent++;
-
-                            // Deduct from tenant credits balance in DB
-                            await supabase
-                                .from('tenants' as any)
-                                .update({ credits_balance: availableCredits })
-                                .eq('id', tenant.id);
-
-                            // Deduct from central platform wallet
-                            const { data: platformData } = await supabase
-                                .from('platform_credits' as any)
-                                .select('id, balance')
-                                .limit(1)
-                                .single() as any;
-                            if (platformData) {
-                                await supabase
-                                    .from('platform_credits' as any)
-                                    .update({ balance: platformData.balance - 1 })
-                                    .eq('id', platformData.id);
-                            }
+                            totalSent++;
                         } else {
+                            console.error('Failed to send reminder:', result.reason);
                             results.errors++;
                         }
-                    } catch (e) {
-                        console.error(`Failed to send 15-day reminder to customer ${customerInfo.id}`, e);
-                        results.errors++;
                     }
                 }
-                tenant.credits_balance = availableCredits;
             }
+
+            // Update tenant credits in DB once after all campaigns for this tenant
+            const creditsUsed = tenant.credits_balance - availableCredits;
+            if (creditsUsed > 0) {
+                await supabase
+                    .from('tenants')
+                    .update({ credits_balance: availableCredits })
+                    .eq('id', tenant.id);
+            }
+        }
+
+        // Bug 5 fix: Single atomic platform credit deduction via RPC (not N individual queries)
+        if (totalSent > 0) {
+            await supabase.rpc('decrement_platform_credits', { amount: totalSent });
         }
 
     } catch (e) {
@@ -238,7 +297,7 @@ export async function processCampaigns() {
     return results;
 }
 
-async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, type: 'winback' | 'bday') {
+async function sendCampaign(supabase: SupabaseClient<Database>, tenant: Tenant, customer: Customer, type: 'winback' | 'bday') {
     const code = generateCouponCode();
     // Use 7 days expiry for campaigns
     const expiresAt = generateExpiryDate(7);
@@ -247,7 +306,7 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
 
     // 1. Create Coupon
     const { data: coupon, error: couponErr } = await supabase
-        .from('coupons' as any)
+        .from('coupons')
         .insert({
             tenant_id: tenant.id,
             customer_id: customer.id,
@@ -310,7 +369,7 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
 
     // 3. Insert Message Log
     const { error: msgErr } = await supabase
-        .from('message_log' as any)
+        .from('message_log')
         .insert({
             tenant_id: tenant.id,
             customer_id: customer.id,
@@ -323,21 +382,7 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
         console.error('Failed to write message log', msgErr);
     }
 
-    if (messageStatus === 'sent') {
-        // 4. Deduct Credit Database
-        const { error: creditErr } = await supabase
-            .from('tenants' as any)
-            .update({ credits_balance: tenant.credits_balance - 1 })
-            .eq('id', tenant.id);
-
-        if (creditErr) {
-            console.error('Failed to deduct tenant credit during campaign', creditErr);
-            throw creditErr;
-        }
-
-        const { data: platformData } = await supabase.from('platform_credits' as any).select('id, balance').limit(1).single() as any;
-        if (platformData) {
-            await supabase.from('platform_credits' as any).update({ balance: platformData.balance - 1 }).eq('id', platformData.id);
-        }
-    }
+    // Bug 5 fix: Tenant and platform credit deduction removed from here.
+    // Tenant credits are updated once per tenant in processCampaigns().
+    // Platform credits are deducted once via decrement_platform_credits RPC at the end.
 }

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '~/lib/database.types';
 import type { Tenant } from './restoloop.types';
 
 /**
@@ -6,12 +7,12 @@ import type { Tenant } from './restoloop.types';
  * Resilient against PGRST116 errors when a developer account owns multiple tenants.
  * Selects the oldest tenant by created_at ascending.
  */
-export async function getTenantForUser(supabase: SupabaseClient, userId: string): Promise<Tenant | null> {
+export async function getTenantForUser(supabase: SupabaseClient<Database>, userId: string): Promise<Tenant | null> {
     const { data, error } = await supabase
-        .from('tenants' as any)
+        .from('tenants')
         .select('*')
         .eq('owner_id', userId)
-        .order('created_at', { ascending: true }) as any;
+        .order('created_at', { ascending: true });
 
     if (error || !data || data.length === 0) {
         return null;
@@ -21,5 +22,5 @@ export async function getTenantForUser(supabase: SupabaseClient, userId: string)
         console.warn(`[Tenant] User ${userId} owns multiple tenants (${data.length}). Using oldest instance by created_at: ${data[0].id}`);
     }
 
-    return data[0] as Tenant;
+    return data[0];
 }

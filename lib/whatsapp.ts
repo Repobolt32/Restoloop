@@ -78,8 +78,17 @@ async function sendMetaMessage(phone: string, templateName: string, discount: st
                 to: phone.replace('+', ''),
                 type: "template",
                 template: {
-                    name: "hello_world",
-                    language: { code: "en_US" }
+                    name: templateName,
+                    language: { code: "en_US" },
+                    components: [
+                        {
+                            type: "body",
+                            parameters: [
+                                { type: "text", text: discount },
+                                { type: "text", text: couponCode }
+                            ]
+                        }
+                    ]
                 }
             })
         });
@@ -92,9 +101,10 @@ async function sendMetaMessage(phone: string, templateName: string, discount: st
 
         const data = await response.json();
         return { success: true, messageId: data.messages?.[0]?.id || `wa_${Date.now()}` };
-    } catch (apiErr: any) {
+    } catch (apiErr: unknown) {
+        const message = apiErr instanceof Error ? apiErr.message : 'Network error';
         console.error('Failed to reach WhatsApp API:', apiErr);
-        return { success: false, error: apiErr.message || 'Network error' };
+        return { success: false, error: message };
     }
 }
 
@@ -176,9 +186,10 @@ export async function sendThirdPartyMessage(phone: string, text: string): Promis
         const data = await response.json();
         return { success: true, messageId: data.id || data.messageId || `3rd_${Date.now()}` };
 
-    } catch (e: any) {
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : 'Network error';
         console.error(`3rd-party WhatsApp send network failure:`, e);
-        return { success: false, error: e.message || 'Network error' };
+        return { success: false, error: message };
     }
 }
 

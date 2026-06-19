@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
         // 3. Look up the coupon linked to this tenant
         const { data: coupon, error: couponError } = await supabase
-            .from('coupons' as any)
+            .from('coupons')
             .select(`
                 id,
                 code,
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
             `)
             .eq('code', code)
             .eq('tenant_id', tenant.id)
-            .single() as any;
+            .single();
 
         if (couponError || !coupon) {
             return NextResponse.json({
@@ -95,11 +95,11 @@ export async function POST(request: Request) {
             customerPhone: customerInfo?.phone || 'Unknown',
         }, { status: 200 });
 
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error('Coupon validation error:', e);
         return NextResponse.json({
             error: 'INTERNAL_ERROR',
-            message: 'An unexpected error occurred during validation.'
+            message: e instanceof Error ? e.message : 'An unexpected error occurred during validation.'
         }, { status: 500 });
     }
 }

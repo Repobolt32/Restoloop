@@ -32,9 +32,9 @@ interface ProfileFormProps {
         couponBday?: number;
         couponWinback?: number;
         slug?: string;
-        address?: string;
-        email?: string;
-        phone?: string;
+        address?: string | null;
+        email?: string | null;
+        phone?: string | null;
     };
 }
 

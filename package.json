@@ -48,6 +48,7 @@
     "zod": "^3.25.32"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
     "@next/bundle-analyzer": "15.5.7",
     "@tailwindcss/postcss": "^4.1.14",
     "@testing-library/jest-dom": "^6.6.3",

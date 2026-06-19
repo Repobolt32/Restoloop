@@ -11,12 +11,11 @@ interface FormPageProps {
 export async function generateMetadata(props: FormPageProps) {
     const { slug } = await props.params;
     const supabase = await createServiceClient();
-    const { data } = await supabase
-        .from('tenants' as any)
+    const { data: tenant } = await supabase
+        .from('tenants')
         .select('name')
         .eq('slug', slug)
         .single();
-    const tenant = data as { name: string } | null;
 
     if (!tenant) {
         return { title: 'Not Found' };
@@ -34,12 +33,11 @@ export default async function CustomerFormPage(props: FormPageProps) {
     // Using the admin/service role client to bypass RLS since unauthenticated
     // public intake lookups are blocked by default tenant policies.
     const supabase = await createServiceClient();
-    const { data, error } = await supabase
-        .from('tenants' as any)
+    const { data: tenant, error } = await supabase
+        .from('tenants')
         .select('id, name')
         .eq('slug', slug)
         .single();
-    const tenant = data as { id: string; name: string } | null;
 
     if (error || !tenant) {
         console.error('Tenant lookup failed:', error);

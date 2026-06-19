@@ -1,6 +1,7 @@
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 import { createClient } from '~/lib/supabase/server';
 import { getTenantForUser } from '~/lib/tenant';
+import type { CouponType } from '~/lib/restoloop.types';
 import CouponsContent from './coupons-content';
 
 export default async function CouponsPage() {
@@ -17,7 +18,6 @@ export default async function CouponsPage() {
   }
 
   try {
-    console.log('Fetching coupons for tenant:', tenant.id);
     const { data, error } = await supabase
       .from('coupons')
       .select(`
@@ -39,17 +39,18 @@ export default async function CouponsPage() {
       throw error;
     }
 
-    console.log('Fetched coupons data:', data?.length);
-
-    const couponRows = data.map(coupon => ({
-      id: coupon.id,
-      code: coupon.code,
-      type: coupon.type,
-      discount: coupon.discount,
-      status: coupon.status,
-      sentDate: new Date(coupon.created_at).toISOString().split('T')[0],
-      customerName: (coupon.customers as any)?.name || 'Unknown',
-    }));
+    const couponRows = (data || []).map(coupon => {
+      const customer = Array.isArray(coupon.customers) ? coupon.customers[0] : coupon.customers;
+      return {
+        id: coupon.id,
+        code: coupon.code,
+        type: coupon.type as CouponType,
+        discount: coupon.discount,
+        status: coupon.status as 'pending' | 'sent' | 'redeemed' | 'expired',
+        sentDate: new Date(coupon.created_at).toISOString().split('T')[0],
+        customerName: customer?.name || 'Unknown',
+      };
+    });
 
     return (
       <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto w-full">

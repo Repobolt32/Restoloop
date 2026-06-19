@@ -28,21 +28,19 @@ export async function POST(req: Request) {
 
         // 1. Insert lead into `customers` table
         const { data: customerData, error: insertError } = await supabase
-            .from('customers' as any)
+            .from('customers')
             .insert({
                 tenant_id: data.tenantId,
                 name: data.name,
                 phone: data.phone,
                 birthday: data.birthday ? data.birthday : null,
                 food_pref: data.favouriteDish ? data.favouriteDish : null,
-                visit_count: 1,
                 last_visit: new Date().toISOString(),
             })
             .select()
             .single();
-        const customer = customerData as { id: string } | null;
 
-        if (insertError || !customer) {
+        if (insertError || !customerData) {
             console.error('Supabase customer insert error:', insertError);
             // Handle unique constraint violations (e.g., phone number already exists for this tenant)
             if (insertError && insertError.code === '23505') {
@@ -52,12 +50,11 @@ export async function POST(req: Request) {
         }
 
         // 2. Fetch tenant coupon configuration to know WELCOME50 amount
-        const { data: tenantData } = await supabase
-            .from('tenants' as any)
+        const { data: tenant } = await supabase
+            .from('tenants')
             .select('coupon_welcome, name')
             .eq('id', data.tenantId)
             .single();
-        const tenant = tenantData as { coupon_welcome: number; name: string } | null;
 
         const discountAmount = tenant?.coupon_welcome || 50;
 
@@ -69,10 +66,10 @@ export async function POST(req: Request) {
         const generatedCouponCode = `W50-${randomSuffix}`;
 
         const { error: couponError } = await supabase
-            .from('coupons' as any)
+            .from('coupons')
             .insert({
                 tenant_id: data.tenantId,
-                customer_id: customer.id,
+                customer_id: customerData.id,
                 code: generatedCouponCode,
                 type: 'welcome',
                 discount: discountAmount,
