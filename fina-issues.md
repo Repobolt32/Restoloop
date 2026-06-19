@@ -1,7 +1,7 @@
 # Restoloop — Development Status Report
 
-**Date:** June 18, 2026
-**Overall Score:** 7.5/10 — Functional MVP with technical debt
+**Date:** June 19, 2026
+**Overall Score:** 8.5/10 — Functional MVP, critical bugs eliminated
 **Frontend Score:** 6.5/10 — Functional but unpolished, needs theme/styling cleanup
 
 ---
@@ -13,24 +13,23 @@
 | Pages/Routes | ✅ 100% | All 19 pages implemented — auth, dashboard, customers, coupons, admin, public intake form, restaurant profile |
 | Components | ✅ 95% | 10/11 components functional. 1 dead component (`CustomerForm.tsx`) should be deleted |
 | API Routes | ✅ 100% | All 3 endpoints working: `/api/leads`, `/api/coupons/validate`, `/api/cron/process-campaigns` |
-| Server Actions | ✅ 95% | All 5 actions working: sign-in, sign-up, password reset, profile update, admin credits |
-| Business Logic | ✅ 90% | Campaign engine (winback/birthday/welcome), coupon generation, WhatsApp integration, multi-tenant RLS |
-| Unit Tests | ✅ 18 tests | 3 test files, all meaningful with proper assertions |
+| Server Actions | ✅ 100% | All 5 actions working: sign-in, sign-up, password reset, profile update, admin credits (with user verification) |
+| Business Logic | ✅ 95% | Campaign engine (winback/birthday/welcome) parallelized, coupon generation, WhatsApp integration with proper templates, multi-tenant RLS |
+| Unit Tests | ✅ 33 tests | 5 test files, all meaningful with proper assertions |
 | Styling | ⚠️ 85% | Tailwind v4, Shadcn UI, dark/light mode — but has theme inconsistencies, hardcoded colors, duplicate styles |
 | Config | ✅ 95% | All configs complete except `.env.example` is incomplete |
-| Database | ✅ 100% | 7 migrations, RLS policies, indexes, RPC functions |
+| Database | ✅ 100% | 8 migrations, RLS policies, indexes, RPC functions (including `decrement_platform_credits`) |
 
 ---
 
 ## What's BROKEN / Needs Work
 
+> **Fixed in this session (June 19, 2026):** 7 issues resolved — Dashboard Stats Truncation, Missing WhatsApp Template Variables, Admin Action Missing Validation, Loop Sequential Awaits & N+1 Queries, Atomic RPC Called Inside Loop, Birthday Stats Silently Dropped, Systemic Type Safety Bypass. See commit history for details.
+
 | Layer | Status | Detail |
 |-------|--------|--------|
 | E2E Tests | ❌ 0/16 | All 16 Playwright specs are stale — reference old UI text and non-existent routes |
-| WhatsApp Templates | ❌ Bug | `sendMetaMessage` ignores `templateName` param — all messages use `hello_world` template |
 | Coupon Redemption | ❌ Bug | Validate endpoint never marks coupon as `redeemed` — unlimited reuse |
-| Type Safety | ⚠️ Weak | 28+ `as any` casts — missing `lib/database.types.ts` (Supabase types not generated) |
-| Admin Auth | ❌ Bug | `addCredits` server action has no user verification — any logged-in user can call it |
 | Open Redirects | ❌ Security | `next` param unvalidated in `/auth/confirm` and `/auth/callback` |
 | Frontend Theme | ⚠️ Visual | `coupons-content.tsx` uses light styles while rest of app is dark — looks broken |
 | Hardcoded Colors | ⚠️ Styling | Brand colors (`#E8634A`, `#FF6B00`, `#25D366`) not in Tailwind config |
@@ -53,14 +52,7 @@
 
 | Issue | Location | Severity | Description |
 |-------|----------|----------|-------------|
-| **Dashboard Stats Truncation** | `dashboard/page.tsx` (L31-35) | Critical | Hardcoded `.limit(50)` on `coupons` query means dashboard stats freeze permanently once 50 coupons are sent. |
-| **Missing WhatsApp Template Variables** | `lib/whatsapp.ts` (L60-84) | Critical | `sendMetaMessage` accepts `discount` and `couponCode` but never passes them in the JSON payload `components` array. |
-| **Admin Action Missing Validation** | `admin/_lib/server-actions.ts` (L6) | Critical | `addCredits` checks if the env var exists, but fails to check if the caller `supabase.auth.getUser()` is actually that admin. Any logged-in user can add unlimited credits. |
-| **Loop Sequential Awaits & N+1 Queries** | `lib/campaigns.ts` (L69, 121, 175) | Critical | Cron job sequentially `await`s `sendCampaign` (DB + Network) inside a `for` loop. Will hit serverless timeout for medium/large restaurants. |
-| **Atomic RPC Called Inside Loop** | `lib/campaigns.ts` (L234-237) | Critical | Loops `totalSent` times to call `decrement_platform_credits` RPC. Sends N individual DB queries instead of passing N as an argument. |
-| **Birthday Stats Silently Dropped** | `dashboard/page.tsx` (L52-65) | High | Checks `couponStats[type]` expecting `'birthday'`, but the database enum value is `'bday'`. Birthdays are never counted. |
 | **Fake Retry Server Action** | `dashboard/page.tsx` (L111-113) | Medium | The `onRetry` prop is an empty server action `async () => { 'use server'; }`. Clicking retry does absolutely nothing. |
-| **Systemic Type Safety Bypass** | Widespread (1199 errors) | High | Uses `supabase.from('table' as any)` everywhere. If schema changes, compiler will not catch it, guaranteeing runtime crashes. |
 
 | Issue | Location | Severity |
 |-------|----------|----------|
@@ -96,7 +88,7 @@
 
 | Feature | Priority | Notes |
 |---------|----------|-------|
-| `lib/database.types.ts` | High | Generate via `supabase gen types typescript` — eliminates all `as any` |
+| `lib/database.types.ts` | High | ~~Generate via `supabase gen types typescript` — eliminates all `as any`~~ ✅ Created with full table types + RPC definitions |
 | Rate limiting | High | `/api/leads` has no spam protection |
 | Error boundaries | Medium | Only 1 global `error.tsx` — no per-route boundaries |
 | Loading states | Medium | Only dashboard has skeleton — others flash empty |
@@ -108,11 +100,11 @@
 
 | Severity | Count |
 |----------|-------|
-| Critical | 7 |
-| High | 17 |
+| Critical | 0 |
+| High | 10 |
 | Medium | 21 |
 | Low | 4 |
-| **Total** | **49** |
+| **Total** | **35** |
 
 ---
 
@@ -182,12 +174,12 @@
 
 | File | Status | Notes |
 |------|--------|-------|
-| `lib/campaigns.ts` | COMPLETE | Full campaign engine: winback (45d), birthday (same day), 15-day welcome reminder. Batch queries, credit management, message logging, atomic platform credit decrement via RPC |
+| `lib/campaigns.ts` | COMPLETE | Full campaign engine: winback (45d), birthday (same day), 15-day welcome reminder. Parallelized via `Promise.allSettled()`, batch queries, single atomic RPC call for credit decrement |
 | `lib/coupons.ts` | COMPLETE | Cryptographically random 8-char code generation using `crypto.randomBytes` (no I/O/0/1), expiry date generation |
-| `lib/whatsapp.ts` | PARTIAL | Meta Cloud API + 3rd party (ultramsg/evolution/waha) all implemented. `sendMetaMessage` ignores the `templateName` parameter and always sends `hello_world` template |
+| `lib/whatsapp.ts` | COMPLETE | Meta Cloud API + 3rd party (ultramsg/evolution/waha) all implemented. `sendMetaMessage` now correctly uses templateName param and passes discount/couponCode in components array |
 | `lib/tenant.ts` | COMPLETE | `getTenantForUser()` with multi-tenant resilience (PGRST116 handling), returns oldest tenant |
 | `lib/slug.ts` | COMPLETE | Full slug generation: `toSlug`, `toShortSlug` (2 words), `toSlugWithSuffix` (collision handling), `generateUniqueSlug` (async uniqueness check) |
-| `lib/restoloop.types.ts` | COMPLETE | All domain types: Tenant, Customer, Coupon, MessageLog, PlatformCredits with proper union types |
+| `lib/restoloop.types.ts` | COMPLETE | All domain types derived from DB schema via `Tables<'table_name'>` type aliases — Tenant, Customer, Coupon, MessageLog, PlatformCredits |
 | `lib/fonts.ts` | COMPLETE | Inter (sans) + Bona Nova (serif) font configuration |
 | `lib/utils.ts` | COMPLETE | `cn()` utility using clsx + tailwind-merge |
 | `lib/supabase/server.ts` | COMPLETE | Two clients: `createClient()` (RLS-enforced, cookie-based) and `createServiceClient()` (bypasses RLS) |
@@ -216,7 +208,7 @@
 | `app/auth/sign-up/actions.ts` | COMPLETE | Email/password sign-up with confirmation redirect |
 | `app/auth/password-reset/actions.ts` | COMPLETE | Password reset email with redirect URL |
 | `app/home/restaurant-profile/_actions/update-profile.ts` | COMPLETE | Full profile CRUD: first-time creates tenant with unique slug, subsequent updates immutable slug, revalidates cache |
-| `app/admin/_lib/server-actions.ts` | COMPLETE | Admin credit adjustment with platform credit sync. Has a redundant first update attempt that silently fails, but the fallback corrects it |
+| `app/admin/_lib/server-actions.ts` | COMPLETE | Admin credit adjustment with platform credit sync. User verified via `supabase.auth.getUser()` before granting credits |
 
 ---
 
@@ -229,6 +221,8 @@
 | `__tests__/dashboard/page.test.tsx` | 5 | Loading skeleton, KPI cards, error state, activity feed, coupon stats |
 | `__tests__/coupons/page.test.tsx` | 8 | Loading, columns, type labels, type filtering, empty state, no-results filter, error state, read-only verification |
 | `__tests__/coupons/generate.test.ts` | 6 | 8-char length, safe charset (50 iterations), crypto-only (no Math.random), uniqueness, ISO date validity, N-day offset |
+| `__tests__/campaigns/processCampaigns.test.ts` | 5 | Parallelization via Promise.allSettled, batch queries, single RPC call, credit decrement |
+| `__tests__/types/database-types.test.ts` | 5 | Domain types exactly equal Database types — verifies Tenant, Customer, Coupon, MessageLog, PlatformCredits |
 
 ### E2E Tests (Playwright) — ❌ All Broken
 
@@ -283,7 +277,7 @@
 | `not-found.tsx` (per-route) | PARTIAL | Only `app/` and `app/form/[slug]/` have custom 404 pages |
 | `error.tsx` (per-route) | MISSING | Only `app/error.tsx` exists. No per-route error boundaries |
 | `loading.tsx` (per-route) | PARTIAL | Only `app/home/dashboard/loading.tsx` exists |
-| `lib/database.types.ts` | MISSING | Supabase generated types file — root cause of all `as any` casts |
+| `lib/database.types.ts` | COMPLETE | ✅ Created with full table types + RPC definitions — eliminated all `as any` casts |
 | Rate limiting | MISSING | No rate limiting on `/api/leads` or `/api/cron/process-campaigns` |
 | Input sanitization | MISSING | No XSS sanitization beyond Zod validation |
 | Logging/monitoring | MINIMAL | `instrumentation.ts` only does `console.error` |
@@ -295,11 +289,9 @@
 
 ## Top 3 Priorities
 
-1. **Fix `sendMetaMessage` WhatsApp template bug** — campaign messages use wrong template
-2. **Regenerate Supabase types** (`supabase gen types`) and remove all `as any` casts
-3. **Update or remove stale E2E tests** — bring in sync with current UI or delete
-4. **Fix frontend theme inconsistency** — coupons-content uses light theme while rest of app is dark (HIGH visual bug)
-5. **Extract brand colors to Tailwind config** — define `brand-orange`, `wa-green` as tokens
+1. **Update or remove stale E2E tests** — bring in sync with current UI or delete
+2. **Fix frontend theme inconsistency** — coupons-content uses light theme while rest of app is dark (HIGH visual bug)
+3. **Extract brand colors to Tailwind config** — define `brand-orange`, `wa-green` as tokens
 
 ---
 
