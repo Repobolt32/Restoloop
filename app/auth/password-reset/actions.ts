@@ -13,7 +13,8 @@ export async function resetPassword(formData: FormData) {
   });
 
   if (error) {
-    redirect('/auth/password-reset?error=' + encodeURIComponent(error.message));
+    console.error('Password reset error:', error);
+    redirect('/auth/password-reset?error=' + encodeURIComponent('Password reset failed. Please try again.'));
   }
 
   redirect('/auth/sign-in?message=' + encodeURIComponent('Check your email for the password reset link.'));

@@ -12,7 +12,8 @@ export async function signUp(formData: FormData) {
   const { error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
-    redirect('/auth/sign-up?error=' + encodeURIComponent(error.message));
+    console.error('Sign-up error:', error);
+    redirect('/auth/sign-up?error=' + encodeURIComponent('Registration failed. Please try again.'));
   }
 
   redirect('/auth/sign-in?message=' + encodeURIComponent('Check your email to confirm your account.'));

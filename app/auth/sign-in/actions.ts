@@ -12,7 +12,8 @@ export async function signIn(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    redirect('/auth/sign-in?error=' + encodeURIComponent(error.message));
+    console.error('Sign-in error:', error);
+    redirect('/auth/sign-in?error=' + encodeURIComponent('Authentication failed. Please check your credentials.'));
   }
 
   redirect('/home');
