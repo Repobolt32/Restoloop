@@ -6,6 +6,16 @@ const mockUpdate = vi.fn();
 const mockEq = vi.fn();
 const mockSingle = vi.fn();
 
+// Default platform_credits mock (returns no row by default)
+const mockPlatformSelect = vi.fn().mockReturnValue({
+    limit: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: null, error: null }),
+    }),
+});
+const mockPlatformUpdate = vi.fn().mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: null }),
+});
+
 vi.mock('~/lib/supabase/server', () => ({
     createServiceClient: vi.fn(() => ({
         from: vi.fn((table: string) => {
@@ -21,14 +31,10 @@ vi.mock('~/lib/supabase/server', () => ({
                     }),
                 };
             }
-            // platform_credits should NOT be touched
+            // platform_credits
             return {
-                select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockReturnValue({
-                        single: vi.fn().mockResolvedValue({ data: null, error: null }),
-                    }),
-                }),
-                update: vi.fn(),
+                select: mockPlatformSelect,
+                update: mockPlatformUpdate,
             };
         }),
     })),
@@ -66,24 +72,57 @@ describe('addCredits', () => {
         expect(mockUpdate).toHaveBeenCalledWith({ credits_balance: 80 });
     });
 
-    it('does NOT update platform_credits table', async () => {
+    it('decrements platform_credits.balance by the added amount', async () => {
         process.env.SUPER_ADMIN_USER_ID = 'admin-1';
         mockSingle.mockResolvedValue({
             data: { credits_balance: 50 },
             error: null,
         });
 
-        const platformUpdate = vi.fn();
-        // Override the mock to track platform_credits.update
-        const originalFrom = vi.mocked(
-            (await import('~/lib/supabase/server')).createServiceClient
-        );
+        // Track platform_credits updates separately
+        const platformEq = vi.fn().mockResolvedValue({ error: null });
+        const platformUpdate = vi.fn().mockReturnValue({
+            eq: platformEq,
+        });
+        const platformSingle = vi.fn().mockResolvedValue({
+            data: { id: 'pc-1', balance: 500 },
+            error: null,
+        });
+        const platformSelect = vi.fn().mockReturnValue({
+            limit: vi.fn().mockReturnValue({
+                single: platformSingle,
+            }),
+        });
+
+        // Override the mock so platform_credits calls are tracked
+        const { createServiceClient } = await import('~/lib/supabase/server');
+        vi.mocked(createServiceClient).mockResolvedValue({
+            from: vi.fn((table: string) => {
+                if (table === 'tenants') {
+                    return {
+                        select: mockSelect.mockReturnValue({
+                            eq: vi.fn().mockReturnValue({ single: mockSingle }),
+                        }),
+                        update: mockUpdate.mockReturnValue({
+                            eq: vi.fn().mockResolvedValue({ error: null }),
+                        }),
+                    };
+                }
+                // platform_credits
+                return {
+                    select: platformSelect,
+                    update: platformUpdate,
+                };
+            }),
+        } as any);
 
         await addCredits('tenant-1', 30);
 
-        // The platform_credits update should NOT have been called
-        // We verify this by checking mockUpdate was called exactly once (for tenants only)
-        expect(mockUpdate).toHaveBeenCalledTimes(1);
+        // platform_credits.update should be called exactly once with the correct delta
+        expect(platformUpdate).toHaveBeenCalledTimes(1);
+        expect(platformUpdate).toHaveBeenCalledWith({ balance: 470 });
+        // Should update by the platform row's ID
+        expect(platformEq).toHaveBeenCalledWith('id', 'pc-1');
     });
 
     it('handles negative amounts (credit removal)', async () => {
