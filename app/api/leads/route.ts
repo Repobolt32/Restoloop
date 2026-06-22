@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         expiresAt.setDate(expiresAt.getDate() + 30); // 30 days expiry
 
         const randomSuffix = generateCouponCode();
-        const generatedCouponCode = `W50-${randomSuffix}`;
+        const generatedCouponCode = `W${discountAmount}-${randomSuffix}`;
 
         const { error: couponError } = await supabase
             .from('coupons' as any)

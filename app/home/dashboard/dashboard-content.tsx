@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useActionState, useState } from 'react';
 
 export interface DashboardStats {
     revenue: number;
@@ -18,12 +18,19 @@ export interface DashboardStats {
     tenantSlug: string;
 }
 
+export interface RetryResult {
+    success: boolean;
+    data?: DashboardStats;
+    error?: string;
+}
+
 interface DashboardContentProps {
     data: DashboardStats | undefined;
     isLoading: boolean;
     isError: boolean;
     error: Error | null;
-    onRetry: () => void;
+    onRetry: (newData?: DashboardStats) => void;
+    retryAction?: (prevState: RetryResult | null, formData: FormData) => Promise<RetryResult>;
 }
 
 export default function DashboardContent({
@@ -32,7 +39,29 @@ export default function DashboardContent({
     isError,
     error,
     onRetry,
+    retryAction,
 }: DashboardContentProps) {
+    const [currentData, setCurrentData] = useState<DashboardStats | undefined>(data);
+    const [currentError, setCurrentError] = useState<{ isError: boolean; error: Error | null }>({
+        isError,
+        error,
+    });
+
+    const [_retryState, retryFormAction, retryPending] = useActionState<RetryResult | null, FormData>(
+        retryAction
+            ? async (prevState: RetryResult | null, formData: FormData) => {
+                const result = await retryAction(prevState, formData);
+                if (result.success && result.data) {
+                    setCurrentData(result.data);
+                    setCurrentError({ isError: false, error: null });
+                    onRetry(result.data);
+                }
+                return result;
+            }
+            : async (prevState: RetryResult | null) => prevState,
+        null
+    );
+
     return (
         <>
             {isLoading && (
@@ -52,34 +81,37 @@ export default function DashboardContent({
                 </div>
             )}
 
-            {isError && (
+            {currentError.isError && (
                 <div className="bg-neutral-900/40 border border-white/5 rounded-xl p-6 mb-12">
                     <p className="text-red-400 mb-4">
-                        Error: {error?.message || 'Failed to load dashboard data'}
+                        Error: {currentError.error?.message || 'Failed to load dashboard data'}
                     </p>
-                    <button
-                        onClick={onRetry}
-                        className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors"
-                    >
-                        Retry
-                    </button>
+                    <form action={retryFormAction}>
+                        <button
+                            type="submit"
+                            disabled={retryPending}
+                            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                            {retryPending ? 'Retrying...' : 'Retry'}
+                        </button>
+                    </form>
                 </div>
             )}
 
-            {data && (
+            {currentData && (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                         <div className="bg-neutral-900/40 border border-white/5 rounded-xl p-6">
                             <h3 className="text-sm font-medium text-neutral-500 mb-2">Total Customers</h3>
-                            <div className="text-3xl font-bold text-white">{data.customers}</div>
+                            <div className="text-3xl font-bold text-white">{currentData.customers}</div>
                         </div>
                         <div className="bg-neutral-900/40 border border-white/5 rounded-xl p-6">
                             <h3 className="text-sm font-medium text-neutral-500 mb-2">Coupons Sent</h3>
-                            <div className="text-3xl font-bold text-white">{data.couponsSent}</div>
+                            <div className="text-3xl font-bold text-white">{currentData.couponsSent}</div>
                         </div>
                         <div className="bg-neutral-900/40 border border-white/5 rounded-xl p-6">
                             <h3 className="text-sm font-medium text-neutral-500 mb-2">Credits Remaining</h3>
-                            <div className="text-3xl font-bold text-white">{data.credits_balance}</div>
+                            <div className="text-3xl font-bold text-white">{currentData.credits_balance}</div>
                         </div>
                     </div>
 
@@ -92,10 +124,10 @@ export default function DashboardContent({
                                     <p className="text-sm font-medium text-neutral-500 capitalize mb-1">{type}</p>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-neutral-400">
-                                            Sent: <span className="text-white font-medium">{data.couponStats[type].sent}</span>
+                                            Sent: <span className="text-white font-medium">{currentData.couponStats[type].sent}</span>
                                         </span>
                                         <span className="text-neutral-400">
-                                            Redeemed: <span className="text-white font-medium">{data.couponStats[type].redeemed}</span>
+                                            Redeemed: <span className="text-white font-medium">{currentData.couponStats[type].redeemed}</span>
                                         </span>
                                     </div>
                                 </div>
@@ -106,11 +138,11 @@ export default function DashboardContent({
                     {/* Recent Activity Feed */}
                     <div className="bg-neutral-900/40 border border-white/5 rounded-xl p-6">
                         <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
-                        {data.recentActivity.length === 0 ? (
+                        {currentData.recentActivity.length === 0 ? (
                             <p className="text-neutral-500">No recent activity</p>
                         ) : (
                             <div className="space-y-3">
-                                {data.recentActivity.map((activity) => (
+                                {currentData.recentActivity.map((activity) => (
                                     <div
                                         key={activity.id}
                                         className="flex items-center justify-between py-2 border-b border-white/5 last:border-b-0"

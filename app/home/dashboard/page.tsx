@@ -2,6 +2,7 @@ import React from 'react';
 import { createClient } from '~/lib/supabase/server';
 import { getTenantForUser } from '~/lib/tenant';
 import DashboardContent, { DashboardStats } from './dashboard-content';
+import { retryFetchDashboardStats } from './actions';
 
 export default async function DashboardPage() {
     const supabase = await createClient() as any;
@@ -151,6 +152,7 @@ export default async function DashboardPage() {
                 onRetry={async () => {
                     'use server';
                 }}
+                retryAction={retryFetchDashboardStats}
             />
         </div>
     );

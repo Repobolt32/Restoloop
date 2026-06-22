@@ -36,4 +36,37 @@ describe('isSafeRedirect', () => {
     it('rejects paths without leading slash', () => {
         expect(isSafeRedirect('home/dashboard')).toBe(false);
     });
+
+    it('rejects URL-encoded protocol-relative URLs', () => {
+        expect(isSafeRedirect('%2F%2Fevil.com')).toBe(false);
+    });
+
+    it('rejects double-encoded protocol-relative URLs', () => {
+        expect(isSafeRedirect('%252F%252Fevil.com')).toBe(false);
+    });
+
+    it('rejects backslash paths', () => {
+        expect(isSafeRedirect('\\evil.com')).toBe(false);
+    });
+
+    it('rejects tab characters in path', () => {
+        expect(isSafeRedirect('/path\tevil.com')).toBe(false);
+    });
+
+    it('rejects newline characters in path', () => {
+        expect(isSafeRedirect('/path\nevil.com')).toBe(false);
+    });
+
+    it('allows nested relative paths', () => {
+        expect(isSafeRedirect('/home/dashboard')).toBe(true);
+        expect(isSafeRedirect('/home/restaurant-profile')).toBe(true);
+    });
+
+    it('allows paths with query parameters', () => {
+        expect(isSafeRedirect('/home?tab=dashboard')).toBe(true);
+    });
+
+    it('allows paths with hash fragments', () => {
+        expect(isSafeRedirect('/home#section')).toBe(true);
+    });
 });

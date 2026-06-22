@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { createClient } from '~/lib/supabase/server';
+import { INITIAL_TENANT_CREDITS } from '~/lib/constants';
 import { generateUniqueSlug } from '~/lib/slug';
 import { getTenantForUser } from '~/lib/tenant';
 
@@ -86,7 +87,7 @@ export async function updateRestaurantProfile(
                 address,
                 email,
                 phone,
-                credits_balance: 0, // Default to 0 to require manual activation
+                credits_balance: INITIAL_TENANT_CREDITS,
             });
 
         if (tenantError) return { error: tenantError.message };

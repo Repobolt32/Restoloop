@@ -7,5 +7,8 @@ export function isSafeRedirect(path: string): boolean {
     if (!path.startsWith('/')) return false;
     if (path.startsWith('//')) return false;
     if (path.includes('://')) return false;
+    // Reject paths with tab, newline, or carriage return characters
+    // These can be stripped by browsers and lead to open redirects
+    if (/[\t\n\r]/.test(path)) return false;
     return true;
 }

@@ -44,7 +44,13 @@ export async function processCampaigns() {
 
         const todayMonthDay = todayStr.substring(5); // "MM-DD"
 
+        // Track credits used per tenant for atomic batch decrement
+        const creditsUsedPerTenant = new Map<string, number>();
+
         for (const tenant of tenants as Tenant[]) {
+            let creditsUsed = 0;
+            let availableCredits = tenant.credits_balance;
+
             // 1. Process Winbacks - batch query with specific columns
             const { data: winbackCustomers, error: winbackErr } = await supabase
                 .from('customers' as any)
@@ -65,7 +71,6 @@ export async function processCampaigns() {
 
                 const alreadySent = new Set((existingCoupons || []).map((c: any) => c.customer_id));
 
-                let availableCredits = tenant.credits_balance;
                 for (const customer of (winbackCustomers as Customer[])) {
                     if (alreadySent.has(customer.id)) continue;
 
@@ -82,14 +87,13 @@ export async function processCampaigns() {
                     try {
                         await sendCampaign(supabase, tenant, customer, 'winback');
                         availableCredits--;
+                        creditsUsed++;
                         results.winbackSent++;
                     } catch (e) {
                         console.error(`Failed to send winback to customer ${customer.id}`, e);
                         results.errors++;
                     }
                 }
-                // Update the tenant's remaining credits memory for the next loop
-                tenant.credits_balance = availableCredits;
             }
 
             // 2. Process Birthdays - batch query with specific columns
@@ -117,7 +121,6 @@ export async function processCampaigns() {
 
                     const alreadySent = new Set((existingCoupons || []).map((c: any) => c.customer_id));
 
-                    let availableCredits = tenant.credits_balance;
                     for (const customer of birthdayCustomers) {
                         if (alreadySent.has(customer.id)) continue;
 
@@ -134,13 +137,13 @@ export async function processCampaigns() {
                         try {
                             await sendCampaign(supabase, tenant, customer, 'bday');
                             availableCredits--;
+                            creditsUsed++;
                             results.bdaySent++;
                         } catch (e) {
                             console.error(`Failed to send bday to customer ${customer.id}`, e);
                             results.errors++;
                         }
                     }
-                    tenant.credits_balance = availableCredits;
                 }
             }
 
@@ -171,7 +174,6 @@ export async function processCampaigns() {
 
                 const alreadySent = new Set((existingLogs || []).map((l: any) => l.coupon_id));
 
-                let availableCredits = tenant.credits_balance;
                 for (const coupon of welcomeCoupons) {
                     const customerInfo = Array.isArray(coupon.customers) ? coupon.customers[0] : coupon.customers;
                     if (!customerInfo || !customerInfo.phone) continue;
@@ -195,7 +197,15 @@ export async function processCampaigns() {
                         
                         const sendRes = await sendThirdPartyMessage(customerInfo.phone, reminderText);
                         
-                        let messageStatus = sendRes.success ? 'sent' : 'failed';
+                        let messageStatus: string;
+                        if ('simulated' in sendRes && sendRes.simulated) {
+                            messageStatus = 'simulated';
+                        } else if (sendRes.success) {
+                            messageStatus = 'sent';
+                        } else {
+                            messageStatus = 'failed';
+                        }
+                        
                         const nowTime = new Date().toISOString();
 
                         // Log message send
@@ -207,10 +217,12 @@ export async function processCampaigns() {
                             sent_at: nowTime
                         });
 
-                        if (sendRes.success) {
+                        // Only deduct credits for real sends, not simulated ones
+                        if (sendRes.success && !('simulated' in sendRes)) {
                             availableCredits--;
+                            creditsUsed++;
                             results.reminderSent++;
-                        } else {
+                        } else if (!sendRes.success && !('simulated' in sendRes)) {
                             results.errors++;
                         }
                     } catch (e) {
@@ -218,22 +230,37 @@ export async function processCampaigns() {
                         results.errors++;
                     }
                 }
-                tenant.credits_balance = availableCredits;
+            }
+
+            // Track total credits used for this tenant
+            if (creditsUsed > 0) {
+                creditsUsedPerTenant.set(tenant.id, creditsUsed);
             }
         }
 
-        // Batch update all tenant credits at the end
-        for (const tenant of tenants as Tenant[]) {
-            await supabase
-                .from('tenants' as any)
-                .update({ credits_balance: tenant.credits_balance })
-                .eq('id', tenant.id);
+        // Issue #20: Atomic tenant credit decrement via RPC
+        // Each tenant's credits are decremented atomically in a single DB operation
+        // This prevents race conditions from concurrent cron runs
+        for (const [tenantId, count] of creditsUsedPerTenant) {
+            const { data: decResult, error: decErr } = await supabase
+                .rpc('decrement_tenant_credits', { p_tenant_id: tenantId, p_count: count });
+            
+            if (decErr) {
+                console.error(`Failed to decrement credits for tenant ${tenantId}:`, decErr);
+            } else if (!decResult || decResult.length === 0) {
+                console.warn(`Insufficient credits for tenant ${tenantId} (concurrent spend detected). Messages were sent but credits could not be deducted.`);
+            }
         }
 
-        // Atomic decrement of platform credits for all sent messages
+        // Issue #19: Batch platform credit decrement (single RPC call)
         const totalSent = results.winbackSent + results.bdaySent + results.reminderSent;
-        for (let i = 0; i < totalSent; i++) {
-            await supabase.rpc('decrement_platform_credits');
+        if (totalSent > 0) {
+            const { error: platformErr } = await supabase
+                .rpc('decrement_platform_credits_batch', { count: totalSent });
+            
+            if (platformErr) {
+                console.error('Failed to decrement platform credits:', platformErr);
+            }
         }
 
     } catch (e) {
