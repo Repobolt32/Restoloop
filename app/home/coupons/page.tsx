@@ -48,7 +48,7 @@ export default async function CouponsPage() {
       discount: coupon.discount,
       status: coupon.status,
       sentDate: new Date(coupon.created_at).toISOString().split('T')[0],
-      customerName: (coupon.customers as any)?.name || 'Unknown',
+      customerName: coupon.customers?.name || 'Unknown',
     }));
 
     return (

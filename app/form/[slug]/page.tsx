@@ -12,7 +12,7 @@ export async function generateMetadata(props: FormPageProps) {
     const { slug } = await props.params;
     const supabase = await createServiceClient();
     const { data } = await supabase
-        .from('tenants' as any)
+        .from('tenants')
         .select('name')
         .eq('slug', slug)
         .single();
@@ -35,7 +35,7 @@ export default async function CustomerFormPage(props: FormPageProps) {
     // public intake lookups are blocked by default tenant policies.
     const supabase = await createServiceClient();
     const { data, error } = await supabase
-        .from('tenants' as any)
+        .from('tenants')
         .select('id, name')
         .eq('slug', slug)
         .single();

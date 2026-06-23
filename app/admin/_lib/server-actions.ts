@@ -9,11 +9,11 @@ export async function addCredits(tenantId: string, amount: number) {
 
     const supabase = await createServiceClient();
 
-    const { data: tenant } = (await supabase
-        .from('tenants' as any)
+    const { data: tenant } = await supabase
+        .from('tenants')
         .select('credits_balance')
         .eq('id', tenantId)
-        .single()) as { data: { credits_balance: number } | null };
+        .single();
 
     if (!tenant) throw new Error('Tenant not found');
 
@@ -21,7 +21,7 @@ export async function addCredits(tenantId: string, amount: number) {
 
     // Update tenant balance
     const { error } = await supabase
-        .from('tenants' as any)
+        .from('tenants')
         .update({ credits_balance: newBalance })
         .eq('id', tenantId);
 
@@ -29,15 +29,15 @@ export async function addCredits(tenantId: string, amount: number) {
 
     // Update platform balance (credits flow from platform to tenant)
     const { data: platformRow } = await supabase
-        .from('platform_credits' as any)
+        .from('platform_credits')
         .select('id, balance')
         .limit(1)
-        .single() as { data: { id: string; balance: number } | null };
+        .single();
 
     if (platformRow) {
         const newPlatformBalance = platformRow.balance - amount;
         const { error: platformError } = await supabase
-            .from('platform_credits' as any)
+            .from('platform_credits')
             .update({ balance: newPlatformBalance })
             .eq('id', platformRow.id);
 

@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
         // 1. Insert lead into `customers` table
         const { data: customerData, error: insertError } = await supabase
-            .from('customers' as any)
+            .from('customers')
             .insert({
                 tenant_id: data.tenantId,
                 name: data.name,
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
         // 2. Fetch tenant coupon configuration to know WELCOME50 amount
         const { data: tenantData } = await supabase
-            .from('tenants' as any)
+            .from('tenants')
             .select('coupon_welcome, name')
             .eq('id', data.tenantId)
             .single();
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
         const generatedCouponCode = `W${discountAmount}-${randomSuffix}`;
 
         const { error: couponError } = await supabase
-            .from('coupons' as any)
+            .from('coupons')
             .insert({
                 tenant_id: data.tenantId,
                 customer_id: customer.id,

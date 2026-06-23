@@ -1,17 +1,20 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from './supabase/database.types';
 import type { Tenant } from './restoloop.types';
+
+type TypedSupabaseClient = SupabaseClient<Database>;
 
 /**
  * Robust multi-tenant helper to retrieve a user's active tenant instance.
  * Resilient against PGRST116 errors when a developer account owns multiple tenants.
  * Selects the oldest tenant by created_at ascending.
  */
-export async function getTenantForUser(supabase: SupabaseClient, userId: string): Promise<Tenant | null> {
+export async function getTenantForUser(supabase: TypedSupabaseClient, userId: string): Promise<Tenant | null> {
     const { data, error } = await supabase
-        .from('tenants' as any)
+        .from('tenants')
         .select('*')
         .eq('owner_id', userId)
-        .order('created_at', { ascending: true }) as any;
+        .order('created_at', { ascending: true });
 
     if (error || !data || data.length === 0) {
         return null;

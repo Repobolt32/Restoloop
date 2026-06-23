@@ -22,7 +22,7 @@ export async function updateRestaurantProfile(
     _prevState: UpdateProfileState,
     formData: FormData,
 ): Promise<UpdateProfileState> {
-    const supabase = await createClient() as any;
+    const supabase = await createClient();
 
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {

@@ -5,7 +5,7 @@ import DashboardContent, { DashboardStats } from './dashboard-content';
 import { retryFetchDashboardStats } from './actions';
 
 export default async function DashboardPage() {
-    const supabase = await createClient() as any;
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     let stats: DashboardStats | undefined;
@@ -25,16 +25,16 @@ export default async function DashboardPage() {
             // Parallel queries instead of sequential
             const [customersResult, allCouponsResult, recentSignupsResult] = await Promise.all([
                 supabase
-                    .from('customers' as any)
+                    .from('customers')
                     .select('*', { count: 'exact', head: true })
                     .eq('tenant_id', tenantId),
                 supabase
-                    .from('coupons' as any)
+                    .from('coupons')
                     .select('id, type, status, redeemed_at')
                     .eq('tenant_id', tenantId)
                     .limit(50),
                 supabase
-                    .from('customers' as any)
+                    .from('customers')
                     .select('id, name, created_at')
                     .eq('tenant_id', tenantId)
                     .order('created_at', { ascending: false })

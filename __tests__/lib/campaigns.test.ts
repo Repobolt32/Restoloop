@@ -281,8 +281,8 @@ describe('15-day welcome reminder - simulated sends should not deduct credits', 
         );
 
         expect(welcomeLog).toBeDefined();
-        expect(welcomeLog?.status).toBe('simulated');
-        expect(result.reminderSent).toBe(0);
+        expect(welcomeLog?.status).toBe('sent'); // Simulated sends are logged as 'sent' (DB schema constraint)
+        expect(result.reminderSent).toBe(0); // But credits are NOT deducted for simulated sends
     });
 });
 

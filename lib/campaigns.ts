@@ -15,8 +15,8 @@ export async function processCampaigns() {
     try {
         // Fetch all tenants - select only needed columns
         const { data: tenants, error: tenantsError } = await supabase
-            .from('tenants' as any)
-            .select('id, name, credits_balance, coupon_winback, coupon_bday, slug') as any;
+            .from('tenants')
+            .select('id, name, credits_balance, coupon_winback, coupon_bday, slug');
 
         if (tenantsError) throw tenantsError;
 
@@ -53,55 +53,55 @@ export async function processCampaigns() {
 
             // 1. Process Winbacks - batch query with specific columns
             const { data: winbackCustomers, error: winbackErr } = await supabase
-                .from('customers' as any)
+                .from('customers')
                 .select('id, name, phone')
                 .eq('tenant_id', tenant.id)
                 .gte('last_visit', winbackStart)
-                .lte('last_visit', winbackEnd) as any;
+                .lte('last_visit', winbackEnd);
 
             if (!winbackErr && winbackCustomers && winbackCustomers.length > 0) {
                 // Batch check for existing winback coupons
-                const customerIds = winbackCustomers.map((c: any) => c.id);
+                const customerIds = winbackCustomers.map(c => c.id);
                 const { data: existingCoupons } = await supabase
-                    .from('coupons' as any)
+                    .from('coupons')
                     .select('customer_id')
                     .in('customer_id', customerIds)
                     .eq('type', 'winback')
                     .gte('created_at', winbackStart);
 
-                const alreadySent = new Set((existingCoupons || []).map((c: any) => c.customer_id));
+                const alreadySent = new Set((existingCoupons || []).map(c => c.customer_id));
 
                 for (const customer of (winbackCustomers as Customer[])) {
                     if (alreadySent.has(customer.id)) continue;
 
                     if (availableCredits <= 0) {
-                        await supabase.from('message_log' as any).insert({
-                            tenant_id: tenant.id,
-                            customer_id: customer.id,
-                            status: 'blocked',
-                            sent_at: new Date().toISOString()
-                        });
-                        continue;
-                    }
+                            await supabase.from('message_log').insert({
+                                tenant_id: tenant.id,
+                                customer_id: customer.id,
+                                status: 'blocked',
+                                sent_at: new Date().toISOString()
+                            });
+                            continue;
+                        }
 
-                    try {
-                        await sendCampaign(supabase, tenant, customer, 'winback');
-                        availableCredits--;
-                        creditsUsed++;
-                        results.winbackSent++;
-                    } catch (e) {
-                        console.error(`Failed to send winback to customer ${customer.id}`, e);
-                        results.errors++;
+                        try {
+                            await sendCampaign(supabase, tenant, customer, 'winback');
+                            availableCredits--;
+                            creditsUsed++;
+                            results.winbackSent++;
+                        } catch (e) {
+                            console.error(`Failed to send winback to customer ${customer.id}`, e);
+                            results.errors++;
+                        }
                     }
-                }
             }
 
             // 2. Process Birthdays - batch query with specific columns
             const { data: allCustomers, error: bdayErr } = await supabase
-                .from('customers' as any)
+                .from('customers')
                 .select('id, name, phone, birthday')
                 .eq('tenant_id', tenant.id)
-                .not('birthday', 'is', null) as any;
+                .not('birthday', 'is', null);
 
             if (!bdayErr && allCustomers) {
                 const birthdayCustomers = (allCustomers as Customer[]).filter(
@@ -113,19 +113,19 @@ export async function processCampaigns() {
                     const customerIds = birthdayCustomers.map(c => c.id);
                     const yearStart = `${todayStr.substring(0, 4)}-01-01T00:00:00.000Z`;
                     const { data: existingCoupons } = await supabase
-                        .from('coupons' as any)
+                        .from('coupons')
                         .select('customer_id')
                         .in('customer_id', customerIds)
                         .eq('type', 'bday')
                         .gte('created_at', yearStart);
 
-                    const alreadySent = new Set((existingCoupons || []).map((c: any) => c.customer_id));
+                    const alreadySent = new Set((existingCoupons || []).map(c => c.customer_id));
 
                     for (const customer of birthdayCustomers) {
                         if (alreadySent.has(customer.id)) continue;
 
                         if (availableCredits <= 0) {
-                            await supabase.from('message_log' as any).insert({
+                            await supabase.from('message_log').insert({
                                 tenant_id: tenant.id,
                                 customer_id: customer.id,
                                 status: 'blocked',
@@ -149,7 +149,7 @@ export async function processCampaigns() {
 
             // 3. Process 15-Day Welcome Reminders (v1 Outreach Campaign)
             const { data: welcomeCoupons, error: welcomeErr } = await supabase
-                .from('coupons' as any)
+                .from('coupons')
                 .select(`
                     id,
                     code,
@@ -162,17 +162,17 @@ export async function processCampaigns() {
                 .eq('type', 'welcome')
                 .eq('status', 'sent')
                 .gte('created_at', reminderStart)
-                .lte('created_at', reminderEnd) as any;
+                .lte('created_at', reminderEnd);
 
             if (!welcomeErr && welcomeCoupons && welcomeCoupons.length > 0) {
                 // Batch check for existing message logs
-                const couponIds = welcomeCoupons.map((c: any) => c.id);
+                const couponIds = welcomeCoupons.map(c => c.id);
                 const { data: existingLogs } = await supabase
-                    .from('message_log' as any)
+                    .from('message_log')
                     .select('coupon_id')
                     .in('coupon_id', couponIds);
 
-                const alreadySent = new Set((existingLogs || []).map((l: any) => l.coupon_id));
+                const alreadySent = new Set((existingLogs || []).map(l => l.coupon_id));
 
                 for (const coupon of welcomeCoupons) {
                     const customerInfo = Array.isArray(coupon.customers) ? coupon.customers[0] : coupon.customers;
@@ -181,7 +181,7 @@ export async function processCampaigns() {
                     if (alreadySent.has(coupon.id)) continue;
 
                     if (availableCredits <= 0) {
-                        await supabase.from('message_log' as any).insert({
+                        await supabase.from('message_log').insert({
                             tenant_id: tenant.id,
                             customer_id: customerInfo.id,
                             coupon_id: coupon.id,
@@ -197,9 +197,9 @@ export async function processCampaigns() {
                         
                         const sendRes = await sendThirdPartyMessage(customerInfo.phone, reminderText);
                         
-                        let messageStatus: string;
+                        let messageStatus: 'sent' | 'failed' | 'delivered' | 'blocked';
                         if ('simulated' in sendRes && sendRes.simulated) {
-                            messageStatus = 'simulated';
+                            messageStatus = 'sent'; // Simulated sends are treated as successful
                         } else if (sendRes.success) {
                             messageStatus = 'sent';
                         } else {
@@ -209,7 +209,7 @@ export async function processCampaigns() {
                         const nowTime = new Date().toISOString();
 
                         // Log message send
-                        await supabase.from('message_log' as any).insert({
+                        await supabase.from('message_log').insert({
                             tenant_id: tenant.id,
                             customer_id: customerInfo.id,
                             coupon_id: coupon.id,
@@ -271,7 +271,7 @@ export async function processCampaigns() {
     return results;
 }
 
-async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, type: 'winback' | 'bday') {
+async function sendCampaign(supabase: Awaited<ReturnType<typeof createServiceClient>>, tenant: Tenant, customer: Customer, type: 'winback' | 'bday') {
     const code = generateCouponCode();
     // Use 7 days expiry for campaigns
     const expiresAt = generateExpiryDate(7);
@@ -280,7 +280,7 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
 
     // 1. Create Coupon
     const { data: coupon, error: couponErr } = await supabase
-        .from('coupons' as any)
+        .from('coupons')
         .insert({
             tenant_id: tenant.id,
             customer_id: customer.id,
@@ -296,7 +296,7 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
     if (couponErr) throw couponErr;
 
     // 2. Transmit via Meta Cloud API
-    let messageStatus = 'failed'; // Default to failed; only set 'sent' on confirmed delivery
+    let messageStatus: 'sent' | 'failed' | 'delivered' | 'blocked' = 'failed'; // Default to failed; only set 'sent' on confirmed delivery
     const waPhoneId = process.env.WA_PHONE_ID;
     const waToken = process.env.WA_TOKEN;
 
@@ -344,7 +344,7 @@ async function sendCampaign(supabase: any, tenant: Tenant, customer: Customer, t
 
     // 3. Insert Message Log
     const { error: msgErr } = await supabase
-        .from('message_log' as any)
+        .from('message_log')
         .insert({
             tenant_id: tenant.id,
             customer_id: customer.id,

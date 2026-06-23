@@ -36,9 +36,9 @@ export default async function RestaurantProfilePage() {
                                 couponWelcome: tenant.coupon_welcome,
                                 couponBday: tenant.coupon_bday,
                                 couponWinback: tenant.coupon_winback,
-                                address: tenant.address,
-                                email: tenant.email,
-                                phone: tenant.phone,
+                                address: tenant.address ?? undefined,
+                                email: tenant.email ?? undefined,
+                                phone: tenant.phone ?? undefined,
                             }
                             : undefined
                     }

@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
         // 3. Look up the coupon linked to this tenant
         const { data: coupon, error: couponError } = await supabase
-            .from('coupons' as any)
+            .from('coupons')
             .select(`
                 id,
                 code,
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
             `)
             .eq('code', code)
             .eq('tenant_id', tenant.id)
-            .single() as any;
+            .single();
 
         if (couponError || !coupon) {
             return NextResponse.json({
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 
         // 6. Mark coupon as redeemed
         await supabase
-            .from('coupons' as any)
+            .from('coupons')
             .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
             .eq('id', coupon.id);
 

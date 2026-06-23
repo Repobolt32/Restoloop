@@ -16,9 +16,9 @@ export interface Tenant {
     tax_rate: number;
     tax_cgst: number;
     tax_sgst: number;
-    address?: string;
-    email?: string;
-    phone?: string;
+    address?: string | null;
+    email?: string | null;
+    phone?: string | null;
     created_at: string;
 }
 

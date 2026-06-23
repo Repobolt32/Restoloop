@@ -61,7 +61,7 @@ export default async function ActiveGuestsPage() {
   const now = new Date().toISOString();
 
   const { data: rows, error } = await supabase
-    .from('coupons' as any)
+    .from('coupons')
     .select(`
       id,
       code,
@@ -74,7 +74,7 @@ export default async function ActiveGuestsPage() {
     .eq('status', 'sent')
     .gt('expires_at', now)
     .order('expires_at', { ascending: true })
-    .limit(10) as any;
+    .limit(10);
 
   const guests: ActiveGuest[] = (rows || []).map((r: any) => {
     const cust = Array.isArray(r.customers) ? r.customers[0] : r.customers;
