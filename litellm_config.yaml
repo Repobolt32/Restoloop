@@ -1,0 +1,24 @@
+model_list:
+  # Claude Sonnet → DeepSeek V4 Flash (cheap coding/testing, OpenAI endpoint)
+  - model_name: claude-sonnet-4-6
+    litellm_params:
+      model: openai/deepseek-v4-flash
+      api_base: https://opencode.ai/zen/go/v1
+      api_key: sk-rGDoTn35EU91bJgiQr1Qu38uAv4XFMQCdcvHDuFQQJpyIYaL4HQAxPEjQhmlAAop
+
+  # Claude Haiku → MiniMax M2.7 (Anthropic endpoint, pass-through)
+  - model_name: claude-haiku-4-5
+    litellm_params:
+      model: anthropic/minimax-m2.7
+      api_base: https://opencode.ai/zen/go
+      api_key: sk-rGDoTn35EU91bJgiQr1Qu38uAv4XFMQCdcvHDuFQQJpyIYaL4HQAxPEjQhmlAAop
+
+  # Claude Opus → Qwen 3.7 Max (Anthropic endpoint, pass-through)
+  - model_name: claude-opus-4-8
+    litellm_params:
+      model: anthropic/qwen3.7-max
+      api_base: https://opencode.ai/zen/go
+      api_key: sk-rGDoTn35EU91bJgiQr1Qu38uAv4XFMQCdcvHDuFQQJpyIYaL4HQAxPEjQhmlAAop
+
+litellm_settings:
+  drop_params: true

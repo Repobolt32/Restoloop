@@ -9,7 +9,7 @@ const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
 const STORAGE_STATE = path.join(__dirname, 'storage-state.json');
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './__tests__/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
