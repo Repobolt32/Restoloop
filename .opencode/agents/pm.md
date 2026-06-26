@@ -26,6 +26,11 @@ Use the `task` tool to spawn the **coder** subagent with a clear prompt:
 Task: [describe the exact bug/feature]
 Project: Restloop (Next.js 15 + TypeScript + Supabase)
 Test commands: pnpm test, pnpm typecheck, pnpm lint
+
+MANDATORY: Before writing any code, you MUST:
+1. Use Context7 MCP (context7_resolve-library-id + context7_query-docs) to fetch current API docs for any library you're working with
+2. Use the skill tool to load relevant tech skills (react-dev, best-practices, test, tdd, etc.)
+3. Follow skill instructions exactly as written
 ```
 
 Wait for the coder to finish and return results.
@@ -36,14 +41,21 @@ After the coder completes, use the `task` tool to spawn the **tester** subagent:
 ```
 Test the following changes:
 [paste coder's summary of changes]
+Original task: [paste the user's original request]
 Run all available tests and report results.
 ```
 
 Wait for the tester to finish and return results.
 
 ### Step 4: Evaluate Results
-- If ALL tests pass: Report success to the user with a summary
-- If ANY test fails: Go to Step 5
+After the tester finishes:
+
+1. **Read the test report**: Read `__tests__/TEST_REPORT.md` to see the full test results and any gaps found.
+2. **Check the recommendation**:
+   - If recommendation is "PASS": Report success to the user
+   - If recommendation is "FAIL": Go to Step 5
+   - If recommendation is "PARTIAL": Report gaps to the user and ask if they want to fix them
+3. **Verify against original task**: Does the implementation match what was requested? The test report includes the original task description — compare it against the changes made.
 
 ### Step 5: Retry Loop (max 3 attempts)
 If tests fail:

@@ -64,6 +64,29 @@ Always report back with:
 - pnpm lint: Pass/Fail
 - pnpm typecheck: Pass/Fail
 
+## Before Coding — MANDATORY Steps
+
+Before writing ANY implementation code, you MUST:
+
+### 1. Use Context7 MCP to fetch current docs
+For any library or framework you're working with (Next.js, Supabase, Zod, Tailwind, etc.):
+- Call `context7_resolve-library-id` to find the library
+- Call `context7_query-docs` to fetch current API patterns and usage
+- NEVER rely on memory for API signatures — always verify against docs
+
+### 2. Load relevant tech skills
+Use the `skill` tool to load skills that match your task:
+- `react-dev` — for React/Next.js patterns
+- `best-practices` — for security and code quality
+- `test` — for test generation patterns
+- `tdd` — for test-driven development workflow
+- Any other skill that matches the task
+
+### 3. Follow OpenCode conventions
+- Use the skill tool to discover available skills before starting work
+- Load and follow skill instructions exactly as written
+- Do not skip skill loading — it's mandatory for every coding task
+
 ## Rules
 - ALWAYS write the test first. Never write implementation code before a test.
 - NEVER skip the Red phase. The test must fail before you implement.
