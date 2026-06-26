@@ -1,12 +1,10 @@
 /**
  * Security tests for auth redirect routes
  *
- * BUG: Both /auth/callback and /auth/confirm use the `next` URL parameter
- * WITHOUT validation, allowing open redirect attacks.
+ * Validates that the `next` URL parameter is properly validated
+ * to prevent open redirect attacks.
  *
- * An attacker can craft a URL like:
- *   /auth/callback?code=xxx&next=https://evil.com
- * which redirects the user to a malicious site after successful authentication.
+ * External URLs should be rejected and fall back to /home.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
@@ -117,8 +115,8 @@ describe('Auth redirect security', () => {
       expect(redirectUrl).toBe('http://localhost:3000/dashboard');
     });
 
-    it('BUG: allows external redirect via next param (open redirect)', async () => {
-      // Arrange - This test PASSES to confirm the vulnerability exists
+    it('blocks external redirect via next param (open redirect fixed)', async () => {
+      // Arrange - External URLs should be rejected and fall back to /home
       const mockSupabase = createMockSupabase();
       vi.mocked(createClient).mockResolvedValue(mockSupabase as never);
 
@@ -131,10 +129,8 @@ describe('Auth redirect security', () => {
       const { GET } = await import('../../app/auth/callback/route');
       const redirectUrl = await extractRedirectUrl(() => GET(request));
 
-      // Assert - BUG: The redirect should NOT contain the external URL
-      // This test PASSES because the code does NOT validate the next param
-      expect(redirectUrl).toContain('https://evil.com'); // BUG: external URL is allowed
-      // A secure implementation would redirect to /home instead
+      // Assert - External URL is blocked, redirects to /home
+      expect(redirectUrl).toBe('http://localhost:3000/home');
     });
   });
 
@@ -175,8 +171,8 @@ describe('Auth redirect security', () => {
       expect(response.headers.get('location')).toBe('http://localhost:3000/update-password');
     });
 
-    it('BUG: allows external redirect via next param (open redirect)', async () => {
-      // Arrange - This test PASSES to confirm the vulnerability exists
+    it('blocks external redirect via next param (open redirect fixed)', async () => {
+      // Arrange - External URLs should be rejected and fall back to /home
       const mockSupabase = createMockSupabase();
       vi.mocked(createClient).mockResolvedValue(mockSupabase as never);
 
@@ -189,11 +185,9 @@ describe('Auth redirect security', () => {
       const { GET } = await import('../../app/auth/confirm/route');
       const response = await GET(request);
 
-      // Assert - BUG: The redirect should NOT contain the external URL
-      // This test PASSES because the code does NOT validate the next param
+      // Assert - External URL is blocked, redirects to /home
       const location = response.headers.get('location');
-      expect(location).toContain('https://evil.com'); // BUG: external URL is allowed
-      // A secure implementation would redirect to /home instead
+      expect(location).toBe('http://localhost:3000/home');
     });
   });
 });

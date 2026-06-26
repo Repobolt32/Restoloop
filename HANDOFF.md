@@ -1,36 +1,56 @@
-# Handoff — 3 Remaining Issues
+# Handoff — All Issues Resolved
 
 **Date:** June 26, 2026
 **Branch:** `main`
-**Status:** 22/22 GitHub issues CLOSED. 3 minor polish items remain.
+**Status:** 22/22 GitHub issues CLOSED. All 3 polish items fixed and verified.
 
 ---
 
-## Issue 1: Discount shows % instead of ₹
+## Issue 1: Discount shows % instead of ₹ — FIXED
 
 **File:** `app/home/coupons/coupons-content.tsx:154`
-**Line:** `{coupon.discount}%`
 
-Change `%` to `₹` (rupee symbol).
+Was: `{coupon.discount}%`
+Now: `₹{coupon.discount}`
 
 ---
 
-## Issue 2: API routes excluded from middleware
+## Issue 2: API routes excluded from middleware — FIXED
 
 **File:** `middleware.ts:13`
-**Line:** `matcher: ['/((?!_next/static|_next/image|images|locales|assets|api/*).*)']`
 
-The `api/*` exclusion means non-cron API routes (like `/api/leads`, `/api/coupons/validate`) skip session refresh. Either remove `api/*` from the exclusion or add specific API routes that need session handling.
+Matcher no longer excludes `api/*`. Only `/api/cron` is skipped (line 18).
 
 ---
 
-## Issue 3: Simulated sends return success: true
+## Issue 3: Simulated sends return success: true — FIXED
 
 **File:** `lib/whatsapp.ts:121`
-**Line:** `return { success: true, messageId: \`mock_3rd_${Date.now()}\` };`
 
-When WA provider is missing, simulated sends return `success: true` which still deducts credits for phantom messages. Should return `success: false` or add a `simulated` flag so campaigns.ts can skip credit deduction.
+Was: `return { success: true, messageId: \`mock_3rd_${Date.now()}\` };`
+Now: `return { success: false, error: 'Missing 3rd-party WhatsApp provider configuration' };`
 
 ---
 
-**All other bugs are fixed. Tests pass. Ready for these 3 quick fixes then ship.**
+## Verification
+
+- **TypeScript**: Pass (`pnpm typecheck`)
+- **Lint**: Pass (`pnpm lint`)
+- **Unit tests**: 47/47 Pass (`pnpm test`)
+- **Build**: Pre-existing env issue (requires HTTPS `NEXT_PUBLIC_SITE_URL` for production build)
+
+---
+
+## OpenCode Setup (New)
+
+The project now has proper OpenCode configuration:
+
+- `AGENTS.md` — primary context file (auto-loaded at session start)
+- `opencode.json` — config with `instructions: ["AGENTS.md", "HANDOFF.md"]`
+- `.opencode/skills/fix-handoff/SKILL.md` — skill for fixing remaining issues
+- `CLAUDE.md` — symlink to AGENTS.md for backward compatibility
+- `.opencode/agents/` — PM, coder, and tester agents (already existed)
+
+---
+
+**All done. Ready to ship.**

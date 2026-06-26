@@ -1,8 +1,7 @@
 /**
  * Tests for app/api/coupons/validate/route.ts — POST handler
  *
- * Bug: Coupon validate API returns success but NEVER marks coupon as redeemed.
- * Coupons can be validated unlimited times because no UPDATE call is made.
+ * Validates coupons and marks them as redeemed on successful validation.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -264,7 +263,7 @@ describe('POST /api/coupons/validate', () => {
         expect(data.message).toContain('date passed');
     });
 
-    it('BUG: returns 200 success but never marks coupon as redeemed', async () => {
+    it('returns 200 success and marks coupon as redeemed', async () => {
         // Arrange: auth and tenant succeed, coupon found with valid status and future expiry
         mockSupabase.auth.getUser.mockResolvedValue({
             data: { user: mockUser },
@@ -298,16 +297,8 @@ describe('POST /api/coupons/validate', () => {
         expect(data.customerName).toBe('Alice');
         expect(data.customerPhone).toBe('+2222222222');
 
-        // BUG ASSERTION: update() was NEVER called to mark coupon as redeemed
-        // After a successful validation, the coupon status should be updated to 'redeemed'
-        // but the current implementation never makes this call
-        expect(updateSpy).not.toHaveBeenCalled();
-
-        // Also verify that from('coupons') was only called once (for the select lookup)
-        // NOT called again for an update
-        const couponFromCalls = mockSupabase.from.mock.calls.filter(
-            (call: unknown[]) => call[0] === 'coupons'
-        );
-        expect(couponFromCalls).toHaveLength(1); // Only the select query, no update query
+        // Verify that update() was called to mark coupon as redeemed
+        expect(updateSpy).toHaveBeenCalled();
+        expect(updateSpy).toHaveBeenCalledWith({ status: 'redeemed' });
     });
 });

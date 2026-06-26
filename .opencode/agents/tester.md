@@ -57,11 +57,11 @@ pnpm build
 Report: pass/fail, any errors.
 
 ### Step 5: End-to-End API Testing
-For API route changes, verify with curl:
+For API route changes, verify with curl. On Windows, use `curl.exe` (not `curl` which is aliased to `Invoke-WebRequest`):
 
 **Example — Coupon Validate:**
 ```bash
-curl -X POST http://localhost:3000/api/coupons/validate \
+curl.exe -X POST http://localhost:3000/api/coupons/validate \
   -H "Content-Type: application/json" \
   -d '{"code":"TEST123"}' \
   -w "\nHTTP Status: %{http_code}\n"
@@ -69,8 +69,10 @@ curl -X POST http://localhost:3000/api/coupons/validate \
 
 **Example — Auth Redirect:**
 ```bash
-curl -v "http://localhost:3000/auth/callback?next=https://evil.com" 2>&1 | grep -i "location"
+curl.exe -v "http://localhost:3000/auth/callback?next=https://evil.com" 2>&1 | findstr /i "location"
 ```
+
+Note: Use `findstr` instead of `grep` on Windows.
 
 Report: HTTP status, response body, whether it matches expected behavior.
 
