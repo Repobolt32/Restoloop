@@ -62,8 +62,9 @@ export function PublicIntakeForm({ tenantId, restaurantName }: { tenantId: strin
             });
             setIsSuccess(true);
             toast.success('Registration successful!');
-        } catch (err: any) {
-            toast.error(err.message || 'An error occurred. Please try again.');
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'An error occurred. Please try again.';
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }

@@ -6,11 +6,12 @@ import DashboardContent from '~/home/dashboard/dashboard-content';
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-const mockData = {
+const mockData: DashboardStats = {
   revenue: 15000,
   customers: 128,
   redeemed: 45,
   couponsSent: 230,
+  credits_balance: 100,
   revenueData: [
     { month: 'Jan', revenue: 0 },
     { month: 'Feb', revenue: 0 },
@@ -31,7 +32,17 @@ const mockData = {
   tenantSlug: 'test-restaurant',
 };
 
-function renderWithProviders(props: any) {
+import type { DashboardStats } from '~/home/dashboard/dashboard-content';
+
+interface DashboardContentProps {
+  data: DashboardStats | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
+  onRetry: () => void;
+}
+
+function renderWithProviders(props: DashboardContentProps) {
   return render(<DashboardContent {...props} />);
 }
 

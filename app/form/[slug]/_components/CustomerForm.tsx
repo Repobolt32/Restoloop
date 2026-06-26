@@ -118,7 +118,7 @@ export function CustomerForm({ slug, welcomeDiscount }: Props) {
                         className="w-full rounded-r-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100 disabled:opacity-60"
                     />
                 </div>
-                <p className="mt-1 text-xs text-gray-400">We'll send your coupon to this number</p>
+                <p className="mt-1 text-xs text-gray-400">We&apos;ll send your coupon to this number</p>
             </div>
 
             {/* Birthday (optional) */}

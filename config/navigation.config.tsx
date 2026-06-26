@@ -1,5 +1,4 @@
 import { Home, Store } from 'lucide-react';
-import { z } from 'zod';
 
 
 import pathsConfig from '~/config/paths.config';

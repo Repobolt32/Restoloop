@@ -10,7 +10,7 @@ export const metadata = {
 
 const NotFoundPage = async () => {
   const client = await createClient();
-  const { data } = await client.auth.getUser();
+  await client.auth.getUser();
 
   return (
     <div className={'flex h-screen flex-1 flex-col'}>

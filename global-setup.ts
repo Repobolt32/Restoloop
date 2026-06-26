@@ -14,6 +14,7 @@ const TEST_PASSWORD = 'TestPassword123';
 const AUTH_COOKIE_NAME = 'sb-oggwcgygkwxywmjdnaef-auth-token';
 const STORAGE_STATE_PATH = path.join(__dirname, 'storage-state.json');
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function globalSetup(_config: FullConfig) {
   // Sign in via Supabase REST API
   const response = await fetch(

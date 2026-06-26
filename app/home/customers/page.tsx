@@ -60,7 +60,7 @@ export default async function ActiveGuestsPage() {
 
   const now = new Date().toISOString();
 
-  const { data: rows, error } = await supabase
+  const { data: rows } = await supabase
     .from('coupons')
     .select(`
       id,

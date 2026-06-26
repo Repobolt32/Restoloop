@@ -1,9 +1,13 @@
 import { render, screen, waitFor, cleanup, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import CouponsContent from '~/home/coupons/coupons-content';
+import CouponsContent, { type CouponRow } from '~/home/coupons/coupons-content';
 import { CouponType } from '~/lib/restoloop.types';
 
-const mockCoupons = [
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), back: vi.fn(), refresh: vi.fn() }),
+}));
+
+const mockCoupons: CouponRow[] = [
   {
     id: '1',
     code: 'WELCOME10',
@@ -33,7 +37,15 @@ const mockCoupons = [
   },
 ];
 
-function renderWithProviders(props: any) {
+interface CouponsContentProps {
+  data: CouponRow[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
+  onRetry?: () => void;
+}
+
+function renderWithProviders(props: CouponsContentProps) {
   return render(<CouponsContent {...props} />);
 }
 
@@ -72,7 +84,7 @@ describe('CouponsContent', () => {
     });
 
     expect(screen.getByRole('cell', { name: /^Welcome$/i })).toBeInTheDocument();
-    expect(screen.getByText('10%')).toBeInTheDocument(); // Assuming discount is shown as percentage
+    expect(screen.getByText('₹10')).toBeInTheDocument();
     expect(screen.getByText('sent')).toBeInTheDocument();
     expect(screen.getByText('2026-05-20')).toBeInTheDocument();
     expect(screen.getByText('Amit Sharma')).toBeInTheDocument();

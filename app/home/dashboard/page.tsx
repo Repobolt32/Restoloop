@@ -82,7 +82,7 @@ export default async function DashboardPage() {
                 .order('created_at', { ascending: false })
                 .limit(10);
 
-            const activityFeed: any[] = [];
+            const activityFeed: { id: string; name: string; action: string; timestamp: number }[] = [];
 
             if (recentSignups) {
                 recentSignups.forEach((s) => {

@@ -2,11 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import {
   PlusCircle,
-  ExternalLink,
   IndianRupee,
   Users,
-  ArrowRight,
-  Sparkles
 } from 'lucide-react';
 
 /**
@@ -47,7 +44,7 @@ export default function HomePage() {
               <Users className="w-5 h-5 text-emerald-500" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Active Guests</h3>
-            <p className="text-neutral-500 text-sm">See who's ready to redeem a coupon.</p>
+            <p className="text-neutral-500 text-sm">See who&apos;s ready to redeem a coupon.</p>
           </div>
         </Link>
 

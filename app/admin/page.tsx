@@ -8,7 +8,7 @@ export default async function AdminDashboardPage() {
     const supabase = await createServiceClient();
 
     // Fetch all tenants with their owners' emails
-    const { data: tenants, error } = await supabase
+    const { data: tenants } = await supabase
         .from('tenants')
         .select('*')
         .order('created_at', { ascending: false });

@@ -58,7 +58,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
     const formUrl = activeSlug ? `https://restoloop.app/form/${activeSlug}` : null;
     const isSlugLocked = !!(state.slug || defaultValues?.slug);
 
-    const InputLabel = ({ children, htmlFor, icon: Icon }: { children: React.ReactNode, htmlFor: string, icon: any }) => (
+    const InputLabel = ({ children, htmlFor, icon: Icon }: { children: React.ReactNode, htmlFor: string, icon: React.ComponentType<{ className?: string }> }) => (
         <div className="flex items-center gap-2 mb-4 ml-1">
             <Icon className="w-3 h-3 text-[#FF6B00]" />
             <label htmlFor={htmlFor} className="text-xs font-black tracking-[0.4em] text-white uppercase">

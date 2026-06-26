@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { createClient } from '~/lib/supabase/server';
 import { getTenantForUser } from '~/lib/tenant';
 import { AlertTriangle } from 'lucide-react';

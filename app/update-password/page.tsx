@@ -11,7 +11,7 @@ export default function UpdatePasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
+  useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

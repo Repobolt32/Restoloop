@@ -14,7 +14,7 @@ interface AuthCallbackErrorPageProps {
 }
 
 export default async function AuthCallbackErrorPage(props: AuthCallbackErrorPageProps) {
-  const { error, callback } = await props.searchParams;
+  const { error } = await props.searchParams;
   const signInPath = pathsConfig.auth.signIn;
 
   return (

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServiceClient } from '~/lib/supabase/server';
-import { sendWelcomeMessage } from '~/lib/whatsapp';
 
 const leadSchema = z.object({
     tenantId: z.string().uuid(),

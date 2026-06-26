@@ -22,12 +22,14 @@ export async function GET(request: Request) {
             results
         });
 
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error('Cron campaign processing error:', e);
+        const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+        const errorStack = e instanceof Error ? e.stack : undefined;
         return NextResponse.json({
             error: 'Internal Server Error',
-            message: e.message,
-            stack: e.stack
+            message: errorMessage,
+            stack: errorStack
         }, { status: 500 });
     }
 }

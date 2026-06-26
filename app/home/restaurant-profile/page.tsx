@@ -1,7 +1,6 @@
 import { createClient } from '~/lib/supabase/server';
 import { getTenantForUser } from '~/lib/tenant';
 import { ProfileForm } from './_components/ProfileForm';
-import { Settings } from 'lucide-react';
 
 export const metadata = {
     title: 'Profile — Restoloop',
