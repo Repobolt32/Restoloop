@@ -118,7 +118,7 @@ export async function sendThirdPartyMessage(phone: string, text: string): Promis
     if (!provider || !apiUrl) {
         console.warn('Missing 3rd-party WhatsApp provider configuration. Falling back to log simulation.');
         console.log(`[SIMULATED 3RD PARTY SEND] To: ${phone}, Content: "${text}"`);
-        return { success: true, messageId: `mock_3rd_${Date.now()}` };
+        return { success: false, error: 'Missing 3rd-party WhatsApp provider configuration' };
     }
 
     try {

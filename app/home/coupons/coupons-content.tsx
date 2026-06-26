@@ -151,7 +151,7 @@ export default function CouponsContent({
                     {TYPE_LABELS[coupon.type]}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-neutral-700">{coupon.discount}%</td>
+                <td className="px-4 py-3 text-neutral-700">₹{coupon.discount}</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${STATUS_COLORS[coupon.status]}`}>
                     {STATUS_LABELS[coupon.status] || coupon.status}
