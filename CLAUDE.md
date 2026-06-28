@@ -1,1 +1,0 @@
-E:/desktop/Restoloop/AGENTS.md
