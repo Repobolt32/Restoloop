@@ -268,7 +268,7 @@ Every outbound message includes opt-out link to reduce WhatsApp ban risk:
 - Never go negative
 
 **7. OpenWA ban / Meta number blocked**
-- Admin alert via dashboard banner + email
+- Admin alert via dashboard banner
 - Owner can switch to alternate provider (env flip)
 - All queued sends marked `failed_provider_blocked`
 

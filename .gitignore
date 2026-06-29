@@ -5,3 +5,16 @@
 !.env.example
 *.log
 .DS_Store
+
+# Dependencies
+node_modules/
+
+# Build / Output
+.next/
+*.tsbuildinfo
+
+# Embedded plugins (submodules)
+.opencode/plugins/
+
+# OS
+Thumbs.db

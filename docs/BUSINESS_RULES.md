@@ -65,7 +65,7 @@ No push message is sent from this endpoint. The customer must tap the link to op
 - Customers can opt out at any time by replying "STOP"
 - Customers can rejoin by replying "YES"
 
-> **Status**: The opt-in column and webhook handler are not yet built (Bug #6). All customers are currently treated as opted-in by default.
+
 
 ---
 
@@ -74,7 +74,7 @@ No push message is sent from this endpoint. The customer must tap the link to op
 The system runs daily campaigns via cron:
 
 ### Welcome Reminder
-- **Trigger**: 25 days after customer signup *(currently at 15 days — Bug #3)*
+- **Trigger**: 25 days after customer signup 
 - **Condition**: Welcome coupon hasn't been redeemed
 - **Action**: Sends reminder: "Hey [Name]! Your coupon [CODE] for [Restaurant] is still active!"
 
@@ -84,17 +84,16 @@ The system runs daily campaigns via cron:
 - **Action**: Generates coupon + sends: "Happy Birthday [Name]! Enjoy Rs.[X] OFF at [Restaurant]"
 
 ### Win-back Campaign
-- **Trigger**: 40 days after customer's last visit *(currently at 45 days — Bug #2)*
+- **Trigger**: 40 days after customer's last visit *(currently at 45 days )*
 - **Condition**: No recent winback coupon for this customer
 - **Action**: Generates coupon + sends: "We miss you [Name]! Come back for Rs.[X] OFF"
 
-> **Bug #1**: `last_visit` is set at signup and never updated on coupon redemption. Winback campaigns currently use signup date, not actual last visit.
 
 ---
 
 ## 4. Coupon Rules
 
-### 4.1 Coupon Types
+### 4.1 Coupon Types(can be edited later)
 
 | Type | When Sent | Default Discount | Expiry |
 |------|-----------|------------------|--------|
@@ -126,7 +125,6 @@ When a coupon is validated at the counter:
 2. System verifies the coupon belongs to the restaurant, is not redeemed, and is not expired
 3. Coupon is marked as `redeemed` with a timestamp
 
-> **Bug #1**: The customer's `last_visit` date is NOT updated during validation. This breaks winback timing.
 
 ---
 
@@ -140,11 +138,9 @@ When a coupon is validated at the counter:
 | Welcome reminder send | 1 credit |
 | No credits remaining | Messages logged as "blocked", no send attempted |
 
-### Two-Tier Wallet
-- **Tenant wallet**: Restaurant's `credits_balance` — deducted per successful send
-- **Platform wallet**: Master wallet (seeded with 1,000 credits) — deducted once atomically via RPC after all campaigns complete
 
-> **Bug #4**: Credits may be deducted even on failed WhatsApp sends. The `sendCampaign()` function does not throw on failure, so the `Promise.allSettled` fulfilled branch still decrements credits.
+
+
 
 ---
 
@@ -211,17 +207,6 @@ Returns a WhatsApp Click-to-Chat URL with the coupon code. No push message is se
 
 ---
 
-## 10. Known Issues (Verified June 2026)
 
-| # | Issue | Impact |
-|---|-------|--------|
-| 1 | `last_visit` not updated on coupon redeem | Winback uses signup date, not real last visit |
-| 2 | Winback at 45 days (should be 40) | Campaigns fire 5 days too late |
-| 3 | Welcome reminder at 15 days (should be 25) | Reminders fire 10 days too early |
-| 4 | Credit charged on failed WhatsApp send | Wasted credits on failed deliveries |
-| 5 | WhatsApp: Meta hardcoded, no OpenWA wired in | WhatsApp DM onboarding path non-functional |
-| 6 | No opt-in model (column + webhook not built) | No compliance mechanism for message consent |
-
----
 
 *Last updated: June 2026 — verified against actual code.*
