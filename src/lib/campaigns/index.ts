@@ -68,11 +68,13 @@ export async function runWelcomeReminders() {
     })
 
     if (result.success) {
-      try {
-        // Deduct 1 credit from restaurant
-        await supabase.rpc('deduct_credit', { restaurant_id: restaurant.id })
-      } catch (err) {
-        console.error(`Failed to deduct credit for restaurant ${restaurant.id}:`, err)
+      const { error: rpcError } = await supabase.rpc('deduct_credit', { restaurant_id: restaurant.id })
+      if (rpcError && rpcError.code === 'PGRST202') {
+        // Fallback to direct update if RPC is not defined in the DB schema
+        await supabase
+          .from('restaurants')
+          .update({ credits: restaurant.credits - 1 })
+          .eq('id', restaurant.id)
       }
     }
   }
