@@ -1,4 +1,4 @@
-import { runWelcomeReminders } from '@/lib/campaigns'
+import { runWelcomeReminders, runBirthdayCampaigns, runWinbackCampaigns } from '@/lib/campaigns'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -14,9 +14,12 @@ export async function GET(request: NextRequest) {
 
   try {
     await runWelcomeReminders()
+    await runBirthdayCampaigns()
+    await runWinbackCampaigns()
     return NextResponse.json({ status: 'ok' })
   } catch (error: any) {
     console.error('Cron engine execution failed:', error)
     return NextResponse.json({ error: error.message || 'Internal error' }, { status: 500 })
   }
 }
+
