@@ -43,7 +43,7 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
       .select()
       .single()
 
-    restaurantId = restaurant.id
+    restaurantId = restaurant!.id
   })
 
   test.afterAll(async () => {
@@ -91,12 +91,12 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
     await supabase
       .from('customers')
       .update({ created_at: twentyFiveDaysAgo.toISOString() })
-      .eq('id', customer.id)
+      .eq('id', customer!.id)
 
     // 2. Seed welcome coupon
     await supabase.from('coupons').insert({
       restaurant_id: restaurantId,
-      customer_id: customer.id,
+      customer_id: customer!.id,
       type: 'welcome',
       code: 'W50-CAMPAIGN',
       discount_cents: 5000,
@@ -119,7 +119,7 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
       .from('message_logs')
       .select('*')
       .eq('restaurant_id', restaurantId)
-      .eq('customer_id', customer.id)
+      .eq('customer_id', customer!.id)
       .eq('type', 'campaign')
 
     expect(logs).not.toBeNull()
@@ -134,6 +134,7 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
       .eq('id', restaurantId)
       .single()
 
-    expect(updatedRestaurant.credits).toBe(9) // From 10 to 9
+    expect(updatedRestaurant).not.toBeNull()
+    expect(updatedRestaurant!.credits).toBe(9) // From 10 to 9
   })
 })
