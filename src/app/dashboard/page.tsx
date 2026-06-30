@@ -69,6 +69,7 @@ export default async function DashboardPage() {
         <QuickNavCard href="/dashboard/customers" title="Active Guests" description="View all registered customers" />
         <QuickNavCard href="/dashboard/coupons" title="Coupons" description="Manage issued coupons" />
         <QuickNavCard href="/dashboard/validate" title="Validate Coupon" description="Redeem and validate customer coupons" />
+        <QuickNavCard href="/dashboard/settings" title="Settings" description="Manage restaurant and buy credits" />
       </div>
 
       {/* Credits progress */}

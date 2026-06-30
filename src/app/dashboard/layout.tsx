@@ -57,6 +57,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <NavLink href="/dashboard/customers" label="Guests" />
           <NavLink href="/dashboard/coupons" label="Coupons" />
           <NavLink href="/dashboard/validate" label="Validate Coupon" />
+          <NavLink href="/dashboard/settings" label="Settings" />
         </nav>
 
         {/* Credits indicator */}
