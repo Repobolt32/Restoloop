@@ -1,0 +1,72 @@
+import { createServiceClient } from '@/lib/supabase/server'
+import Razorpay from 'razorpay'
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.text()
+    const signature = request.headers.get('x-razorpay-signature') || ''
+
+    const isMock = process.env.RAZORPAY_WEBHOOK_SECRET === 'mock' || !process.env.RAZORPAY_WEBHOOK_SECRET
+
+    if (!isMock) {
+      const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET!
+      const isValid = Razorpay.validateWebhookSignature(
+        body,
+        signature,
+        webhookSecret
+      )
+
+      if (!isValid) {
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+      }
+    } else {
+      // Mock validation verification for testing
+      if (signature !== 'sig_mock') {
+        return NextResponse.json({ error: 'Invalid signature (mock mode)' }, { status: 400 })
+      }
+    }
+
+    const event = JSON.parse(body)
+
+    if (event.event === 'payment.captured') {
+      const payment = event.payload.payment.entity
+      const userId = payment.notes.userId
+      const credits = parseInt(payment.notes.credits, 10)
+
+      if (!userId || isNaN(credits)) {
+        return NextResponse.json({ error: 'Missing payment notes metadata' }, { status: 400 })
+      }
+
+      const supabase = createServiceClient()
+
+      const { data: restaurant, error: fetchError } = await supabase
+        .from('restaurants')
+        .select('credits')
+        .eq('owner_id', userId)
+        .maybeSingle()
+
+      if (fetchError || !restaurant) {
+        console.error('Webhook: Restaurant not found for owner_id:', userId, fetchError)
+        return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 })
+      }
+
+      const newCredits = (restaurant.credits || 0) + credits
+
+      const { error: updateError } = await supabase
+        .from('restaurants')
+        .update({ credits: newCredits })
+        .eq('owner_id', userId)
+
+      if (updateError) {
+        console.error('Webhook: Failed to update credits:', updateError)
+        return NextResponse.json({ error: 'Database update failed' }, { status: 500 })
+      }
+    }
+
+    return NextResponse.json({ status: 'ok' })
+  } catch (error: any) {
+    console.error('Error handling webhook:', error)
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
+  }
+}
