@@ -7,13 +7,17 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@dietrichgebert/ponytail": "^4.8.3",
     "@eslint/eslintrc": "^3.3.5",
+    "@playwright/test": "^1.61.1",
+    "dotenv": "^17.4.2",
     "eslint": "^9.21.0",
     "eslint-config-next": "^15.1.7",
+    "pg": "^8.22.0",
     "vitest": "^3.0.7"
   },
   "dependencies": {
@@ -24,6 +28,7 @@
     "@types/react": "^19.2.17",
     "next": "^16.2.9",
     "postcss": "^8.5.16",
+    "razorpay": "^2.9.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.1",
