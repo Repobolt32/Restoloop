@@ -76,7 +76,7 @@ Subagent configs: `.opencode/agents/pm.md`, `coder.md`, `tester.md`
 - Follow existing patterns. Match style of neighboring files.
 - No premature abstractions. One implementation = no interface.
 - No comments unless asked.
-- `ui-ux-pro-max` + `frontend-design` for dashboard: strictly follow the Crimson & Warm Saffron light mode theme defined in [MASTER.md](file:///e:/desktop/Restoloop/design-system/restoloop/MASTER.md) throughout the project (no dark mode, use defined Tailwind variables).
+- Global Styling Rule: Strictly follow the Crimson & Warm Saffron light mode theme defined in [MASTER.md](file:///e:/desktop/Restoloop/design-system/restoloop/MASTER.md) across the entire application (including login, signup, intake forms, dashboard, and all future pages). No dark mode is allowed, and all styling must use the defined Tailwind variables/CSS variables for colors, typography (Playfair Display SC / Karla), and spacing.
 - Load `ponytail` skill for all coding tasks — lazy, minimal, YAGNI-first
 - Fetch current API docs via Context7 MCP before relying on memory for signatures
 
