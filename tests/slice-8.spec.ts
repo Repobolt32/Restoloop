@@ -104,4 +104,40 @@ test.describe('Slice 8: Admin Sees All', () => {
     await page.goto('http://localhost:3000/admin')
     await expect(page).toHaveURL(/.*dashboard/)
   })
+
+  test('Super admin can view details and add credits', async ({ page }) => {
+    // 1. Log in as Super Admin
+    await page.goto('http://localhost:3000/login')
+    await page.getByLabel('Email').fill('admin@restoloop.com')
+    await page.getByLabel('Password').fill('adminpassword123')
+    await page.getByRole('button', { name: /log in/i }).click()
+    await expect(page).toHaveURL(/.*dashboard/)
+
+    // 2. Navigate to admin panel
+    await page.goto('http://localhost:3000/admin')
+    await expect(page.getByTestId(`restaurant-row-${restaurantSlug}`)).toBeVisible()
+
+    // 3. Click manage restaurant button
+    await page.getByTestId(`manage-btn-${restaurantSlug}`).click()
+    await expect(page).toHaveURL(new RegExp(`/admin/${restaurantId}`))
+
+    // 4. Verify detail elements
+    await expect(page.getByTestId('admin-restaurant-name')).toContainText('Slice 8 Gourmet Diner')
+    await expect(page.getByTestId('admin-credits-display')).toContainText('100')
+
+    // 5. Trigger add 100 credits action
+    await page.getByTestId('add-100-btn').click()
+
+    // 6. Verify credits update to 200 in UI and success banner appears
+    await expect(page.getByTestId('admin-credits-display')).toContainText('200')
+    await expect(page.getByTestId('success-alert')).toBeVisible()
+
+    // 7. Verify in database directly
+    const { data: dbRest } = await supabase
+      .from('restaurants')
+      .select('credits')
+      .eq('id', restaurantId)
+      .single()
+    expect(dbRest!.credits).toBe(200)
+  })
 })
