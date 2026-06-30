@@ -73,8 +73,8 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
   test('Welcome reminder triggers, deducts credits, and logs status', async ({ request }) => {
     const phone = uniquePhone()
 
-    // 1. Seed customer with created_at set to exactly 25 days ago
-    const twentyFiveDaysAgo = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000 - 60 * 1000) // 25 days and 1 minute ago
+    // 1. Seed customer with created_at set to exactly 24.5 days ago
+    const targetDate = new Date(Date.now() - 24.5 * 24 * 60 * 60 * 1000)
     const { data: customer } = await supabase
       .from('customers')
       .insert({
@@ -82,7 +82,7 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
         name: 'Slice 4 Guest',
         phone: phone,
         opt_in_status: 'opted_in',
-        created_at: twentyFiveDaysAgo.toISOString()
+        created_at: targetDate.toISOString()
       })
       .select()
       .single()
@@ -90,8 +90,16 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
     // Explicitly update created_at via service role to bypass default client override if any
     await supabase
       .from('customers')
-      .update({ created_at: twentyFiveDaysAgo.toISOString() })
+      .update({ created_at: targetDate.toISOString() })
       .eq('id', customer!.id)
+
+    // Log customer to verify created_at was set correctly
+    const { data: verifiedCustomer } = await supabase
+      .from('customers')
+      .select('created_at, opt_in_status')
+      .eq('id', customer!.id)
+      .single()
+    console.log('Verified Customer in DB:', verifiedCustomer)
 
     // 2. Seed welcome coupon
     await supabase.from('coupons').insert({
