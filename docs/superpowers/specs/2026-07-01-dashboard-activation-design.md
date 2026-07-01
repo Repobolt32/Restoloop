@@ -327,9 +327,10 @@ COUPON DISCOUNTS
 **What:** Owner can create a coupon for any customer.
 
 **UI (coupons page addition):**
-- "Create Coupon" button → opens form (modal or inline)
-- Fields: Customer (dropdown), Type (welcome/birthday/winback/custom), Discount (₹), Expiry (days)
-- On submit: insert coupon with generated code, status `sent`
+- "Create Coupon" button → inline form (expands at top of page, no modal — simpler, matches existing patterns)
+- Fields: Customer (dropdown of restaurant's customers), Type (welcome/birthday/winback), Discount (₹, pre-filled from restaurant's default for that type), Expiry (days, default 30)
+- On submit: insert coupon with generated code, status `sent`, `enabled = true`
+- Form uses server action, page revalidates after submission
 
 **Files:**
 - Modify: `src/app/dashboard/coupons/page.tsx` (add create button + form)
@@ -457,7 +458,7 @@ CAMPAIGN SETTINGS
 
 ## Global Constraints
 
-- **Design tokens:** Use existing tokens (Crimson #DC2626, Saffron #A16207, Playfair Display SC, Karla). Full color palette overhaul deferred to a later pass. The food POS palette provided by the user is inspiration only — nearly identical to current tokens, with `--color-muted: #E6E3E7` and sidebar bg `#EDEEF0` as notable differences.
+- **Design tokens:** Use user's POS palette (already applied to `globals.css` and `dashboard/layout.tsx`). Tokens: `--color-muted: #E6E3E7`, sidebar bg `#EDEEF0`. Rest unchanged (Crimson #DC2626, Saffron #A16207, Playfair Display SC, Karla).
 - **No new dependencies except `qrcode`** (for QR generation). No chart library — CSS/SVG bars only.
 - **No new services.** All slices use existing Next.js App Router + Supabase + Vercel cron.
 - **RLS respected.** All owner-facing queries go through the Supabase SSR client (user-scoped). Campaign cron uses service client (bypasses RLS).

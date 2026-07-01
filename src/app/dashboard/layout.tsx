@@ -24,7 +24,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         style={{
           width: '240px',
           flexShrink: 0,
-          background: '#F9FAFB',
+          background: '#EDEEF0',
           borderRight: '1px solid var(--color-border)',
           display: 'flex',
           flexDirection: 'column',
