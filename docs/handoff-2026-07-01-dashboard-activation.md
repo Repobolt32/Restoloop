@@ -162,29 +162,67 @@ alter table message_logs add column coupon_id uuid references coupons(id);
 
 ---
 
-## What To Do Next
+## What To Do Next (Agent Instructions)
 
-**Approach:** Write implementation plan slice by slice (not all at once).
+**DO NOT write one giant plan for all 8 slices.** Work slice by slice.
 
-1. **Start with Slice 9** — write plan, then execute:
-   - Install `qrcode`, `@types/qrcode`, `lucide-react`
-   - Replace `globals.css` entirely (Goodrest tokens)
-   - Update `layout.tsx` fonts (Inter + Fira Code)
-   - Restyle all 14 existing pages
-   - Create landing page `/`
-   - Add QR code to settings
+### Step 0: Load Context
+```
+1. Read this handoff file
+2. Read the design spec: docs/superpowers/specs/2026-07-01-dashboard-activation-design.md
+3. Read docs/BUSINESS_RULES.md
+4. Read docs/DEVELOPER_GUIDE.md
+```
 
-2. **Then Slice 10** — onboarding fix
-3. **Then Slice 11** — campaign visibility
-4. **Then Slice 15** — migration + campaign control
-5. **Then Slice 14** — coupon management
-6. **Then Slice 12** — dashboard upgrade
-7. **Then Slice 13** — analytics page
-8. **Then Slice 16** — customer segments
+### Step 1: For Each Slice — Plan THEN Execute
 
-**For each slice:** Write plan → execute → verify → commit → move to next.
+For each slice in order (9→10→11→15→14→12→13→16):
 
-**Landing page design:** User will provide a reference design before Slice 9 implementation. Ask for it first.
+1. **Load skills** (see Skills table below)
+2. **Invoke `writing-plans` skill** — write implementation plan for THAT slice only
+3. **Save plan** to `docs/superpowers/plans/2026-07-01-slice-{N}-{name}.md`
+4. **Ask user** for execution mode:
+   - Subagent-Driven (recommended) — dispatch fresh subagent per task
+   - Inline Execution — execute tasks in current session
+5. **Execute** the plan (using `subagent-driven-development` or `executing-plans` skill)
+6. **Verify** — run typecheck, lint, test, Playwright screenshot
+7. **Commit** — `git commit -m "feat: slice {N} — {description}"`
+8. **Move to next slice**
+
+### Skills to Load Per Slice
+
+| Slice | Load These Skills | Purpose |
+|-------|-------------------|---------|
+| **9** | `writing-plans` → `frontend-design`, `tailwind-design-system`, `web-design-guidelines`, `playwright-visual-testing` | UI reset + landing page + QR |
+| **10** | `writing-plans` → `server-actions`, `zod` | Form opt-in fix + webhook |
+| **11** | `writing-plans` → `server-actions`, `supabase-postgres-best-practices` | Campaign logging fix + campaigns page |
+| **15** | `writing-plans` → `supabase-postgres-best-practices`, `zod`, `vercel-functions` | DB migration + campaign control |
+| **14** | `writing-plans` → `server-actions`, `zod`, `supabase-postgres-best-practices` | Coupon CRUD + discount editor |
+| **12** | `writing-plans` → `frontend-design`, `supabase-postgres-best-practices` | Dashboard stat cards + activity |
+| **13** | `writing-plans` → `frontend-design`, `supabase-postgres-best-practices` | Analytics page |
+| **16** | `writing-plans` → `frontend-design`, `supabase-postgres-best-practices` | Customer segments |
+
+### Superpowers Workflow Per Slice
+
+```
+For each slice:
+  1. Invoke skill("writing-plans")
+  2. Read the spec section for this slice
+  3. Read the existing files that will be modified
+  4. Write the plan (bite-sized tasks, TDD, exact file paths, complete code)
+  5. Save plan to docs/superpowers/plans/
+  6. Invoke skill("subagent-driven-development") OR skill("executing-plans")
+  7. Execute tasks
+  8. Verify (typecheck, lint, test, screenshot)
+  9. Commit
+```
+
+### Slice 9 Special Note
+
+**Ask user for landing page reference design BEFORE implementing Slice 9.**
+The user said they will provide a sample design. Ask first.
+
+**Slice 9 also requires:** `npm install qrcode @types/qrcode lucide-react`
 
 ---
 
