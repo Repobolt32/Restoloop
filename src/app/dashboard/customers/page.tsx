@@ -1,7 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { maskPhone } from '@/lib/utils'
-import Link from 'next/link'
+
+function maskPhone(phone: string) {
+  return phone.slice(0, -4) + '****'
+}
+
+const TH_STYLE: React.CSSProperties = {
+  padding: '12px 16px',
+  textAlign: 'left',
+  fontFamily: 'var(--font-display)',
+  fontSize: '0.75rem',
+  fontWeight: 700,
+  letterSpacing: '0.08em',
+  color: '#FFFFFF',
+  background: 'var(--color-foreground)',
+  whiteSpace: 'nowrap',
+}
 
 export default async function CustomersPage() {
   const supabase = await createClient()
@@ -12,7 +26,7 @@ export default async function CustomersPage() {
     .from('restaurants')
     .select('id')
     .eq('owner_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!restaurant) redirect('/dashboard/create')
 
@@ -23,58 +37,102 @@ export default async function CustomersPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Customers</h1>
-        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">
-          ← Dashboard
-        </Link>
-      </div>
+    <div style={{ padding: '2rem' }}>
+      <h1
+        data-testid="customers-heading"
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.75rem',
+          color: 'var(--color-foreground)',
+          marginBottom: '1.5rem',
+        }}
+      >
+        Active Guests
+      </h1>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100 text-left text-sm text-gray-600">
-              <th className="p-3 font-medium">Name</th>
-              <th className="p-3 font-medium">Phone</th>
-              <th className="p-3 font-medium">Status</th>
-              <th className="p-3 font-medium">Last Visit</th>
-              <th className="p-3 font-medium">Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(!customers || customers.length === 0) ? (
-              <tr>
-                <td colSpan={5} className="p-8 text-center text-gray-400">
-                  No customers yet. Share your intake form to get started.
-                </td>
-              </tr>
-            ) : (
-              customers.map((c) => (
-                <tr key={c.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="p-3">{c.name || '—'}</td>
-                  <td className="p-3 font-mono text-sm">{maskPhone(c.phone)}</td>
-                  <td className="p-3">
-                    <span className={
-                      c.opt_in_status === 'confirmed' ? 'text-green-600' :
-                      c.opt_in_status === 'opted_out' ? 'text-red-500' :
-                      'text-yellow-600'
-                    }>
-                      {c.opt_in_status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-sm text-gray-500">
-                    {c.last_visit_at ? new Date(c.last_visit_at).toLocaleDateString('en-IN') : '—'}
-                  </td>
-                  <td className="p-3 text-sm text-gray-500">
-                    {new Date(c.created_at).toLocaleDateString('en-IN')}
-                  </td>
+      {!customers || customers.length === 0 ? (
+        <div
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid var(--color-border)',
+            borderRadius: '12px',
+            padding: '3rem',
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-foreground)', opacity: 0.5 }}>
+            No guests yet. Share your QR code to get started.
+          </p>
+        </div>
+      ) : (
+        <div
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid var(--color-border)',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: 'var(--shadow-md)',
+          }}
+        >
+          <div style={{ overflowX: 'auto' }}>
+            <table
+              data-testid="customers-table"
+              style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-body)' }}
+            >
+              <thead>
+                <tr>
+                  <th style={TH_STYLE}>Name</th>
+                  <th style={TH_STYLE}>Phone</th>
+                  <th style={TH_STYLE}>Status</th>
+                  <th style={TH_STYLE}>Last Visit</th>
+                  <th style={TH_STYLE}>Joined</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {customers.map((customer, i) => (
+                  <tr
+                    key={customer.id}
+                    className={i % 2 === 0 ? 'dash-table-row-even' : 'dash-table-row-odd'}
+                  >
+                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-foreground)' }}>
+                      {customer.name || <span style={{ opacity: 0.4 }}>—</span>}
+                    </td>
+                    <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontSize: '0.875rem', color: 'var(--color-foreground)' }}>
+                      {maskPhone(customer.phone)}
+                    </td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <OptInBadge status={customer.opt_in_status} />
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-foreground)', opacity: 0.7 }}>
+                      {customer.last_visit_at
+                        ? new Date(customer.last_visit_at).toLocaleDateString('en-IN')
+                        : <span style={{ opacity: 0.4 }}>—</span>}
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-foreground)', opacity: 0.7 }}>
+                      {new Date(customer.created_at).toLocaleDateString('en-IN')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+function OptInBadge({ status }: { status: string }) {
+  const styles: Record<string, React.CSSProperties> = {
+    opted_in:  { background: '#DCFCE7', color: '#166534' },
+    opted_out: { background: '#FEE2E2', color: '#991B1B' },
+    pending:   { background: '#FEF9C3', color: '#854D0E' },
+  }
+  const s = styles[status] ?? { background: 'var(--color-muted)', color: 'var(--color-foreground)' }
+  return (
+    <span style={{ ...s, display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-body)' }}>
+      {status.replace('_', ' ')}
+    </span>
   )
 }

@@ -8,8 +8,8 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) return NextResponse.redirect(`${origin}${next}`)
+    await supabase.auth.exchangeCodeForSession(code)
   }
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+
+  return NextResponse.redirect(new URL(next, origin))
 }

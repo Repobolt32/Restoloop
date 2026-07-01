@@ -1,0 +1,13 @@
+uid=1_0 RootWebArea url="http://localhost:3000/login"
+  uid=1_1 form
+    uid=1_2 heading "Log In" level="1"
+    uid=1_3 StaticText "Email"
+    uid=1_4 textbox "Email" required
+    uid=1_5 StaticText "Password"
+    uid=1_6 textbox "Password" required
+    uid=1_7 button "Log In"
+    uid=1_8 StaticText "Don't have an account? "
+    uid=1_9 link "Sign up" url="http://localhost:3000/signup"
+      uid=1_10 StaticText "Sign up"
+  uid=1_11 button "Open Next.js Dev Tools" expandable haspopup="menu"
+  uid=1_12 alert atomic live="assertive" relevant="additions text"

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenWA WhatsApp Pairing</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f7f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            max-width: 400px;
+        }
+        h2 {
+            color: #128c7e;
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+        p.subtitle {
+            color: #667781;
+            font-size: 14px;
+            margin: 0 0 30px 0;
+        }
+        .qr-wrapper {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #e1e9eb;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        img {
+            width: 280px;
+            height: 280px;
+            display: block;
+        }
+        .status {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #8696a0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #e1e9eb;
+            border-top: 2px solid #128c7e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>WhatsApp Link Device</h2>
+        <p class="subtitle">Open WhatsApp > Settings > Linked Devices > Link a device</p>
+        <div class="qr-wrapper">
+            <img id="qr" src="" alt="Loading QR code..." />
+        </div>
+        <div class="status">
+            <div class="spinner"></div>
+            <span>Auto-refreshing every 10 seconds...</span>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "owa_k1_5cce14b93c4fbc60ebcbd272fdf7cac20328ca56f00080bb24b5d59418620592";
+        const sessionId = "ef004332-4291-4202-8bf2-55427415e785";
+        
+        async function loadQR() {
+            try {
+                const res = await fetch(`http://localhost:2785/api/sessions/${sessionId}/qr`, {
+                    headers: { 'X-API-Key': apiKey }
+                });
+                const data = await res.json();
+                if (data.qrCode) {
+                    document.getElementById('qr').src = data.qrCode;
+                }
+            } catch (err) {
+                console.error("Error loading QR:", err);
+            }
+        }
+        loadQR();
+        setInterval(loadQR, 10000);
+    </script>
+</body>
+</html>

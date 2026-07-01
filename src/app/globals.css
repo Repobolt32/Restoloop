@@ -1,1 +1,122 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: #FEF2F2;
+  --color-foreground: #450A0A;
+  --color-primary: #DC2626;
+  --color-on-primary: #FFFFFF;
+  --color-secondary: #F87171;
+  --color-accent: #A16207;
+  --color-muted: #F0EDF1;
+  --color-border: #FECACA;
+  --color-destructive: #DC2626;
+  --color-ring: #DC2626;
+
+  --font-display: 'Playfair Display SC', serif;
+  --font-body: 'Karla', sans-serif;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+
+  --animate-fade-in: fade-in 0.2s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Dashboard component classes */
+.dash-nav-link {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+  text-decoration: none;
+  transition: background 200ms, color 200ms;
+  cursor: pointer;
+}
+.dash-nav-link:hover {
+  background: var(--color-border);
+}
+
+.dash-stat-card {
+  display: block;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  transition: box-shadow 200ms, transform 200ms;
+  cursor: pointer;
+}
+.dash-stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.dash-quick-card {
+  display: block;
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  transition: background 200ms;
+  cursor: pointer;
+}
+.dash-quick-card:hover {
+  background: var(--color-border);
+}
+
+.dash-table-row-even {
+  background: #FFFFFF;
+  transition: background 200ms;
+}
+.dash-table-row-odd {
+  background: var(--color-background);
+  transition: background 200ms;
+}
+.dash-table-row-even:hover,
+.dash-table-row-odd:hover {
+  background: var(--color-border);
+}
+

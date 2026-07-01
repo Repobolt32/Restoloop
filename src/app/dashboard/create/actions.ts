@@ -1,50 +1,76 @@
 'use server'
+
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
+import { redirect } from 'next/navigation'
 
 const schema = z.object({
   name: z.string().min(1),
-  address: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email().optional(),
   whatsappNumber: z.string().regex(/^91\d{10}$/),
-  welcomeDiscountCents: z.coerce.number().int().positive(),
-  birthdayDiscountCents: z.coerce.number().int().positive(),
-  winbackDiscountCents: z.coerce.number().int().positive(),
+  welcomeDiscount: z.coerce.number().int().positive(),
+  birthdayDiscount: z.coerce.number().int().positive(),
+  winbackDiscount: z.coerce.number().int().positive(),
 })
+
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
 
 export async function createRestaurant(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const validated = schema.parse({
+  const parsed = schema.parse({
     name: formData.get('name'),
-    address: formData.get('address'),
-    phone: formData.get('phone'),
-    email: formData.get('email'),
     whatsappNumber: formData.get('whatsappNumber'),
-    welcomeDiscountCents: formData.get('welcomeDiscountCents'),
-    birthdayDiscountCents: formData.get('birthdayDiscountCents'),
-    winbackDiscountCents: formData.get('winbackDiscountCents'),
+    welcomeDiscount: formData.get('welcomeDiscount'),
+    birthdayDiscount: formData.get('birthdayDiscount'),
+    winbackDiscount: formData.get('winbackDiscount'),
   })
 
-  const slug = validated.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  let slug = slugify(parsed.name)
+
+  // Check for slug collision across all tenants using admin client to bypass RLS
+  const adminClient = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  let isUnique = false
+  let attempts = 0
+  const maxAttempts = 10
+
+  while (!isUnique && attempts < maxAttempts) {
+    const checkSlug = attempts === 0 ? slug : `${slug}-${Math.random().toString(36).slice(2, 6)}`
+    const { data: existing } = await adminClient
+      .from('restaurants')
+      .select('id')
+      .eq('slug', checkSlug)
+      .maybeSingle()
+
+    if (!existing) {
+      slug = checkSlug
+      isUnique = true
+    }
+    attempts++
+  }
 
   const { error } = await supabase.from('restaurants').insert({
     owner_id: user.id,
-    name: validated.name,
-    address: validated.address || null,
-    phone: validated.phone || null,
-    email: validated.email || null,
+    name: parsed.name,
     slug,
-    whatsapp_number: validated.whatsappNumber,
-    welcome_discount_cents: validated.welcomeDiscountCents,
-    birthday_discount_cents: validated.birthdayDiscountCents,
-    winback_discount_cents: validated.winbackDiscountCents,
+    whatsapp_number: parsed.whatsappNumber,
+    welcome_discount_cents: parsed.welcomeDiscount * 100,
+    birthday_discount_cents: parsed.birthdayDiscount * 100,
+    winback_discount_cents: parsed.winbackDiscount * 100,
   })
 
   if (error) throw new Error(error.message)
+
   redirect('/dashboard')
 }

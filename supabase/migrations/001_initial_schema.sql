@@ -1,4 +1,3 @@
--- Restaurants table
 create table restaurants (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid references auth.users not null,
@@ -17,7 +16,6 @@ create table restaurants (
   updated_at timestamp with time zone default now()
 );
 
--- Customers table
 create table customers (
   id uuid primary key default gen_random_uuid(),
   restaurant_id uuid references restaurants not null,
@@ -33,7 +31,6 @@ create table customers (
   unique (restaurant_id, phone)
 );
 
--- Coupons table
 create table coupons (
   id uuid primary key default gen_random_uuid(),
   restaurant_id uuid references restaurants not null,
@@ -47,7 +44,6 @@ create table coupons (
   created_at timestamp with time zone default now()
 );
 
--- Message logs table
 create table message_logs (
   id uuid primary key default gen_random_uuid(),
   restaurant_id uuid references restaurants,

@@ -1,12 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "deliver-acceptance-criteria": {
-      "source": "product-on-purpose/pm-skills",
-      "sourceType": "github",
-      "skillPath": "skills/deliver-acceptance-criteria/SKILL.md",
-      "computedHash": "edbf6db213e248354cea7538bd63b829cbb6d3b5420cf2dcb4b56437933070f9"
-    },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
@@ -42,6 +36,12 @@
       "sourceType": "github",
       "skillPath": ".claude/skills/typescript-best-practices/SKILL.md",
       "computedHash": "b73b69197553b711e02839015e6abca717eb2305e90de3cc86403c92d92b00d9"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "20c0ed05adb01fde3db5bb1aeefd61d33db2471bdadfd9c9ce19d30dd54a12fd"
     },
     "vercel-functions": {
       "source": "vercel-labs/vercel-plugin",

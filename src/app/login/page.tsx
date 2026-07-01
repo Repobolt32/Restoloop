@@ -1,7 +1,8 @@
 'use client'
+
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -9,22 +10,55 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const router = useRouter()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setError('')
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) { setError(error.message) }
-    else { router.push('/dashboard') }
+    if (error) {
+      setError(error.message)
+      return
+    }
+    router.push('/dashboard')
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form onSubmit={handleLogin} className="flex flex-col gap-4 w-80">
-        <h1 className="text-2xl font-bold">Login</h1>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="border p-2" />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="border p-2" />
-        {error && <p className="text-red-500">{error}</p>}
-        <button type="submit" className="bg-blue-500 text-white p-2">Login</button>
+    <div className="flex min-h-screen items-center justify-center">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 p-8">
+        <h1 className="text-2xl font-bold">Log In</h1>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium">Email</label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="mt-1 block w-full rounded border px-3 py-2"
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium">Password</label>
+          <input
+            id="password"
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="mt-1 block w-full rounded border px-3 py-2"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full rounded bg-black px-4 py-2 text-white hover:bg-gray-800"
+        >
+          Log In
+        </button>
+        <p className="text-center text-sm">
+          Don&apos;t have an account? <a href="/signup" className="underline">Sign up</a>
+        </p>
       </form>
     </div>
   )
