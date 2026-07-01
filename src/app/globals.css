@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* Brand — Restoloop identity */
   --color-background: #FEF2F2;
   --color-foreground: #450A0A;
   --color-primary: #DC2626;
@@ -12,9 +13,18 @@
   --color-destructive: #DC2626;
   --color-ring: #DC2626;
 
+  /* Surfaces — from Goodrest, darkened ~5% for contrast */
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #f8fafc;
+  --color-grey-50: #eef1f5;
+  --color-grey-100: #e4e8ed;
+
+  /* Typography */
   --font-display: 'Playfair Display SC', serif;
   --font-body: 'Karla', sans-serif;
+  --font-mono: 'Fira Code', monospace;
 
+  /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
@@ -23,10 +33,11 @@
   --space-2xl: 3rem;
   --space-3xl: 4rem;
 
+  /* Shadows — layered, from Goodrest */
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.15);
 
   --animate-fade-in: fade-in 0.2s ease-out;
 
@@ -59,29 +70,55 @@
   }
 }
 
-/* Dashboard component classes */
+/* ============================================
+   Glass Card — primary card pattern (from Goodrest)
+   ============================================ */
+.glass-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-grey-100);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   Sidebar Nav Links
+   ============================================ */
 .dash-nav-link {
-  display: block;
-  padding: 10px 12px;
-  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 0.75rem;
   margin-bottom: 4px;
   font-family: var(--font-body);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--color-foreground);
+  opacity: 0.6;
   text-decoration: none;
-  transition: background 200ms, color 200ms;
+  transition: background 200ms, opacity 200ms;
   cursor: pointer;
 }
 .dash-nav-link:hover {
-  background: var(--color-border);
+  background: var(--color-grey-100);
+  opacity: 1;
+}
+.dash-nav-link[data-active="true"] {
+  background: var(--color-surface);
+  opacity: 1;
+  box-shadow: var(--shadow-md);
 }
 
+/* ============================================
+   Stat Cards
+   ============================================ */
 .dash-stat-card {
   display: block;
-  background: #FFFFFF;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-grey-100);
+  border-radius: 1rem;
   padding: 1.25rem 1.5rem;
   box-shadow: var(--shadow-sm);
   text-decoration: none;
@@ -93,30 +130,160 @@
   transform: translateY(-2px);
 }
 
+/* ============================================
+   Quick Nav Cards
+   ============================================ */
 .dash-quick-card {
   display: block;
-  background: var(--color-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-grey-100);
+  border-radius: 1rem;
   padding: 1rem 1.25rem;
   text-decoration: none;
-  transition: background 200ms;
+  transition: background 200ms, box-shadow 200ms;
   cursor: pointer;
 }
 .dash-quick-card:hover {
-  background: var(--color-border);
+  background: var(--color-grey-50);
+  box-shadow: var(--shadow-sm);
 }
 
+/* ============================================
+   Table Rows
+   ============================================ */
 .dash-table-row-even {
-  background: #FFFFFF;
+  background: var(--color-surface);
   transition: background 200ms;
 }
 .dash-table-row-odd {
-  background: var(--color-background);
+  background: var(--color-surface-muted);
   transition: background 200ms;
 }
 .dash-table-row-even:hover,
 .dash-table-row-odd:hover {
-  background: var(--color-border);
+  background: var(--color-grey-50);
 }
 
+/* ============================================
+   Status Badges (bg/text/border triple)
+   ============================================ */
+.badge-sent,
+.badge-success {
+  background: #DCFCE7;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+}
+.badge-failed {
+  background: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+.badge-pending {
+  background: #FEF9C3;
+  color: #854D0E;
+  border: 1px solid #FDE68A;
+}
+.badge-blocked {
+  background: #F3E8FF;
+  color: #6B21A8;
+  border: 1px solid #E9D5FF;
+}
+.badge-redeemed {
+  background: #DCFCE7;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+}
+
+/* ============================================
+   Type Badges
+   ============================================ */
+.badge-welcome {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+.badge-birthday {
+  background: #FEF3C7;
+  color: #92400E;
+}
+.badge-winback {
+  background: #F3E8FF;
+  color: #6B21A8;
+}
+.badge-expiry {
+  background: #FFEDD5;
+  color: #9A3412;
+}
+
+/* ============================================
+   Toggle Switch (campaign on/off)
+   ============================================ */
+.toggle-track {
+  width: 3rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  transition: background 200ms;
+}
+.toggle-track[data-on="true"] {
+  background: #22C55E;
+}
+.toggle-track[data-on="false"] {
+  background: var(--color-grey-100);
+}
+.toggle-knob {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  position: absolute;
+  top: 0.25rem;
+  transition: left 200ms;
+}
+.toggle-track[data-on="true"] .toggle-knob {
+  left: 1.75rem;
+}
+.toggle-track[data-on="false"] .toggle-knob {
+  left: 0.25rem;
+}
+
+/* ============================================
+   Filter Chips
+   ============================================ */
+.filter-chip {
+  padding: 6px 18px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 200ms, color 200ms, border-color 200ms;
+}
+.filter-chip:hover {
+  background: var(--color-accent);
+  color: white;
+}
+.filter-chip[data-active="true"] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+/* ============================================
+   Section Headers (Goodrest pattern)
+   ============================================ */
+.section-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-foreground);
+  opacity: 0.4;
+}

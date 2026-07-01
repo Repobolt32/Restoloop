@@ -14,7 +14,109 @@ No new services, no new infrastructure. All slices use existing Next.js App Rout
 
 ## Tech Stack
 
-Next.js 16 (App Router, Turbopack), Supabase (Postgres + RLS + Auth), Tailwind CSS v4, existing `qrcode` npm dependency (new), existing design tokens. No chart library — CSS/SVG bars only.
+Next.js 16 (App Router, Turbopack), Supabase (Postgres + RLS + Auth), Tailwind CSS v4, `qrcode` (new), `lucide-react` (new — replaces inline SVGs). No chart library — CSS/SVG bars only.
+
+## Design System (Merged from Goodrest POS + Restoloop Identity)
+
+Inspired by the Goodrest owner dashboard UI report. Merges Goodrest's clean, data-dense dashboard patterns with Restoloop's warm restaurant identity.
+
+### Colors
+
+| Token | Hex | Source | Notes |
+|-------|-----|--------|-------|
+| `--color-background` | `#FEF2F2` | Restoloop | Warm rose cream — keep |
+| `--color-foreground` | `#450A0A` | Restoloop | Deep maroon — keep |
+| `--color-primary` | `#DC2626` | Restoloop | Crimson red — keep |
+| `--color-on-primary` | `#FFFFFF` | both | White |
+| `--color-secondary` | `#F87171` | Restoloop | Coral — keep |
+| `--color-accent` | `#A16207` | Restoloop | Saffron gold CTAs — keep |
+| `--color-muted` | `#E6E3E7` | POS | Card wells, subtle bg |
+| `--color-border` | `#FECACA` | Restoloop | Soft pink borders — keep |
+| `--color-surface` | `#FFFFFF` | Goodrest | Card backgrounds |
+| `--color-surface-muted` | `#f8fafc` | Goodrest | Main content bg (replaces old grey) |
+
+**Grey palette (from Goodrest, darkened ~5% for contrast):**
+
+| Token | Hex | Replaces |
+|-------|-----|----------|
+| `--color-grey-50` | `#eef1f5` | slate-50 `#f8fafc` |
+| `--color-grey-100` | `#e4e8ed` | slate-100 `#f1f5f9` |
+
+### Typography
+
+| Token | Value | Source |
+|-------|-------|--------|
+| `--font-display` | `'Playfair Display SC', serif` | Restoloop — brand identity |
+| `--font-body` | `'Karla', sans-serif` | Restoloop — warm feel |
+| `--font-mono` | `'Fira Code', monospace` | Goodrest — for codes, IDs, amounts |
+
+**Type scale (from Goodrest):**
+- Page title: `text-3xl font-black tracking-tight`
+- Section header: `text-sm font-black uppercase tracking-[0.2em]`
+- Card title: `text-sm font-black`
+- Card meta: `text-[10px] font-bold`
+- Status badge: `text-[9px] font-black uppercase tracking-widest`
+- Label (tiny): `text-[9px] font-black uppercase tracking-widest text-slate-400`
+- Table header: `text-[10px] font-black uppercase tracking-widest`
+- Button text: `text-[10px] font-black uppercase tracking-widest`
+
+**Key pattern:** Nearly all labels/headers are uppercase with wide letter-spacing. Font-black (900) for emphasis, font-bold (700) for data.
+
+### Layout
+
+```
+┌──────────────────────────────────────────┐
+│  Sidebar (w-60)  │  Main Content         │
+│  bg #EDEEF0      │  bg #FEF2F2           │
+│  sticky           │  flex-1               │
+│  border-r         │  max-w-7xl mx-auto    │
+│  p-6              │  p-4 md:p-8           │
+└──────────────────────────────────────────┘
+```
+
+### Components
+
+**Glass Card (from Goodrest):**
+```css
+background: white;
+border: 1px solid var(--color-grey-100);
+border-radius: 1rem;
+box-shadow: var(--shadow-sm);
+```
+
+**Status badges (bg/text/border triple):**
+- Sent/success: bg `#DCFCE7`, text `#166534`, border `#BBF7D0`
+- Failed: bg `#FEE2E2`, text `#991B1B`, border `#FECACA`
+- Pending: bg `#FEF9C3`, text `#854D0E`, border `#FDE68A`
+- Blocked: bg `#F3E8FF`, text `#6B21A8`, border `#E9D5FF`
+
+**Type badges:**
+- Welcome: bg `#DBEAFE`, text `#1E40AF`
+- Birthday: bg `#FEF3C7`, text `#92400E`
+- Winback: bg `#F3E8FF`, text `#6B21A8`
+- Expiry: bg `#FFEDD5`, text `#9A3412`
+
+**Toggle switch (for campaign on/off, from Goodrest):**
+```
+w-12 h-6 rounded-full
+ON:  bg-green-500
+OFF: bg-slate-300
+Knob: w-4 h-4 bg-white rounded-full shadow-sm
+```
+
+**Border radius:**
+- Cards: `rounded-2xl` (16px)
+- Badges: `rounded-full`
+- Buttons: `rounded-xl` (12px)
+- Inputs: `rounded-lg` (8px)
+- Sidebar nav items: `rounded-xl`
+
+**Icons:** `lucide-react` (20px default). Replace all inline SVGs.
+
+**Responsive:**
+- `< lg`: Sidebar hidden, hamburger menu, stacked layout
+- `lg+`: Sidebar sticky, grid layouts
+- `md+`: Larger padding, side-by-side layouts
 
 ## Slice Map
 
@@ -458,19 +560,17 @@ CAMPAIGN SETTINGS
 
 ## Global Constraints
 
-- **Design tokens:** Use user's POS palette (already applied to `globals.css` and `dashboard/layout.tsx`). Tokens: `--color-muted: #E6E3E7`, sidebar bg `#EDEEF0`. Rest unchanged (Crimson #DC2626, Saffron #A16207, Playfair Display SC, Karla).
-- **No new dependencies except `qrcode`** (for QR generation). No chart library — CSS/SVG bars only.
+- **Design system:** Merged Goodrest POS + Restoloop identity (see Design System section above). Applied to `globals.css` in Slice 9. All new pages/components follow this system.
+- **New dependencies:** `qrcode` + `@types/qrcode` (QR generation), `lucide-react` (icons). No chart library — CSS/SVG bars only.
 - **No new services.** All slices use existing Next.js App Router + Supabase + Vercel cron.
 - **RLS respected.** All owner-facing queries go through the Supabase SSR client (user-scoped). Campaign cron uses service client (bypasses RLS).
 - **Tailwind v4 CSS-native config.** No `tailwind.config.js`. Tokens in `globals.css` `@theme` block.
 - **Server components by default.** Client components only where interactivity requires it (settings toggles, coupon create form, QR canvas).
-- **Existing patterns followed.** Inline `style={}` referencing CSS variables + Tailwind utility classes + custom `.dash-*` classes (as seen in existing dashboard pages).
 - **Ponytail principle.** Shortest working diff. No abstractions for single use cases. No boilerplate.
 
 ## Out of Scope (Deferred)
 
 - WhatsApp conversational AI agent (LLM-powered human-like conversation) — deferred to v1.5
-- Color palette overhaul — separate pass
 - POS integration — out of scope per PRD
 - Referral program — out of scope per PRD
 - Feedback/NPS — out of scope per PRD
