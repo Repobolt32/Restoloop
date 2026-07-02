@@ -134,6 +134,44 @@ export async function POST(request: NextRequest) {
     // Existing customer: handle opt-in/out
     const body = event.body.trim().toUpperCase()
 
+    // Form-originated customers (opted_in) — send coupon if not yet confirmed
+    if (customer.opt_in_status === 'opted_in') {
+      const { data: confirmLog } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('direction', 'outbound')
+        .eq('type', 'opt_in_confirm')
+        .limit(1)
+        .maybeSingle()
+
+      if (!confirmLog) {
+        // Find the welcome coupon
+        const { data: welcomeCoupon } = await supabase
+          .from('coupons')
+          .select('*')
+          .eq('customer_id', customer.id)
+          .eq('type', 'welcome')
+          .maybeSingle()
+
+        if (welcomeCoupon) {
+          const welcomeMessage = `Hey ${customer.name || 'there'}! Welcome to ${restaurant.name}. Your coupon: ${welcomeCoupon.code} for ₹${restaurant.welcome_discount_cents / 100} OFF. Valid till ${new Date(welcomeCoupon.expires_at).toLocaleDateString('en-IN')}. Reply STOP to opt out.`
+          const result = await adapter.sendText(fromPhone, welcomeMessage)
+
+          await supabase.from('message_logs').insert({
+            restaurant_id: restaurant.id,
+            customer_id: customer.id,
+            direction: 'outbound',
+            type: 'opt_in_confirm',
+            status: result.success ? 'sent' : 'failed',
+            error: result.error || null,
+          })
+
+          return NextResponse.json({ status: 'ok' })
+        }
+      }
+    }
+
     if (body === 'YES') {
       await supabase
         .from('customers')

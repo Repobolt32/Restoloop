@@ -41,14 +41,14 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
 
     const phone = validated.phone.replace('+', '')
 
-    // Create pending customer
+    // Create opted_in customer
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .insert({
         restaurant_id: restaurant.id,
         phone,
         name: validated.name,
-        opt_in_status: 'pending',
+        opt_in_status: 'opted_in',
         birthday_month: validated.birthdayMonth || null,
         birthday_day: validated.birthdayDay || null,
         food_preference: validated.foodPreference || null,
@@ -66,7 +66,8 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
           .maybeSingle()
 
         if (existingCustomer) {
-          const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=hello`
+          const prefilledMessage = encodeURIComponent('Hi! I just signed up for your loyalty club.')
+          const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=${prefilledMessage}`
           return { success: true, waUrl }
         }
       }
@@ -90,7 +91,8 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
       return { success: false, error: couponError.message }
     }
 
-    const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=hello`
+    const prefilledMessage = encodeURIComponent('Hi! I just signed up for your loyalty club.')
+    const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=${prefilledMessage}`
     return { success: true, waUrl }
   } catch (error) {
     if (error instanceof z.ZodError) {
