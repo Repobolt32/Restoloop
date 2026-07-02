@@ -93,6 +93,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <QuickNavCard href="/dashboard/customers" title="Active Guests" description="View all registered customers" />
         <QuickNavCard href="/dashboard/coupons" title="Coupons" description="Manage issued coupons" />
+        <QuickNavCard href="/dashboard/analytics" title="Analytics" description="Growth charts and campaign stats" />
         <QuickNavCard href="/dashboard/validate" title="Validate Coupon" description="Redeem and validate customer coupons" />
         <QuickNavCard href="/dashboard/settings" title="Settings" description="Manage restaurant and buy credits" />
       </div>
