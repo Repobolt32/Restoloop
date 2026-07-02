@@ -28,21 +28,20 @@ export default function ValidatePage() {
       }
     })
   }
-
   return (
     <div className="p-8 max-w-xl mx-auto font-body">
       {/* Back link */}
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-2 text-primary font-semibold text-sm mb-6 hover:underline cursor-pointer"
+        className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[--color-grey-500] hover:text-[--color-primary] mb-6 cursor-pointer transition-colors"
       >
         <svg
-          width="16"
-          height="16"
+          width="12"
+          height="12"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
@@ -52,15 +51,15 @@ export default function ValidatePage() {
         Back to Dashboard
       </Link>
 
-      <h1 className="font-display text-3xl font-bold text-foreground mb-1 text-wrap-balance">
+      <h1 className="font-display text-3xl font-black tracking-tight text-[--color-foreground] mb-1 text-wrap-balance uppercase">
         Validate Coupon
       </h1>
-      <p className="text-foreground/60 mb-8">
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent] mb-8">
         Scan or enter a guest&apos;s coupon code to redeem it.
       </p>
 
       {/* Form card container */}
-      <div className="bg-white border border-border rounded-xl p-8 shadow-md">
+      <div className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md">
         <form onSubmit={handleValidate} className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <label

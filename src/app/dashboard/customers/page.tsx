@@ -5,18 +5,6 @@ function maskPhone(phone: string) {
   return phone.slice(0, -4) + '****'
 }
 
-const TH_STYLE: React.CSSProperties = {
-  padding: '12px 16px',
-  textAlign: 'left',
-  fontFamily: 'var(--font-display)',
-  fontSize: '0.75rem',
-  fontWeight: 700,
-  letterSpacing: '0.08em',
-  color: '#FFFFFF',
-  background: 'var(--color-foreground)',
-  whiteSpace: 'nowrap',
-}
-
 export default async function CustomersPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -37,79 +25,62 @@ export default async function CustomersPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className="p-8 max-w-[900px]">
       <h1
         data-testid="customers-heading"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '1.75rem',
-          color: 'var(--color-foreground)',
-          marginBottom: '1.5rem',
-        }}
+        className="text-3xl font-black tracking-tight text-[--color-foreground] mb-1 font-display uppercase"
       >
         Active Guests
       </h1>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent] mb-8">
+        View all registered customers
+      </p>
 
       {!customers || customers.length === 0 ? (
-        <div
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid var(--color-border)',
-            borderRadius: '12px',
-            padding: '3rem',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-sm)',
-          }}
-        >
-          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-foreground)', opacity: 0.5 }}>
+        <div className="bg-white border border-[--color-border] rounded-2xl p-12 text-center shadow-md">
+          <p className="text-sm font-bold text-[--color-grey-500]">
             No guests yet. Share your QR code to get started.
           </p>
         </div>
       ) : (
-        <div
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid var(--color-border)',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: 'var(--shadow-md)',
-          }}
-        >
-          <div style={{ overflowX: 'auto' }}>
+        <div className="bg-white border border-[--color-border] rounded-2xl overflow-hidden shadow-md">
+          <div className="overflow-x-auto">
             <table
               data-testid="customers-table"
-              style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-body)' }}
+              className="w-full border-collapse text-left"
             >
               <thead>
-                <tr>
-                  <th style={TH_STYLE}>Name</th>
-                  <th style={TH_STYLE}>Phone</th>
-                  <th style={TH_STYLE}>Status</th>
-                  <th style={TH_STYLE}>Last Visit</th>
-                  <th style={TH_STYLE}>Joined</th>
+                <tr className="border-b border-[--color-border] bg-[--color-grey-50]">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Name</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Phone</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Status</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Last Visit</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Joined</th>
                 </tr>
               </thead>
               <tbody>
                 {customers.map((customer, i) => (
                   <tr
                     key={customer.id}
-                    className={i % 2 === 0 ? 'dash-table-row-even' : 'dash-table-row-odd'}
+                    className={`border-b border-[--color-border] last:border-b-0 hover:bg-[--color-grey-50] transition-colors ${
+                      i % 2 === 0 ? 'bg-white' : 'bg-[--color-grey-50]/30'
+                    }`}
                   >
-                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-foreground)' }}>
-                      {customer.name || <span style={{ opacity: 0.4 }}>—</span>}
+                    <td className="px-6 py-4 text-sm font-bold text-[--color-foreground]">
+                      {customer.name || <span className="opacity-40 font-normal">—</span>}
                     </td>
-                    <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontSize: '0.875rem', color: 'var(--color-foreground)' }}>
+                    <td className="px-6 py-4 font-mono text-sm font-bold text-[--color-foreground]">
                       {maskPhone(customer.phone)}
                     </td>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td className="px-6 py-4">
                       <OptInBadge status={customer.opt_in_status} />
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-foreground)', opacity: 0.7 }}>
+                    <td className="px-6 py-4 text-sm font-bold text-[--color-grey-500]">
                       {customer.last_visit_at
                         ? new Date(customer.last_visit_at).toLocaleDateString('en-IN')
-                        : <span style={{ opacity: 0.4 }}>—</span>}
+                        : <span className="opacity-40 font-normal">—</span>}
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-foreground)', opacity: 0.7 }}>
+                    <td className="px-6 py-4 text-sm font-bold text-[--color-grey-500]">
                       {new Date(customer.created_at).toLocaleDateString('en-IN')}
                     </td>
                   </tr>
@@ -124,14 +95,20 @@ export default async function CustomersPage() {
 }
 
 function OptInBadge({ status }: { status: string }) {
-  const styles: Record<string, React.CSSProperties> = {
-    opted_in:  { background: '#DCFCE7', color: '#166534' },
-    opted_out: { background: '#FEE2E2', color: '#991B1B' },
-    pending:   { background: '#FEF9C3', color: '#854D0E' },
-  }
-  const s = styles[status] ?? { background: 'var(--color-muted)', color: 'var(--color-foreground)' }
+  const isOptedIn = status === 'opted_in'
+  const isOptedOut = status === 'opted_out'
+  const isPending = status === 'pending'
+
   return (
-    <span style={{ ...s, display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-body)' }}>
+    <span
+      className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+        isOptedIn
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+          : isOptedOut
+          ? 'bg-red-50 text-red-700 border-red-100'
+          : 'bg-amber-50 text-amber-700 border-amber-100'
+      }`}
+    >
       {status.replace('_', ' ')}
     </span>
   )

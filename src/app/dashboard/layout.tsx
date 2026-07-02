@@ -22,30 +22,39 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <aside
         data-testid="dashboard-sidebar"
         style={{
-          width: '240px',
+          width: '288px',
           flexShrink: 0,
-          background: '#EDEEF0',
-          borderRight: '1px solid var(--color-border)',
+          background: 'var(--color-surface)',
+          borderRight: '1px solid var(--color-grey-100)',
           display: 'flex',
           flexDirection: 'column',
           padding: '0',
         }}
       >
         {/* Logo */}
-        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ padding: '24px 24px 20px', borderBottom: '1px solid var(--color-grey-100)' }}>
           <span
             style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '1.25rem',
-              fontWeight: 700,
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.8rem',
+              fontWeight: 900,
               color: 'var(--color-primary)',
-              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
             }}
           >
             Restoloop
           </span>
           {restaurant && (
-            <p style={{ fontSize: '0.75rem', color: 'var(--color-foreground)', opacity: 0.6, marginTop: '4px', fontFamily: 'var(--font-body)' }}>
+            <p style={{
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              color: 'var(--color-grey-800)',
+              marginTop: '6px',
+              fontFamily: 'var(--font-body)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}>
               {restaurant.name}
             </p>
           )}
@@ -55,8 +64,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <nav style={{ flex: 1, padding: '16px 12px' }}>
           <NavLink href="/dashboard" label="Overview" />
           <NavLink href="/dashboard/customers" label="Guests" />
+          <NavLink href="/dashboard/campaigns" label="Campaigns" />
           <NavLink href="/dashboard/coupons" label="Coupons" />
-          <NavLink href="/dashboard/validate" label="Validate Coupon" />
+          <NavLink href="/dashboard/analytics" label="Analytics" />
+          <NavLink href="/dashboard/validate" label="Validate" />
           <NavLink href="/dashboard/settings" label="Settings" />
         </nav>
 
@@ -64,21 +75,34 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div
           data-testid="credits-indicator"
           style={{
-            padding: '16px 20px',
-            borderTop: '1px solid var(--color-border)',
+            padding: '20px 24px',
+            borderTop: '1px solid var(--color-grey-100)',
           }}
         >
-          <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-foreground)', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+          <p className="section-label" style={{ marginBottom: '8px' }}>
             Credits
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-foreground)' }}>{credits}</span>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-foreground)', opacity: 0.5 }}>/ 1000</span>
+            <span style={{
+              fontSize: '1.25rem',
+              fontWeight: 900,
+              color: 'var(--color-grey-800)',
+              fontFamily: 'var(--font-mono)',
+            }}>
+              {credits}
+            </span>
+            <span style={{
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              color: 'var(--color-grey-400)',
+              alignSelf: 'flex-end',
+            }}>
+              / 1000
+            </span>
           </div>
-          {/* SVG progress bar */}
-          <svg width="100%" height="8" role="progressbar" aria-valuenow={credits} aria-valuemin={0} aria-valuemax={1000}>
-            <rect x="0" y="0" width="100%" height="8" rx="4" fill="var(--color-border)" />
-            <rect x="0" y="0" width={`${creditPct}%`} height="8" rx="4" fill="#22C55E" />
+          <svg width="100%" height="6" role="progressbar" aria-valuenow={credits} aria-valuemin={0} aria-valuemax={1000}>
+            <rect x="0" y="0" width="100%" height="6" rx="3" fill="var(--color-grey-100)" />
+            <rect x="0" y="0" width={`${creditPct}%`} height="6" rx="3" fill="var(--color-accent)" />
           </svg>
         </div>
       </aside>

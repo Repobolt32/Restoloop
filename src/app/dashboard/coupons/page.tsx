@@ -25,18 +25,6 @@ function formatCents(cents: number) {
   return '₹' + (cents / 100).toFixed(2)
 }
 
-const TH_STYLE: React.CSSProperties = {
-  padding: '12px 16px',
-  textAlign: 'left',
-  fontFamily: 'var(--font-display)',
-  fontSize: '0.75rem',
-  fontWeight: 700,
-  letterSpacing: '0.08em',
-  color: '#FFFFFF',
-  background: 'var(--color-foreground)',
-  whiteSpace: 'nowrap',
-}
-
 export default function CouponsPage() {
   const [coupons, setCoupons] = useState<CouponRow[]>([])
   const [filter, setFilter] = useState<FilterType>('all')
@@ -66,23 +54,21 @@ export default function CouponsPage() {
   }, [fetchCoupons])
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className="p-8 max-w-[900px]">
       <h1
         data-testid="coupons-heading"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '1.75rem',
-          color: 'var(--color-foreground)',
-          marginBottom: '1.5rem',
-        }}
+        className="text-3xl font-black tracking-tight text-[--color-foreground] mb-1 font-display uppercase"
       >
         Coupons
       </h1>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent] mb-8">
+        Manage issued coupons
+      </p>
 
       {/* Filter chips */}
       <div
         data-testid="filter-chips"
-        style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}
+        className="flex gap-2 mb-6 flex-wrap"
       >
         {FILTER_TYPES.map((type) => {
           const isActive = filter === type
@@ -92,19 +78,9 @@ export default function CouponsPage() {
               id={`filter-${type}`}
               data-testid={`filter-${type}`}
               onClick={() => setFilter(type)}
-              style={{
-                padding: '6px 18px',
-                borderRadius: '9999px',
-                border: isActive ? 'none' : '1.5px solid var(--color-accent)',
-                background: isActive ? 'var(--color-primary)' : 'transparent',
-                color: isActive ? '#FFFFFF' : 'var(--color-primary)',
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'background 200ms, color 200ms, border-color 200ms',
-                textTransform: 'capitalize',
-              }}
+              className={`filter-chip capitalize ${
+                isActive ? 'bg-[--color-primary] border-[--color-primary] text-white' : ''
+              }`}
             >
               {type}
             </button>
@@ -113,74 +89,54 @@ export default function CouponsPage() {
       </div>
 
       {loading ? (
-        <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-foreground)', opacity: 0.5 }}>Loading…</p>
+        <p className="text-sm font-bold text-[--color-grey-500]">Loading…</p>
       ) : coupons.length === 0 ? (
-        <div
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid var(--color-border)',
-            borderRadius: '12px',
-            padding: '3rem',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-sm)',
-          }}
-        >
-          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-foreground)', opacity: 0.5 }}>
+        <div className="bg-white border border-[--color-border] rounded-2xl p-12 text-center shadow-md">
+          <p className="text-sm font-bold text-[--color-grey-500]">
             {filter === 'all' ? 'No coupons issued yet.' : `No ${filter} coupons found.`}
           </p>
         </div>
       ) : (
-        <div
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid var(--color-border)',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: 'var(--shadow-md)',
-          }}
-        >
-          <div style={{ overflowX: 'auto' }}>
+        <div className="bg-white border border-[--color-border] rounded-2xl overflow-hidden shadow-md">
+          <div className="overflow-x-auto">
             <table
               data-testid="coupons-table"
-              style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-body)' }}
+              className="w-full border-collapse text-left"
             >
               <thead>
-                <tr>
-                  <th style={TH_STYLE}>Code</th>
-                  <th style={TH_STYLE}>Customer</th>
-                  <th style={TH_STYLE}>Type</th>
-                  <th style={TH_STYLE}>Discount</th>
-                  <th style={TH_STYLE}>Status</th>
-                  <th style={TH_STYLE}>Expires</th>
+                <tr className="border-b border-[--color-border] bg-[--color-grey-50]">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Code</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Customer</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Type</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Discount</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Status</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[--color-grey-600]">Expires</th>
                 </tr>
               </thead>
               <tbody>
                 {coupons.map((coupon, i) => (
                   <tr
                     key={coupon.id}
-                    style={{
-                      background: i % 2 === 0 ? '#FFFFFF' : 'var(--color-background)',
-                      transition: 'background 200ms',
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-border)' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? '#FFFFFF' : 'var(--color-background)' }}
+                    className={`border-b border-[--color-border] last:border-b-0 hover:bg-[--color-grey-50] transition-colors ${
+                      i % 2 === 0 ? 'bg-white' : 'bg-[--color-grey-50]/30'
+                    }`}
                   >
-                    <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontSize: '0.875rem', color: 'var(--color-foreground)', fontWeight: 600 }}>
+                    <td className="px-6 py-4 font-mono text-sm font-black text-[--color-foreground]">
                       {coupon.code}
                     </td>
-                    <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontSize: '0.875rem', color: 'var(--color-foreground)' }}>
-                      {coupon.customers?.phone ? maskPhone(coupon.customers.phone) : <span style={{ opacity: 0.4 }}>—</span>}
+                    <td className="px-6 py-4 font-mono text-sm font-bold text-[--color-foreground]">
+                      {coupon.customers?.phone ? maskPhone(coupon.customers.phone) : <span className="opacity-40 font-normal">—</span>}
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: '0.875rem' }}>
+                    <td className="px-6 py-4">
                       <TypeBadge type={coupon.type} />
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-accent)', fontWeight: 600 }}>
+                    <td className="px-6 py-4 text-sm font-black text-[--color-accent]">
                       {formatCents(coupon.discount_cents)}
                     </td>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td className="px-6 py-4">
                       <CouponStatusBadge status={coupon.status} />
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: '0.875rem', color: 'var(--color-foreground)', opacity: 0.7 }}>
+                    <td className="px-6 py-4 text-sm font-bold text-[--color-grey-500]">
                       {new Date(coupon.expires_at).toLocaleDateString('en-IN')}
                     </td>
                   </tr>
@@ -195,14 +151,22 @@ export default function CouponsPage() {
 }
 
 function TypeBadge({ type }: { type: string }) {
-  const colors: Record<string, React.CSSProperties> = {
-    welcome:  { background: '#DBEAFE', color: '#1E40AF' },
-    birthday: { background: '#FEF3C7', color: '#92400E' },
-    winback:  { background: '#F3E8FF', color: '#6B21A8' },
-  }
-  const s = colors[type] ?? { background: 'var(--color-muted)', color: 'var(--color-foreground)' }
+  const isWelcome = type === 'welcome'
+  const isBirthday = type === 'birthday'
+  const isWinback = type === 'winback'
+
   return (
-    <span style={{ ...s, display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600 }}>
+    <span
+      className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+        isWelcome
+          ? 'bg-blue-50 text-blue-700 border-blue-100'
+          : isBirthday
+          ? 'bg-amber-50 text-amber-700 border-amber-100'
+          : isWinback
+          ? 'bg-purple-50 text-purple-700 border-purple-100'
+          : 'bg-red-50 text-red-700 border-red-100'
+      }`}
+    >
       {type}
     </span>
   )
@@ -211,10 +175,17 @@ function TypeBadge({ type }: { type: string }) {
 function CouponStatusBadge({ status }: { status: string }) {
   const isSent = status === 'sent'
   const isRedeemed = status === 'redeemed'
-  const bg = isRedeemed ? '#DCFCE7' : isSent ? '#FEF9C3' : '#FEE2E2'
-  const color = isRedeemed ? '#166534' : isSent ? '#854D0E' : '#991B1B'
+
   return (
-    <span style={{ background: bg, color, display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600 }}>
+    <span
+      className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+        isRedeemed
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+          : isSent
+          ? 'bg-amber-50 text-amber-700 border-amber-100'
+          : 'bg-red-50 text-red-700 border-red-100'
+      }`}
+    >
       {status}
     </span>
   )

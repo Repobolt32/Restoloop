@@ -2,66 +2,79 @@ import { createRestaurant } from './actions'
 
 export default function CreateRestaurantPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <form action={createRestaurant} className="w-full max-w-md space-y-4 p-8">
-        <h1 className="text-2xl font-bold">Create Your Restaurant</h1>
+    <div className="min-h-screen bg-[--color-background] flex items-center justify-center p-4">
+      <form action={createRestaurant} className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md w-full max-w-md flex flex-col gap-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium">Restaurant Name</label>
+          <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-1">
+            Create Your Restaurant
+          </h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent]">
+            Retain guests on autopilot
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="name" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">Restaurant Name</label>
           <input
             id="name"
             name="name"
             type="text"
             required
-            className="mt-1 block w-full rounded border px-3 py-2"
+            className="border border-[--color-border] rounded-lg px-4 py-3 text-sm focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 w-full font-bold text-[--color-foreground]"
           />
         </div>
-        <div>
-          <label htmlFor="whatsappNumber" className="block text-sm font-medium">WhatsApp Number</label>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="whatsappNumber" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">WhatsApp Number</label>
           <input
             id="whatsappNumber"
             name="whatsappNumber"
             type="text"
             required
             placeholder="919876543210"
-            className="mt-1 block w-full rounded border px-3 py-2"
+            className="border border-[--color-border] rounded-lg px-4 py-3 text-sm focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 w-full font-mono font-bold text-[--color-foreground]"
           />
         </div>
-        <div>
-          <label htmlFor="welcomeDiscount" className="block text-sm font-medium">Welcome Discount (%)</label>
-          <input
-            id="welcomeDiscount"
-            name="welcomeDiscount"
-            type="number"
-            required
-            min="1"
-            className="mt-1 block w-full rounded border px-3 py-2"
-          />
+
+        <div className="grid grid-cols-3 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="welcomeDiscount" className="text-[9px] font-black uppercase tracking-wider text-[--color-grey-600] line-clamp-1">Welcome (%)</label>
+            <input
+              id="welcomeDiscount"
+              name="welcomeDiscount"
+              type="number"
+              required
+              min="1"
+              className="border border-[--color-border] rounded-lg px-3 py-3 text-sm focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 w-full font-bold text-[--color-foreground]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="birthdayDiscount" className="text-[9px] font-black uppercase tracking-wider text-[--color-grey-600] line-clamp-1">Birthday (%)</label>
+            <input
+              id="birthdayDiscount"
+              name="birthdayDiscount"
+              type="number"
+              required
+              min="1"
+              className="border border-[--color-border] rounded-lg px-3 py-3 text-sm focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 w-full font-bold text-[--color-foreground]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="winbackDiscount" className="text-[9px] font-black uppercase tracking-wider text-[--color-grey-600] line-clamp-1">Winback (%)</label>
+            <input
+              id="winbackDiscount"
+              name="winbackDiscount"
+              type="number"
+              required
+              min="1"
+              className="border border-[--color-border] rounded-lg px-3 py-3 text-sm focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 w-full font-bold text-[--color-foreground]"
+            />
+          </div>
         </div>
-        <div>
-          <label htmlFor="birthdayDiscount" className="block text-sm font-medium">Birthday Discount (%)</label>
-          <input
-            id="birthdayDiscount"
-            name="birthdayDiscount"
-            type="number"
-            required
-            min="1"
-            className="mt-1 block w-full rounded border px-3 py-2"
-          />
-        </div>
-        <div>
-          <label htmlFor="winbackDiscount" className="block text-sm font-medium">Winback Discount (%)</label>
-          <input
-            id="winbackDiscount"
-            name="winbackDiscount"
-            type="number"
-            required
-            min="1"
-            className="mt-1 block w-full rounded border px-3 py-2"
-          />
-        </div>
+
         <button
           type="submit"
-          className="w-full rounded bg-black px-4 py-2 text-white hover:bg-gray-800"
+          className="bg-black hover:bg-gray-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3.5 w-full transition-colors cursor-pointer"
         >
           Create Restaurant
         </button>
