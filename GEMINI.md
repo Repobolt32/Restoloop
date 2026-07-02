@@ -62,7 +62,7 @@ docs/                # business rules, design spec, implementation plan
 
 When asked to implement a slice ("Run S1", "do Slice 2"):
 
-1. **PM** reads the slice plan from `docs/superpowers/plans/` (e.g., `docs/superpowers/plans/slice-1.md`), extracts concrete tasks, constraints, and expected behavior. It MUST load the required skill/sub-skill specified in the plan (e.g., `superpowers:subagent-driven-development` or `superpowers:executing-plans`). **Additionally, whenever making an implementation plan by reading a slice plan from `docs/superpowers/plans/`, the agent must read the tech-related skills specified in that slice plan and also mention/document those skills in the resulting `implementation_plan.md`.**
+1. **PM** reads the slice plan from `docs/superpowers/plans/` (e.g., `docs/superpowers/plans/slice-1.md`), extracts concrete tasks, constraints, and expected behavior. It MUST load the required skill/sub-skill specified in the plan (e.g., `superpowers:subagent-driven-development` or `superpowers:executing-plans`). **Additionally, whenever making an implementation plan by reading a slice plan from `docs/superpowers/plans/`, the agent must use the `view_file` tool to open and read all tech-related skill `.md` files specified in that slice plan, and explicitly mention/document those skills in the resulting `implementation_plan.md` (so the executing agent loads them before coding).**
 2. **PM** dispatches `coder` subagent with the slice tasks and relevant context.
 3. **Coder** writes targeted tests for the requested behavior, then implements to pass.
 4. **PM** dispatches `tester` subagent with the slice task description, spec path, and coder's summary.
