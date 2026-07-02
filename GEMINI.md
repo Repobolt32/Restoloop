@@ -58,17 +58,6 @@ docs/                # business rules, design spec, implementation plan
 
 `@/*` maps to `./src/*`. Use it: `import { createClient } from '@/lib/supabase/server'`
 
-## Agent Loop (PM -> Coder -> Tester)
-
-When asked to implement a slice ("Run S1", "do Slice 2"):
-
-1. **PM** reads the slice plan from `docs/superpowers/plans/` (e.g., `docs/superpowers/plans/slice-1.md`), extracts concrete tasks, constraints, and expected behavior. It MUST load the required skill/sub-skill specified in the plan (e.g., `superpowers:subagent-driven-development` or `superpowers:executing-plans`). **Additionally, whenever making an implementation plan by reading a slice plan from `docs/superpowers/plans/`, the agent must use the `view_file` tool to open and read all tech-related skill `.md` files specified in that slice plan, and explicitly mention/document those skills in the resulting `implementation_plan.md` (so the executing agent loads them before coding).**
-2. **PM** dispatches `coder` subagent with the slice tasks and relevant context.
-3. **Coder** writes targeted tests for the requested behavior, then implements to pass.
-4. **PM** dispatches `tester` subagent with the slice task description, spec path, and coder's summary.
-5. **Tester** runs the relevant verification commands and audits whether the behavior matches the slice plan. Trivial or missing checks are BLOCKED, not PASS.
-6. **PM** judges tester's evidence. All required behavior verified -> VERIFIED. Any FAIL -> re-dispatch coder. Max 3 retries.
-
 ## Code Rules
 
 - Follow existing patterns. Match style of neighboring files.
@@ -77,6 +66,7 @@ When asked to implement a slice ("Run S1", "do Slice 2"):
 - Global Styling Rule: Strictly follow the Crimson & Warm Saffron light mode theme defined in [MASTER.md](file:///e:/desktop/Restoloop/design-system/restoloop/MASTER.md) across the entire application (including login, signup, intake forms, dashboard, and all future pages). No dark mode is allowed, and all styling must use the defined Tailwind variables/CSS variables for colors, typography (Playfair Display SC / Karla), and spacing.
 - Load `ponytail` skill for all coding tasks - lazy, minimal, YAGNI-first
 - Fetch current API docs via Context7 MCP before relying on memory for signatures
+- **Planning Rule**: Whenever making an implementation plan by reading a slice plan from `docs/superpowers/plans/`, the agent must use the `view_file` tool to open and read all tech-related skill `.md` files specified in that slice plan, and explicitly mention/document those skills in the resulting `implementation_plan.md` (so the executing agent loads them before coding).
 
 ## Domain Conventions
 
