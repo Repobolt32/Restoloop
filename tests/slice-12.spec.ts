@@ -88,7 +88,7 @@ test.describe('Slice 12: Dashboard Upgrade', () => {
     await expect(page.getByText('Redemption Rate')).toBeVisible()
 
     // Verify values match seeded credits
-    await expect(page.getByText('950')).toBeVisible()
+    await expect(page.locator('.dash-stat-card').getByText('950')).toBeVisible()
 
     // 4. Verify Campaign Performance summary is visible
     await expect(page.getByText('Campaign Performance')).toBeVisible()
