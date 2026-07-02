@@ -381,3 +381,53 @@
   color: #dc2626;
   background: #fef2f2;
 }
+
+/* Coupon / badge utilities */
+.badge-welcome {
+  color: #7c3aed;
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+}
+.badge-birthday {
+  color: #db2777;
+  background: #fdf2f8;
+  border-color: #fbcfe8;
+}
+.badge-winback {
+  color: #ea580c;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+.badge-expiry {
+  color: #0891b2;
+  background: #ecfeff;
+  border-color: #a5f3fc;
+}
+.badge-manual {
+  color: var(--color-grey-600);
+  background: var(--color-grey-50);
+  border-color: var(--color-grey-200);
+}
+.badge-redeemed {
+  color: #16a34a;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+.badge-pending {
+  color: var(--color-accent);
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+.badge-failed {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* Alternating table rows */
+.dash-table-row-even {
+  background: var(--color-surface);
+}
+.dash-table-row-odd {
+  background: var(--color-background);
+}
