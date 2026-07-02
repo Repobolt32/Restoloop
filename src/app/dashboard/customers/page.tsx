@@ -1,9 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-
-function maskPhone(phone: string) {
-  return phone.slice(0, -4) + '****'
-}
+import { maskPhone } from '@/lib/utils'
 
 export default async function CustomersPage() {
   const supabase = await createClient()

@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { maskPhone } from '@/lib/utils'
 
 type CouponRow = {
   id: string
@@ -16,10 +17,6 @@ type CouponRow = {
 
 const FILTER_TYPES = ['all', 'welcome', 'birthday', 'winback'] as const
 type FilterType = typeof FILTER_TYPES[number]
-
-function maskPhone(phone: string) {
-  return phone.slice(0, -4) + '****'
-}
 
 function formatCents(cents: number) {
   return '₹' + (cents / 100).toFixed(2)
