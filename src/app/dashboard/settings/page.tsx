@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect, useTransition, useCallback } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
+import { updateDiscountsAction } from './actions'
 
 export default function SettingsPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
@@ -364,6 +365,78 @@ export default function SettingsPage() {
           </a>
         </div>
       </div>
+
+      {/* Campaign Discount Settings */}
+      {restaurant && (
+        <section className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md mb-8">
+          <h2 className="font-display text-xl font-black text-[--color-foreground] mb-2 uppercase">
+            Campaign Discounts
+          </h2>
+          <p className="section-label mb-6">Set default coupon values for each campaign type (in ₹).</p>
+          <form
+            action={async (formData) => {
+              startTransition(async () => {
+                await updateDiscountsAction(formData)
+                await fetchRestaurant()
+              })
+            }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+          >
+            <div>
+              <label htmlFor="welcome_discount" className="section-label mb-1 block">Welcome Discount (₹)</label>
+              <input
+                id="welcome_discount"
+                name="welcome_discount"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                defaultValue={((restaurant.welcome_discount_cents ?? 5000) / 100).toFixed(2)}
+                className="w-full border border-[--color-border] rounded-xl px-4 py-3 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20"
+                data-testid="welcome-discount-input"
+              />
+            </div>
+            <div>
+              <label htmlFor="birthday_discount" className="section-label mb-1 block">Birthday Discount (₹)</label>
+              <input
+                id="birthday_discount"
+                name="birthday_discount"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                defaultValue={((restaurant.birthday_discount_cents ?? 3800) / 100).toFixed(2)}
+                className="w-full border border-[--color-border] rounded-xl px-4 py-3 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20"
+                data-testid="birthday-discount-input"
+              />
+            </div>
+            <div>
+              <label htmlFor="winback_discount" className="section-label mb-1 block">Winback Discount (₹)</label>
+              <input
+                id="winback_discount"
+                name="winback_discount"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                defaultValue={((restaurant.winback_discount_cents ?? 3000) / 100).toFixed(2)}
+                className="w-full border border-[--color-border] rounded-xl px-4 py-3 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20"
+                data-testid="winback-discount-input"
+              />
+            </div>
+            <div className="sm:col-span-3">
+              <button
+                type="submit"
+                disabled={isPending}
+                className="btn-primary disabled:opacity-50"
+                data-testid="save-discounts-btn"
+              >
+                Save Discounts
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
       {/* Sandbox Payment Simulator Modal Overlay */}
       {showSandbox && sandboxOrder && (
