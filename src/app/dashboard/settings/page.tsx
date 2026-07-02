@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect, useTransition, useCallback } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
-import { updateDiscountsAction } from './actions'
+import { updateDiscountsAction, updateCampaignSettings } from './actions'
 
 export default function SettingsPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
@@ -438,6 +438,124 @@ export default function SettingsPage() {
         </section>
       )}
 
+      {/* Campaign Settings Card */}
+      {restaurant && (
+        <section className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md mb-8">
+          <h2 className="font-display text-xl font-black text-[--color-foreground] mb-2 uppercase">
+            Campaign Settings
+          </h2>
+          <p className="section-label mb-6">Enable or disable each campaign, and configure timing.</p>
+          <form
+            action={async (formData) => {
+              startTransition(async () => {
+                await updateCampaignSettings(formData)
+                await fetchRestaurant()
+              })
+            }}
+            className="space-y-6"
+          >
+            <div className="space-y-4">
+              <ToggleRow
+                name="welcome_reminder_enabled"
+                label="Welcome Reminder"
+                description={`Sends ${restaurant.welcome_reminder_days ?? 25} days after signup`}
+                defaultChecked={restaurant.welcome_reminder_enabled ?? true}
+              />
+              <ToggleRow
+                name="birthday_campaign_enabled"
+                label="Birthday Campaign"
+                description="Sends on customer's birthday"
+                defaultChecked={restaurant.birthday_campaign_enabled ?? true}
+              />
+              <ToggleRow
+                name="winback_campaign_enabled"
+                label="Winback Campaign"
+                description={`Sends after ${restaurant.winback_days ?? 40} days of inactivity`}
+                defaultChecked={restaurant.winback_campaign_enabled ?? true}
+              />
+              <ToggleRow
+                name="expiry_reminder_enabled"
+                label="Expiry Reminder"
+                description={`Sends ${restaurant.expiry_reminder_days ?? 1} day(s) before coupon expiry`}
+                defaultChecked={restaurant.expiry_reminder_enabled ?? true}
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[--color-border]">
+              <div>
+                <label htmlFor="welcome_reminder_days" className="section-label mb-1 block">
+                  Welcome (days)
+                </label>
+                <input
+                  id="welcome_reminder_days"
+                  type="number"
+                  name="welcome_reminder_days"
+                  defaultValue={restaurant.welcome_reminder_days ?? 25}
+                  min={1}
+                  max={90}
+                  className="w-full border border-[--color-border] rounded-xl px-3 py-2 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20"
+                />
+              </div>
+              <div>
+                <label htmlFor="winback_days" className="section-label mb-1 block">
+                  Winback (days)
+                </label>
+                <input
+                  id="winback_days"
+                  type="number"
+                  name="winback_days"
+                  defaultValue={restaurant.winback_days ?? 40}
+                  min={1}
+                  max={180}
+                  className="w-full border border-[--color-border] rounded-xl px-3 py-2 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20"
+                />
+              </div>
+              <div>
+                <label htmlFor="expiry_reminder_days" className="section-label mb-1 block">
+                  Expiry (days before)
+                </label>
+                <input
+                  id="expiry_reminder_days"
+                  type="number"
+                  name="expiry_reminder_days"
+                  defaultValue={restaurant.expiry_reminder_days ?? 1}
+                  min={1}
+                  max={7}
+                  className="w-full border border-[--color-border] rounded-xl px-3 py-2 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20"
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-[--color-border]">
+              <label htmlFor="whatsapp_prefill_message" className="section-label mb-1 block">
+                WhatsApp Prefill Message
+              </label>
+              <p className="text-xs font-bold text-[--color-grey-500] mb-2">
+                Pre-written message customers send when they scan your QR code.
+              </p>
+              <input
+                id="whatsapp_prefill_message"
+                type="text"
+                name="whatsapp_prefill_message"
+                defaultValue={restaurant.whatsapp_prefill_message ?? 'Hi, I would like to join your loyalty club!'}
+                maxLength={200}
+                className="w-full border border-[--color-border] rounded-xl px-4 py-3 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20"
+                data-testid="whatsapp-prefill-input"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isPending}
+              className="btn-primary disabled:opacity-50"
+              data-testid="save-campaign-settings-btn"
+            >
+              Save Campaign Settings
+            </button>
+          </form>
+        </section>
+      )}
+
       {/* Sandbox Payment Simulator Modal Overlay */}
       {showSandbox && sandboxOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs" data-testid="sandbox-modal">
@@ -484,5 +602,36 @@ export default function SettingsPage() {
         </div>
       )}
     </div>
+  )
+}
+
+function ToggleRow({
+  name,
+  label,
+  description,
+  defaultChecked,
+}: {
+  name: string
+  label: string
+  description: string
+  defaultChecked: boolean
+}) {
+  return (
+    <label className="flex items-center justify-between cursor-pointer group">
+      <div>
+        <p className="text-sm font-bold text-[--color-foreground]">{label}</p>
+        <p className="text-xs font-bold text-[--color-grey-500]">{description}</p>
+      </div>
+      <div className="relative ml-4 shrink-0">
+        <input
+          type="checkbox"
+          name={name}
+          defaultChecked={defaultChecked}
+          className="sr-only peer"
+        />
+        <div className="w-12 h-6 bg-[--color-grey-200] peer-checked:bg-emerald-500 rounded-full transition-colors" />
+        <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-6 pointer-events-none" />
+      </div>
+    </label>
   )
 }
