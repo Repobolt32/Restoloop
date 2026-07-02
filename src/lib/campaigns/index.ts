@@ -54,7 +54,7 @@ export async function runWelcomeReminders() {
         restaurant_id: restaurant.id,
         customer_id: customer.id,
         direction: 'outbound',
-        type: 'campaign',
+        type: 'welcome_reminder',
         status: 'blocked_no_credits',
       })
       continue
@@ -71,7 +71,7 @@ export async function runWelcomeReminders() {
       restaurant_id: restaurant.id,
       customer_id: customer.id,
       direction: 'outbound',
-      type: 'campaign',
+      type: 'welcome_reminder',
       status: result.success ? 'sent' : 'failed',
       error: result.error || null,
     })
@@ -144,7 +144,7 @@ export async function runBirthdayCampaigns() {
         restaurant_id: restaurant.id,
         customer_id: customer.id,
         direction: 'outbound',
-        type: 'campaign',
+        type: 'birthday_campaign',
         status: 'blocked_no_credits',
       })
       continue
@@ -175,7 +175,7 @@ export async function runBirthdayCampaigns() {
       restaurant_id: restaurant.id,
       customer_id: customer.id,
       direction: 'outbound',
-      type: 'campaign',
+      type: 'birthday_campaign',
       status: result.success ? 'sent' : 'failed',
       error: result.error || null,
     })
@@ -241,7 +241,7 @@ export async function runWinbackCampaigns() {
         restaurant_id: restaurant.id,
         customer_id: customer.id,
         direction: 'outbound',
-        type: 'campaign',
+        type: 'winback_campaign',
         status: 'blocked_no_credits',
       })
       continue
@@ -272,7 +272,7 @@ export async function runWinbackCampaigns() {
       restaurant_id: restaurant.id,
       customer_id: customer.id,
       direction: 'outbound',
-      type: 'campaign',
+      type: 'winback_campaign',
       status: result.success ? 'sent' : 'failed',
       error: result.error || null,
     })
