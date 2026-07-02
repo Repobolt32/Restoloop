@@ -21,7 +21,7 @@ export default async function IntakeFormPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[--color-background] text-[--color-foreground] flex items-center justify-center p-4">
       <IntakeForm slug={slug} restaurantName={restaurant.name} />
     </div>
   )

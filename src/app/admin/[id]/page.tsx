@@ -46,13 +46,13 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
         <div className="mb-6">
           <Link
             href="/admin"
-            className="inline-flex items-center text-sm font-semibold text-[var(--color-primary)] hover:opacity-85 transition-opacity cursor-pointer"
+            className="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-500)] hover:text-[var(--color-primary)] transition-colors cursor-pointer"
           >
             <svg
-              className="w-4 h-4 mr-2"
+              className="w-3.5 h-3.5 mr-2"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="3"
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
@@ -66,7 +66,7 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
         {showSuccess && (
           <div
             data-testid="success-alert"
-            className="mb-6 p-4 rounded-xl border border-green-200 bg-green-50 text-green-800 text-sm flex items-center font-semibold animate-fade-in"
+            className="mb-6 p-4 rounded-xl border border-green-200 bg-green-50 text-green-800 text-sm flex items-center font-bold animate-fade-in"
             role="alert"
           >
             <svg
@@ -87,31 +87,31 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
         <div className="mb-8 border-b border-[var(--color-border)] pb-4">
           <h1
             data-testid="admin-restaurant-name"
-            className="font-display text-3xl font-bold tracking-tight text-[var(--color-primary)]"
+            className="font-display text-3xl font-black tracking-tight text-[var(--color-foreground)] uppercase"
           >
             {restaurant.name}
           </h1>
-          <p className="text-sm text-[var(--color-foreground)] opacity-60 mt-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-accent)] mt-1">
             Admin Credit & Information Panel
           </p>
         </div>
 
         {/* Credit Management Block */}
-        <div className="bg-white rounded-xl border border-[var(--color-border)] shadow-sm p-6 mb-6">
-          <h2 className="font-display text-lg font-bold mb-2 text-[var(--color-foreground)]">
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-md p-8 mb-6">
+          <h2 className="font-display text-lg font-black mb-2 text-[var(--color-foreground)] uppercase">
             Credit Balance
           </h2>
           <div className="flex items-baseline space-x-2 mb-6">
             <span
               data-testid="admin-credits-display"
-              className="text-4xl font-extrabold font-mono text-[var(--color-accent)]"
+              className="text-4xl font-black font-mono text-[var(--color-accent)]"
             >
               {restaurant.credits}
             </span>
-            <span className="text-sm opacity-60">credits</span>
+            <span className="text-sm font-bold text-[var(--color-grey-500)]">credits</span>
           </div>
 
-          <h3 className="text-sm font-bold mb-3 uppercase tracking-wider text-[var(--color-foreground)] opacity-70">
+          <h3 className="text-[10px] font-black mb-3 uppercase tracking-widest text-[var(--color-grey-500)]">
             Add Credits
           </h3>
           <div className="grid grid-cols-3 gap-4">
@@ -121,7 +121,7 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
               <button
                 type="submit"
                 data-testid="add-100-btn"
-                className="w-full py-3 bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-foreground)] rounded-lg font-bold hover:bg-[var(--color-border)] active:scale-[0.98] transition-all duration-150 cursor-pointer text-sm"
+                className="w-full py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
               >
                 +100 Credits
               </button>
@@ -133,7 +133,7 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
               <button
                 type="submit"
                 data-testid="add-500-btn"
-                className="w-full py-3 bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-foreground)] rounded-lg font-bold hover:bg-[var(--color-border)] active:scale-[0.98] transition-all duration-150 cursor-pointer text-sm"
+                className="w-full py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
               >
                 +500 Credits
               </button>
@@ -145,7 +145,7 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
               <button
                 type="submit"
                 data-testid="add-1000-btn"
-                className="w-full py-3 bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-foreground)] rounded-lg font-bold hover:bg-[var(--color-border)] active:scale-[0.98] transition-all duration-150 cursor-pointer text-sm"
+                className="w-full py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
               >
                 +1000 Credits
               </button>
@@ -154,30 +154,30 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
         </div>
 
         {/* General Metadata Details */}
-        <div className="bg-white rounded-xl border border-[var(--color-border)] shadow-sm p-6">
-          <h2 className="font-display text-lg font-bold mb-4 text-[var(--color-foreground)]">
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-md p-8">
+          <h2 className="font-display text-lg font-black mb-4 text-[var(--color-foreground)] uppercase">
             General Details
           </h2>
-          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="border-b border-[var(--color-muted)] pb-2">
-              <dt className="opacity-60 text-xs font-semibold uppercase">Owner ID</dt>
-              <dd className="font-mono mt-0.5 select-all text-xs">{restaurant.owner_id}</dd>
+          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-bold">
+            <div className="border-b border-[var(--color-border)] pb-2">
+              <dt className="text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)]">Owner ID</dt>
+              <dd className="font-mono mt-0.5 select-all text-xs text-[var(--color-foreground)]">{restaurant.owner_id}</dd>
             </div>
-            <div className="border-b border-[var(--color-muted)] pb-2">
-              <dt className="opacity-60 text-xs font-semibold uppercase">Restaurant ID</dt>
-              <dd className="font-mono mt-0.5 select-all text-xs">{restaurant.id}</dd>
+            <div className="border-b border-[var(--color-border)] pb-2">
+              <dt className="text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)]">Restaurant ID</dt>
+              <dd className="font-mono mt-0.5 select-all text-xs text-[var(--color-foreground)]">{restaurant.id}</dd>
             </div>
-            <div className="border-b border-[var(--color-muted)] pb-2">
-              <dt className="opacity-60 text-xs font-semibold uppercase">Slug</dt>
-              <dd className="font-mono mt-0.5">{restaurant.slug}</dd>
+            <div className="border-b border-[var(--color-border)] pb-2">
+              <dt className="text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)]">Slug</dt>
+              <dd className="font-mono mt-0.5 text-[var(--color-foreground)]">{restaurant.slug}</dd>
             </div>
-            <div className="border-b border-[var(--color-muted)] pb-2">
-              <dt className="opacity-60 text-xs font-semibold uppercase">WhatsApp Contact</dt>
-              <dd className="font-mono mt-0.5">{restaurant.whatsapp_number}</dd>
+            <div className="border-b border-[var(--color-border)] pb-2">
+              <dt className="text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)]">WhatsApp Contact</dt>
+              <dd className="font-mono mt-0.5 text-[var(--color-foreground)]">{restaurant.whatsapp_number}</dd>
             </div>
-            <div className="border-b border-[var(--color-muted)] pb-2 col-span-2">
-              <dt className="opacity-60 text-xs font-semibold uppercase">Pricing Plan</dt>
-              <dd className="font-bold text-[var(--color-primary)] uppercase mt-0.5">
+            <div className="border-b border-[var(--color-border)] pb-2 col-span-2">
+              <dt className="text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)]">Pricing Plan</dt>
+              <dd className="font-black text-[var(--color-primary)] uppercase tracking-wider text-xs mt-0.5">
                 {restaurant.plan}
               </dd>
             </div>

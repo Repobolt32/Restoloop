@@ -26,25 +26,25 @@ export default async function AdminPage() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center border-b border-[var(--color-border)] pb-4">
           <div>
-            <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--color-primary)]">
+            <h1 className="font-display text-3xl font-black tracking-tight text-[var(--color-foreground)] uppercase">
               Admin Panel
             </h1>
-            <p className="text-sm text-[var(--color-foreground)] opacity-60 mt-1">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-accent)] mt-1">
               Restoloop SaaS Administration Overview
             </p>
           </div>
           <Link
             href="/dashboard"
-            className="px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] rounded-lg text-sm font-semibold hover:bg-[var(--color-border)] transition-colors duration-200 cursor-pointer"
+            className="px-4 py-2 border border-[var(--color-accent)] text-[var(--color-accent)] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[var(--color-border)] transition-colors duration-200 cursor-pointer"
           >
             Go to Dashboard
           </Link>
         </div>
 
         {/* Restaurant List Section */}
-        <div className="bg-white rounded-xl border border-[var(--color-border)] shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-[var(--color-border)] bg-[var(--color-muted)]">
-            <h2 className="font-display text-lg font-bold text-[var(--color-foreground)]">
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-md overflow-hidden">
+          <div className="p-6 border-b border-[var(--color-border)] bg-[var(--color-grey-50)]">
+            <h2 className="font-display text-sm font-black uppercase tracking-[0.1em] text-[var(--color-foreground)]">
               All Registered Restaurants
             </h2>
           </div>
@@ -52,20 +52,20 @@ export default async function AdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-[var(--color-border)] bg-[var(--color-background)] font-display text-sm font-bold text-[var(--color-foreground)]">
-                  <th className="p-4">Name</th>
-                  <th className="p-4">Slug</th>
-                  <th className="p-4">WhatsApp Number</th>
-                  <th className="p-4">Credits</th>
-                  <th className="p-4">Plan</th>
-                  <th className="p-4">Registered On</th>
-                  <th className="p-4 text-right">Actions</th>
+                <tr className="border-b border-[var(--color-border)] bg-[var(--color-background)]">
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Name</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Slug</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">WhatsApp Number</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Credits</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Plan</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Registered On</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)] text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {!restaurants || restaurants.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center text-sm opacity-55">
+                    <td colSpan={7} className="p-8 text-center text-sm font-bold text-[var(--color-grey-500)]">
                       No restaurants registered yet.
                     </td>
                   </tr>
@@ -74,20 +74,20 @@ export default async function AdminPage() {
                     <tr
                       key={restaurant.id}
                       data-testid={`restaurant-row-${restaurant.slug}`}
-                      className="border-b border-[var(--color-border)] hover:bg-[var(--color-background)] transition-colors duration-150 text-sm"
+                      className="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-grey-50)] transition-colors duration-150 text-sm font-bold text-[var(--color-foreground)]"
                     >
-                      <td className="p-4 font-semibold">{restaurant.name}</td>
-                      <td className="p-4 text-xs font-mono">{restaurant.slug}</td>
-                      <td className="p-4 font-mono">{restaurant.whatsapp_number}</td>
-                      <td className="p-4 font-bold text-[var(--color-accent)]">
+                      <td className="p-4">{restaurant.name}</td>
+                      <td className="p-4 text-xs font-mono text-[var(--color-grey-800)]">{restaurant.slug}</td>
+                      <td className="p-4 font-mono text-[var(--color-grey-800)]">{restaurant.whatsapp_number}</td>
+                      <td className="p-4 font-black text-[var(--color-accent)]">
                         {restaurant.credits}
                       </td>
                       <td className="p-4">
-                        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-[var(--color-border)] text-[var(--color-foreground)] uppercase">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-amber-100 bg-amber-50 text-amber-700">
                           {restaurant.plan}
                         </span>
                       </td>
-                      <td className="p-4 text-xs opacity-75">
+                      <td className="p-4 text-xs text-[var(--color-grey-500)]">
                         {new Date(restaurant.created_at).toLocaleDateString('en-IN', {
                           dateStyle: 'medium',
                         })}
@@ -96,7 +96,7 @@ export default async function AdminPage() {
                         <Link
                           href={`/admin/${restaurant.id}`}
                           data-testid={`manage-btn-${restaurant.slug}`}
-                          className="inline-block px-3 py-1.5 bg-[var(--color-accent)] text-white rounded-lg text-xs font-bold hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 cursor-pointer"
+                          className="inline-block px-3 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-800 transition-colors cursor-pointer"
                         >
                           Manage
                         </Link>

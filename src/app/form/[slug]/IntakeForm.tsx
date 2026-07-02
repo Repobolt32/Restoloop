@@ -44,21 +44,21 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
 
   if (waUrl) {
     return (
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl text-center">
-        <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="w-full max-w-md bg-white border border-[--color-border] rounded-2xl p-8 shadow-md text-center">
+        <div className="w-16 h-16 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white mb-2">You&apos;re Registered!</h1>
-        <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-          Tap the button below to open WhatsApp and claim your welcome discount code at <strong className="text-white">{restaurantName}</strong>.
+        <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-2">You&apos;re Registered!</h1>
+        <p className="text-[--color-grey-600] text-sm mb-8 font-bold leading-relaxed">
+          Tap the button below to open WhatsApp and claim your welcome discount code at <strong className="text-[--color-foreground]">{restaurantName}</strong>.
         </p>
         <a
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold py-3.5 px-6 rounded-xl transition duration-200 inline-flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-900/20"
+          className="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest py-3.5 px-6 rounded-xl transition duration-200 inline-flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-900/10 cursor-pointer"
         >
           <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.57 2.015 14.1 1.01 11.479 1.01c-5.442 0-9.866 4.372-9.87 9.802 0 1.934.507 3.826 1.47 5.514L2.094 20l3.963-1.039c1.6.877 3.325 1.34 5.093 1.343zm12.19-7.065c-.328-.164-1.945-.96-2.247-1.07-.302-.109-.522-.164-.74.164-.219.329-.85 1.07-1.041 1.29-.192.219-.384.246-.712.082-1.194-.597-1.974-1.055-2.756-2.396-.206-.353-.021-.544.153-.718.156-.156.328-.384.493-.575.164-.192.219-.329.328-.549.11-.22.055-.411-.027-.575-.082-.164-.74-1.78-.988-2.382-.24-.58-.51-.502-.7-.512-.178-.01-.384-.01-.59-.01-.205 0-.54.077-.822.384-.282.308-1.078 1.054-1.078 2.57s1.103 2.983 1.257 3.189c.154.205 2.17 3.313 5.258 4.646.734.317 1.309.507 1.758.65.74.235 1.414.202 1.947.122.593-.089 1.945-.794 2.219-1.56.275-.767.275-1.424.192-1.56-.083-.137-.302-.219-.63-.383z" />
@@ -70,17 +70,17 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
   }
 
   return (
-    <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+    <div className="w-full max-w-md bg-white border border-[--color-border] rounded-2xl p-8 shadow-md">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-white mb-1.5">Join the Club</h1>
-        <p className="text-slate-400 text-sm leading-relaxed">
-          Sign up to receive exclusive offers and a welcome coupon from <span className="text-slate-200 font-semibold">{restaurantName}</span>.
+        <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-1">Join the Club</h1>
+        <p className="text-xs font-bold text-[--color-grey-500] leading-relaxed">
+          Sign up to receive exclusive offers and a welcome coupon from <span className="text-[--color-foreground] font-extrabold">{restaurantName}</span>.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="name" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">
             Name
           </label>
           <input
@@ -89,12 +89,12 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
             name="name"
             placeholder="John Doe"
             required
-            className="w-full bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none transition duration-150 text-sm"
+            className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] placeholder-[--color-grey-300] font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150"
           />
         </div>
 
-        <div>
-          <label htmlFor="phone" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="phone" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">
             WhatsApp Number
           </label>
           <input
@@ -104,23 +104,23 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
             placeholder="+919876543210"
             required
             pattern="^\+91\d{10}$"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none transition duration-150 text-sm"
+            className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] placeholder-[--color-grey-300] font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150"
           />
-          <p className="text-slate-500 text-[11px] mt-1">Must include country code, e.g. +91XXXXXXXXXX</p>
+          <p className="text-[--color-grey-400] text-[10px] font-bold">Must include country code, e.g. +91XXXXXXXXXX</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="birthdayMonth" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="birthdayMonth" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">
               Birth Month
             </label>
             <select
               id="birthdayMonth"
               name="birthdayMonth"
               defaultValue=""
-              className="w-full bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none transition duration-150 text-sm appearance-none"
+              className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150 appearance-none cursor-pointer"
             >
-              <option value="" disabled className="text-slate-600">Month</option>
+              <option value="" disabled className="text-slate-400">Month</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                 <option key={m} value={m}>
                   {new Date(0, m - 1).toLocaleString('default', { month: 'long' })}
@@ -129,17 +129,17 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
             </select>
           </div>
 
-          <div>
-            <label htmlFor="birthdayDay" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="birthdayDay" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">
               Birth Day
             </label>
             <select
               id="birthdayDay"
               name="birthdayDay"
               defaultValue=""
-              className="w-full bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none transition duration-150 text-sm appearance-none"
+              className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150 appearance-none cursor-pointer"
             >
-              <option value="" disabled className="text-slate-600">Day</option>
+              <option value="" disabled className="text-slate-400">Day</option>
               {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
                 <option key={d} value={d}>
                   {d}
@@ -149,17 +149,17 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
           </div>
         </div>
 
-        <div>
-          <label htmlFor="foodPreference" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-            Food Preference <span className="text-slate-600 lowercase font-normal">(optional)</span>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="foodPreference" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">
+            Food Preference <span className="text-[--color-grey-400] lowercase font-normal">(optional)</span>
           </label>
           <select
             id="foodPreference"
             name="foodPreference"
             defaultValue=""
-            className="w-full bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none transition duration-150 text-sm appearance-none"
+            className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150 appearance-none cursor-pointer"
           >
-            <option value="" disabled className="text-slate-600">Preference</option>
+            <option value="" disabled className="text-slate-400">Preference</option>
             <option value="Veg">Vegetarian</option>
             <option value="Non-Veg">Non-Vegetarian</option>
             <option value="Both">Both / Any</option>
@@ -167,7 +167,7 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl p-3.5 leading-relaxed">
+          <div className="bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-3.5 font-bold leading-relaxed">
             {error}
           </div>
         )}
@@ -175,7 +175,7 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:bg-indigo-800 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 text-sm shadow-lg shadow-indigo-900/10 flex items-center justify-center gap-2 mt-4 cursor-pointer"
+          className="w-full bg-[--color-primary] hover:bg-[--color-primary-dark] active:bg-[--color-primary] text-white font-black text-[10px] uppercase tracking-widest py-3.5 rounded-xl transition duration-200 flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-50"
         >
           {loading ? (
             <>
