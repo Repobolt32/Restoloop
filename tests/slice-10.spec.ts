@@ -92,7 +92,7 @@ test.describe('Slice 10: Onboarding Fix', () => {
     
     // Expect correct prefilled message
     expect(href).toContain(`wa.me/${restaurantPhone}`)
-    expect(href).toContain('text=Hi%21%20I%20just%20signed%20up%20for%20your%20loyalty%20club.')
+    expect(href).toContain('text=Hi!%20I%20just%20signed%20up%20for%20your%20loyalty%20club.')
 
     // Verify in database that customer opt_in_status is opted_in
     const { data: customer } = await supabase
