@@ -27,7 +27,7 @@ Always run `typecheck` + `lint` before claiming code works. If `build` fails, it
 
 - `docs/BUSINESS_RULES.md` - business requirements (flexible, not law)
 - `docs/superpowers/specs/2026-06-28-restoloop-design.md` - design spec
-- `docs/superpowers/plans/2026-06-28-restoloop-implementation.md` - implementation plan (slices)
+- `docs/superpowers/plans/` - directory containing individual slice implementation plans (e.g., `slice-1.md`, `2026-06-30-slice-7-credits.md`). When implementing a slice, the agent must load the required skill/sub-skill specified in the slice plan file.
 - Never refer to `docs/Doc-Restoloop.md` (old, dead)
 - `docs/DEVELOPER_GUIDE.md` has stale directory structure (references old `app/` at root, not `src/app/`)
 
@@ -62,7 +62,7 @@ docs/                # business rules, design spec, implementation plan
 
 When asked to implement a slice ("Run S1", "do Slice 2"):
 
-1. **PM** reads the slice plan and extracts the concrete tasks, constraints, and expected behavior.
+1. **PM** reads the slice plan from `docs/superpowers/plans/`, extracts concrete tasks, constraints, and expected behavior, and MUST load the required skill/sub-skill specified in the plan (e.g., `superpowers:subagent-driven-development` or `superpowers:executing-plans`).
 2. **PM** dispatches `coder` subagent with the slice tasks and relevant context.
 3. **Coder** writes targeted tests for the requested behavior, then implements to pass.
 4. **PM** dispatches `tester` subagent with the slice task description, spec path, and coder's summary.
