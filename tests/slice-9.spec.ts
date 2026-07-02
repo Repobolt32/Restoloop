@@ -9,9 +9,9 @@ test.describe('Slice 9: Front Door + QR', () => {
     await expect(page.getByText('Start Free — 1000 Credits')).toBeVisible()
 
     // Features section
-    await expect(page.getByText('Automated Campaigns')).toBeVisible()
-    await expect(page.getByText('QR Enrollment')).toBeVisible()
-    await expect(page.getByText('Live Dashboard')).toBeVisible()
+    await expect(page.getByText('Automated Campaigns', { exact: true })).toBeVisible()
+    await expect(page.getByText('QR Enrollment', { exact: true })).toBeVisible()
+    await expect(page.getByText('Live Dashboard', { exact: true })).toBeVisible()
 
     // How it works
     await expect(page.getByText('3 Steps. Zero Hassle.')).toBeVisible()
