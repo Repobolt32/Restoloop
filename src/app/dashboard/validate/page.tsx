@@ -3,7 +3,7 @@
 import { validateCoupon } from './actions'
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { Receipt, Percent, IndianRupee, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Receipt, Percent, IndianRupee, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react'
 
 export default function ValidatePage() {
   const [code, setCode] = useState('')
@@ -37,13 +37,12 @@ export default function ValidatePage() {
     })
   }
 
-  // Live preview — shown whenever bill amount is entered
-  const billCentsPreview = Number(billAmount) > 0 ? Math.round(Number(billAmount) * 100) : 0
-  // We don't know discount % before redemption, so show placeholder dashes
-  const hasPreview = billCentsPreview > 0 && !result?.success
+  // Calculate live numbers for the billing panel preview
+  const enteredBillAmount = Number(billAmount) || 0
+  const isRedeemed = !!result?.success
 
   return (
-    <div className="p-8 max-w-xl mx-auto font-body">
+    <div className="p-8 max-w-5xl mx-auto font-body">
       {/* Back link */}
       <Link
         href="/dashboard"
@@ -59,13 +58,16 @@ export default function ValidatePage() {
         POS Billing
       </h1>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent] mb-8">
-        Enter the bill total, paste the customer coupon code, and redeem.
+        Process guest visits, calculate discounts, and register redemptions.
       </p>
 
-      <div className="grid grid-cols-1 gap-6">
-        {/* Input Form card */}
-        <div className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md">
-          <p className="section-label mb-5">Step 1 — Enter Bill Details</p>
+      {/* Two column layout on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
+        
+        {/* Left Column: Form (3/5 width) */}
+        <div className="md:col-span-3 bg-white border border-[--color-border] rounded-2xl p-8 shadow-md">
+          <p className="section-label mb-5">Step 1 — Enter Transaction details</p>
+          
           <form onSubmit={handleValidate} className="flex flex-col gap-5">
             {/* Bill Amount */}
             <div className="flex flex-col gap-2">
@@ -78,7 +80,10 @@ export default function ValidatePage() {
                   id="bill-amount"
                   type="number"
                   value={billAmount}
-                  onChange={(e) => { setBillAmount(e.target.value); setResult(null) }}
+                  onChange={(e) => {
+                    setBillAmount(e.target.value)
+                    if (result) setResult(null)
+                  }}
                   placeholder="0.00"
                   required
                   min={1}
@@ -99,8 +104,11 @@ export default function ValidatePage() {
                 name="code"
                 type="text"
                 value={code}
-                onChange={(e) => { setCode(e.target.value.toUpperCase()); setResult(null) }}
-                placeholder="Paste code here, e.g. W10-ABCDEF"
+                onChange={(e) => {
+                  setCode(e.target.value.toUpperCase())
+                  if (result) setResult(null)
+                }}
+                placeholder="e.g. WELCOME10"
                 required
                 disabled={isPending}
                 autoComplete="off"
@@ -109,9 +117,9 @@ export default function ValidatePage() {
               />
             </div>
 
-            {/* Error state */}
+            {/* Error Message */}
             {result?.error && (
-              <div className="bg-red-50 border border-red-200 p-3.5 rounded-xl text-red-800 text-sm font-bold flex items-center gap-2" aria-live="polite">
+              <div className="bg-red-50 border border-red-200 p-3.5 rounded-xl text-red-800 text-sm font-bold flex items-center gap-2 animate-fade-in" aria-live="polite">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 {result.error}
               </div>
@@ -128,96 +136,112 @@ export default function ValidatePage() {
           </form>
         </div>
 
-        {/* ── Payable Price Card — always shown when bill amount is entered ── */}
-        {(hasPreview || result?.success) && (
+        {/* Right Column: Billing Summary (2/5 width) — Always Present */}
+        <div className="md:col-span-2 space-y-4">
           <div
-            aria-live="polite"
-            className={`rounded-2xl overflow-hidden shadow-md border transition-all ${
-              result?.success
-                ? 'border-emerald-200 bg-emerald-50'
+            className={`rounded-2xl overflow-hidden shadow-md border transition-all duration-300 ${
+              isRedeemed
+                ? 'border-emerald-200 bg-emerald-50/50'
                 : 'border-[--color-border] bg-white'
             }`}
           >
-            {/* Card header */}
-            <div className={`px-6 py-4 flex items-center justify-between ${
-              result?.success ? 'bg-emerald-500' : 'bg-[--color-primary]'
+            {/* Summary Header */}
+            <div className={`px-6 py-4 flex items-center justify-between transition-colors duration-300 ${
+              isRedeemed ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-[--color-foreground]'
             }`}>
               <div className="flex items-center gap-2">
-                {result?.success
-                  ? <CheckCircle2 className="w-5 h-5 text-white" />
-                  : <Receipt className="w-5 h-5 text-white" />
-                }
-                <span className="text-white font-black uppercase tracking-widest text-sm">
-                  {result?.success ? 'Coupon Redeemed!' : 'Payable Amount'}
+                <Receipt className="w-4 h-4 shrink-0" />
+                <span className="font-black uppercase tracking-widest text-xs">
+                  {isRedeemed ? 'Redemption Invoice' : 'Billing Summary'}
                 </span>
               </div>
-              {result?.success && result.code && (
-                <span className="bg-white/20 text-white font-mono text-xs font-black px-2.5 py-1 rounded-lg">
-                  {result.code}
+              {isRedeemed && (
+                <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md">
+                  Active
                 </span>
               )}
             </div>
 
-            {/* Breakdown rows */}
-            <div className="p-6 space-y-3">
-              {/* Customer row — only after redemption */}
-              {result?.success && (
-                <div className="flex justify-between items-center pb-3 border-b border-emerald-200">
-                  <span className="text-sm font-bold text-[--color-grey-600]">Customer</span>
-                  <span className="text-sm font-black text-[--color-foreground]">
-                    {result.customer?.name || 'Anonymous'}
-                  </span>
+            {/* Breakdown Content */}
+            <div className="p-6 space-y-4">
+              
+              {/* Customer Info (Redeemed state only) */}
+              {isRedeemed && result && (
+                <div className="flex justify-between items-center pb-3 border-b border-emerald-100 animate-fade-in">
+                  <span className="text-xs font-bold text-[--color-grey-500] uppercase tracking-wider">Customer</span>
+                  <span className="text-sm font-black text-[--color-foreground]">{result.customer?.name || 'Anonymous Guest'}</span>
                 </div>
               )}
 
-              {/* Bill amount */}
+              {/* Coupon Code Row (Redeemed state only) */}
+              {isRedeemed && result && (
+                <div className="flex justify-between items-center pb-3 border-b border-emerald-100 animate-fade-in">
+                  <span className="text-xs font-bold text-[--color-grey-500] uppercase tracking-wider">Coupon Code</span>
+                  <span className="font-mono text-xs font-black bg-emerald-100/60 px-2 py-0.5 rounded text-emerald-900">{result.code}</span>
+                </div>
+              )}
+
+              {/* Bill Total (Always Present) */}
               <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-[--color-grey-600]">Bill Total</span>
-                <span className="text-sm font-black text-[--color-foreground]">
-                  ₹{result?.success
-                    ? ((result.billAmountCents ?? 0) / 100).toFixed(2)
-                    : Number(billAmount).toFixed(2)
+                <span className="text-xs font-bold text-[--color-grey-500] uppercase tracking-wider">Bill Total</span>
+                <span className={`text-sm font-black transition-opacity duration-300 ${enteredBillAmount > 0 ? 'text-[--color-foreground]' : 'text-[--color-grey-300]'}`}>
+                  {enteredBillAmount > 0 
+                    ? `₹${(isRedeemed && result?.billAmountCents ? result.billAmountCents / 100 : enteredBillAmount).toFixed(2)}`
+                    : '₹0.00'
                   }
                 </span>
               </div>
 
-              {/* Discount row */}
+              {/* Discount Row (Always Present) */}
               <div className="flex justify-between items-center">
-                <span className={`text-sm font-bold flex items-center gap-1 ${result?.success ? 'text-emerald-700' : 'text-[--color-grey-400]'}`}>
-                  <Percent className="w-3 h-3" />
-                  {result?.success
-                    ? `Discount (${result.discountPercent}%)`
-                    : 'Discount (coupon %)'
-                  }
+                <span className={`text-xs font-bold flex items-center gap-1 uppercase tracking-wider ${isRedeemed ? 'text-emerald-700' : 'text-[--color-grey-500]'}`}>
+                  <Percent className="w-3.5 h-3.5" />
+                  {isRedeemed ? `Discount (${result?.discountPercent}%)` : 'Discount'}
                 </span>
-                <span className={`text-sm font-black ${result?.success ? 'text-emerald-700' : 'text-[--color-grey-400]'}`}>
-                  {result?.success
-                    ? `−₹${((result.discountAmountCents ?? 0) / 100).toFixed(2)}`
+                <span className={`text-sm font-black transition-all ${isRedeemed ? 'text-emerald-600' : 'text-[--color-grey-300]'}`}>
+                  {isRedeemed && result?.discountAmountCents
+                    ? `−₹${(result.discountAmountCents / 100).toFixed(2)}`
                     : '— —'
                   }
                 </span>
               </div>
 
-              {/* Divider */}
-              <div className={`border-t pt-3 ${result?.success ? 'border-emerald-200' : 'border-[--color-border]'}`}>
+              {/* Payable Amount Divider */}
+              <div className={`border-t pt-4 ${isRedeemed ? 'border-emerald-200' : 'border-[--color-border]'}`}>
                 <div className="flex justify-between items-center">
-                  <span className="text-base font-black text-[--color-foreground]">You Pay</span>
-                  <span className={`text-3xl font-black tabular-nums ${result?.success ? 'text-emerald-600' : 'text-[--color-primary]'}`}>
-                    {result?.success
-                      ? `₹${(((result.billAmountCents ?? 0) - (result.discountAmountCents ?? 0)) / 100).toFixed(2)}`
-                      : `₹${Number(billAmount).toFixed(2)}`
+                  <span className="text-sm font-black uppercase tracking-wider text-[--color-foreground]">You Pay</span>
+                  <span className={`text-2xl font-black tabular-nums transition-all ${
+                    isRedeemed 
+                      ? 'text-emerald-600' 
+                      : enteredBillAmount > 0 ? 'text-[--color-foreground]' : 'text-[--color-grey-300]'
+                  }`}>
+                    {isRedeemed && result?.billAmountCents && result?.discountAmountCents
+                      ? `₹${((result.billAmountCents - result.discountAmountCents) / 100).toFixed(2)}`
+                      : enteredBillAmount > 0 
+                        ? `₹${enteredBillAmount.toFixed(2)}`
+                        : '₹0.00'
                     }
                   </span>
                 </div>
-                {!result?.success && (
-                  <p className="text-[10px] font-bold text-[--color-grey-400] mt-1.5 text-right">
-                    Discount applied after coupon validation
-                  </p>
-                )}
               </div>
             </div>
+
+            {/* Bottom Info bar */}
+            <div className={`px-6 py-3 border-t text-[10px] font-bold text-center uppercase tracking-wider transition-colors duration-300 ${
+              isRedeemed 
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-100' 
+                : 'bg-gray-50 text-[--color-grey-400] border-gray-100'
+            }`}>
+              {isRedeemed 
+                ? 'Transaction Completed & Logged'
+                : enteredBillAmount > 0 
+                  ? 'Coupon discount will apply on validation'
+                  : 'Enter bill amount to begin'
+              }
+            </div>
           </div>
-        )}
+        </div>
+
       </div>
     </div>
   )
