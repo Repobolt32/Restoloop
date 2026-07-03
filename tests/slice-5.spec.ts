@@ -113,7 +113,7 @@ test.describe('Slice 5: Birthday + Winback Campaigns', () => {
       .select('*')
       .eq('restaurant_id', restaurantId)
       .eq('customer_id', customer!.id)
-      .eq('type', 'campaign')
+      .eq('type', 'birthday_campaign')
 
     expect(logs).not.toBeNull()
     expect(logs!.length).toBe(1)
@@ -187,7 +187,7 @@ test.describe('Slice 5: Birthday + Winback Campaigns', () => {
       .select('*')
       .eq('restaurant_id', restaurantId)
       .eq('customer_id', customer!.id)
-      .eq('type', 'campaign')
+      .eq('type', 'winback_campaign')
 
     expect(logs).not.toBeNull()
     expect(logs!.length).toBe(1)
@@ -271,7 +271,7 @@ test.describe('Slice 5: Birthday + Winback Campaigns', () => {
       .select('*')
       .eq('restaurant_id', restaurantId)
       .eq('customer_id', customer!.id)
-      .eq('type', 'campaign')
+      .eq('type', 'birthday_campaign')
 
     expect(logs).not.toBeNull()
     expect(logs!.length).toBe(1)

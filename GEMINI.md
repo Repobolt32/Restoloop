@@ -95,15 +95,3 @@ Two separate code paths that need unification:
 - Input validation with Zod at trust boundaries
 - Cron endpoint uses `Authorization: Bearer <CRON_SECRET>` header
 
-## 8 Slices (Execution Order)
-
-| Slice | Name | What It Ships |
-|-------|------|---------------|
-| S1 | Hello Restoloop | signup -> restaurant -> empty dashboard |
-| S2 | Customer joins | QR -> WhatsApp opt-in -> welcome coupon |
-| S3 | Owner sees activity | dashboard tables, recent activity feed |
-| S4 | First campaign fires | cron, welcome reminder (25d) |
-| S5 | Birthday + winback fire | remaining 2 campaign types |
-| S6 | Coupon redemption | validation screen, last_visit_at update |
-| S7 | Credits work | Razorpay self-serve top-up |
-| S8 | Admin sees all | super admin panel |

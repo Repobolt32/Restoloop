@@ -1,0 +1,3713 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "eslint.config.mjs",
+      "file_type": "code",
+      "source_file": "eslint.config.mjs",
+      "source_location": "L1",
+      "id": "eslint_config_mjs",
+      "community": 25,
+      "norm_label": "eslint.config.mjs"
+    },
+    {
+      "label": "next-env.d.ts",
+      "file_type": "code",
+      "source_file": "next-env.d.ts",
+      "source_location": "L1",
+      "id": "next_env_d_ts",
+      "community": 26,
+      "norm_label": "next-env.d.ts"
+    },
+    {
+      "label": "next.config.ts",
+      "file_type": "code",
+      "source_file": "next.config.ts",
+      "source_location": "L1",
+      "id": "next_config_ts",
+      "community": 27,
+      "norm_label": "next.config.ts"
+    },
+    {
+      "label": "playwright.config.ts",
+      "file_type": "code",
+      "source_file": "playwright.config.ts",
+      "source_location": "L1",
+      "id": "playwright_config_ts",
+      "community": 28,
+      "norm_label": "playwright.config.ts"
+    },
+    {
+      "label": "postcss.config.mjs",
+      "file_type": "code",
+      "source_file": "postcss.config.mjs",
+      "source_location": "L1",
+      "id": "postcss_config_mjs",
+      "community": 29,
+      "norm_label": "postcss.config.mjs"
+    },
+    {
+      "label": "vitest.config.ts",
+      "file_type": "code",
+      "source_file": "vitest.config.ts",
+      "source_location": "L1",
+      "id": "vitest_config_ts",
+      "community": 30,
+      "norm_label": "vitest.config.ts"
+    },
+    {
+      "label": "screenshot_dashboard.py",
+      "file_type": "code",
+      "source_file": "scripts/screenshot_dashboard.py",
+      "source_location": "L1",
+      "id": "scripts_screenshot_dashboard_py",
+      "community": 31,
+      "norm_label": "screenshot_dashboard.py"
+    },
+    {
+      "label": "test_full.py",
+      "file_type": "code",
+      "source_file": "scripts/test_full.py",
+      "source_location": "L1",
+      "id": "scripts_test_full_py",
+      "community": 9,
+      "norm_label": "test_full.py"
+    },
+    {
+      "label": "screenshot()",
+      "file_type": "code",
+      "source_file": "scripts/test_full.py",
+      "source_location": "L9",
+      "id": "scripts_test_full_screenshot",
+      "community": 9,
+      "norm_label": "screenshot()"
+    },
+    {
+      "label": "test_full2.py",
+      "file_type": "code",
+      "source_file": "scripts/test_full2.py",
+      "source_location": "L1",
+      "id": "scripts_test_full2_py",
+      "community": 10,
+      "norm_label": "test_full2.py"
+    },
+    {
+      "label": "snap()",
+      "file_type": "code",
+      "source_file": "scripts/test_full2.py",
+      "source_location": "L9",
+      "id": "scripts_test_full2_snap",
+      "community": 10,
+      "norm_label": "snap()"
+    },
+    {
+      "label": "test_login.py",
+      "file_type": "code",
+      "source_file": "scripts/test_login.py",
+      "source_location": "L1",
+      "id": "scripts_test_login_py",
+      "community": 11,
+      "norm_label": "test_login.py"
+    },
+    {
+      "label": "snap()",
+      "file_type": "code",
+      "source_file": "scripts/test_login.py",
+      "source_location": "L9",
+      "id": "scripts_test_login_snap",
+      "community": 11,
+      "norm_label": "snap()"
+    },
+    {
+      "label": "proxy.ts",
+      "file_type": "code",
+      "source_file": "src/proxy.ts",
+      "source_location": "L1",
+      "id": "src_proxy_ts",
+      "community": 12,
+      "norm_label": "proxy.ts"
+    },
+    {
+      "label": "proxy()",
+      "file_type": "code",
+      "source_file": "src/proxy.ts",
+      "source_location": "L4",
+      "id": "src_proxy_proxy",
+      "community": 12,
+      "norm_label": "proxy()"
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L1",
+      "id": "src_app_layout_tsx",
+      "community": 13,
+      "norm_label": "layout.tsx"
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L3",
+      "id": "app_layout_rootlayout",
+      "community": 13,
+      "norm_label": "rootlayout()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_page_tsx",
+      "community": 32,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/admin/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_admin_page_tsx",
+      "community": 0,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "src/app/admin/[id]/actions.ts",
+      "source_location": "L1",
+      "id": "src_app_admin_id_actions_ts",
+      "community": 0,
+      "norm_label": "actions.ts"
+    },
+    {
+      "label": "addCreditsAction()",
+      "file_type": "code",
+      "source_file": "src/app/admin/[id]/actions.ts",
+      "source_location": "L7",
+      "id": "id_actions_addcreditsaction",
+      "community": 0,
+      "norm_label": "addcreditsaction()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/admin/[id]/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_admin_id_page_tsx",
+      "community": 0,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_cron_welcome_reminder_route_ts",
+      "community": 2,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "GET()",
+      "file_type": "code",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L6",
+      "id": "welcome_reminder_route_get",
+      "community": 2,
+      "norm_label": "get()"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/razorpay/create-order/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_razorpay_create_order_route_ts",
+      "community": 0,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/razorpay/create-order/route.ts",
+      "source_location": "L5",
+      "id": "create_order_route_post",
+      "community": 0,
+      "norm_label": "post()"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/razorpay/webhook/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_razorpay_webhook_route_ts",
+      "community": 2,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/razorpay/webhook/route.ts",
+      "source_location": "L5",
+      "id": "webhook_route_post",
+      "community": 2,
+      "norm_label": "post()"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/test/openwa-mock/chat/send/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_test_openwa_mock_chat_send_route_ts",
+      "community": 14,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/test/openwa-mock/chat/send/route.ts",
+      "source_location": "L3",
+      "id": "send_route_post",
+      "community": 14,
+      "norm_label": "post()"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/test/rls-check/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_test_rls_check_route_ts",
+      "community": 0,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "GET()",
+      "file_type": "code",
+      "source_file": "src/app/api/test/rls-check/route.ts",
+      "source_location": "L4",
+      "id": "rls_check_route_get",
+      "community": 0,
+      "norm_label": "get()"
+    },
+    {
+      "label": "route.test.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L1",
+      "id": "src_app_api_whatsapp_route_test_ts",
+      "community": 5,
+      "norm_label": "route.test.ts"
+    },
+    {
+      "label": "constructor()",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L17",
+      "id": "whatsapp_route_test_constructor",
+      "community": 5,
+      "norm_label": "constructor()"
+    },
+    {
+      "label": "text()",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L18",
+      "id": "whatsapp_route_test_text",
+      "community": 5,
+      "norm_label": "text()"
+    },
+    {
+      "label": "chain()",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L31",
+      "id": "whatsapp_route_test_chain",
+      "community": 5,
+      "norm_label": "chain()"
+    },
+    {
+      "label": "tableHandler()",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L50",
+      "id": "whatsapp_route_test_tablehandler",
+      "community": 5,
+      "norm_label": "tablehandler()"
+    },
+    {
+      "label": "makeRequest()",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L61",
+      "id": "whatsapp_route_test_makerequest",
+      "community": 5,
+      "norm_label": "makerequest()"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_whatsapp_route_ts",
+      "community": 5,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L5",
+      "id": "whatsapp_route_post",
+      "community": 5,
+      "norm_label": "post()"
+    },
+    {
+      "label": "route.test.ts",
+      "file_type": "code",
+      "source_file": "src/app/auth/callback/route.test.ts",
+      "source_location": "L1",
+      "id": "src_app_auth_callback_route_test_ts",
+      "community": 0,
+      "norm_label": "route.test.ts"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/auth/callback/route.ts",
+      "source_location": "L1",
+      "id": "src_app_auth_callback_route_ts",
+      "community": 0,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "GET()",
+      "file_type": "code",
+      "source_file": "src/app/auth/callback/route.ts",
+      "source_location": "L4",
+      "id": "callback_route_get",
+      "community": 0,
+      "norm_label": "get()"
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/layout.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_layout_tsx",
+      "community": 0,
+      "norm_label": "layout.tsx"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_page_tsx",
+      "community": 0,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/analytics/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_analytics_page_tsx",
+      "community": 0,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/campaigns/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_campaigns_page_tsx",
+      "community": 0,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L1",
+      "id": "src_app_dashboard_coupons_actions_ts",
+      "community": 4,
+      "norm_label": "actions.ts"
+    },
+    {
+      "label": "generateCode()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L7",
+      "id": "coupons_actions_generatecode",
+      "community": 4,
+      "norm_label": "generatecode()"
+    },
+    {
+      "label": "createCouponAction()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L16",
+      "id": "coupons_actions_createcouponaction",
+      "community": 4,
+      "norm_label": "createcouponaction()"
+    },
+    {
+      "label": "disableCouponAction()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L53",
+      "id": "coupons_actions_disablecouponaction",
+      "community": 4,
+      "norm_label": "disablecouponaction()"
+    },
+    {
+      "label": "deleteCouponAction()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L75",
+      "id": "coupons_actions_deletecouponaction",
+      "community": 4,
+      "norm_label": "deletecouponaction()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_coupons_page_tsx",
+      "community": 4,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "formatCents()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L22",
+      "id": "coupons_page_formatcents",
+      "community": 4,
+      "norm_label": "formatcents()"
+    },
+    {
+      "label": "handleDisable()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L54",
+      "id": "coupons_page_handledisable",
+      "community": 4,
+      "norm_label": "handledisable()"
+    },
+    {
+      "label": "handleDelete()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L61",
+      "id": "coupons_page_handledelete",
+      "community": 4,
+      "norm_label": "handledelete()"
+    },
+    {
+      "label": "handleCreate()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L68",
+      "id": "coupons_page_handlecreate",
+      "community": 4,
+      "norm_label": "handlecreate()"
+    },
+    {
+      "label": "actions.test.ts",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/create/actions.test.ts",
+      "source_location": "L1",
+      "id": "src_app_dashboard_create_actions_test_ts",
+      "community": 15,
+      "norm_label": "actions.test.ts"
+    },
+    {
+      "label": "slugify()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/create/actions.test.ts",
+      "source_location": "L4",
+      "id": "create_actions_test_slugify",
+      "community": 15,
+      "norm_label": "slugify()"
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L1",
+      "id": "src_app_dashboard_create_actions_ts",
+      "community": 8,
+      "norm_label": "actions.ts"
+    },
+    {
+      "label": "slugify()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L16",
+      "id": "create_actions_slugify",
+      "community": 8,
+      "norm_label": "slugify()"
+    },
+    {
+      "label": "createRestaurant()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L23",
+      "id": "create_actions_createrestaurant",
+      "community": 8,
+      "norm_label": "createrestaurant()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/create/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_create_page_tsx",
+      "community": 8,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "CreateRestaurantPage()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/create/page.tsx",
+      "source_location": "L3",
+      "id": "create_page_createrestaurantpage",
+      "community": 8,
+      "norm_label": "createrestaurantpage()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/customers/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_customers_page_tsx",
+      "community": 0,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "getSegments()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/customers/page.tsx",
+      "source_location": "L18",
+      "id": "customers_page_getsegments",
+      "community": 0,
+      "norm_label": "getsegments()"
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/actions.ts",
+      "source_location": "L1",
+      "id": "src_app_dashboard_settings_actions_ts",
+      "community": 3,
+      "norm_label": "actions.ts"
+    },
+    {
+      "label": "updateDiscountsAction()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/actions.ts",
+      "source_location": "L8",
+      "id": "settings_actions_updatediscountsaction",
+      "community": 3,
+      "norm_label": "updatediscountsaction()"
+    },
+    {
+      "label": "updateCampaignSettings()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/actions.ts",
+      "source_location": "L46",
+      "id": "settings_actions_updatecampaignsettings",
+      "community": 3,
+      "norm_label": "updatecampaignsettings()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_settings_page_tsx",
+      "community": 3,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "handleTopUp()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L65",
+      "id": "settings_page_handletopup",
+      "community": 3,
+      "norm_label": "handletopup()"
+    },
+    {
+      "label": "handleSandboxSuccess()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L126",
+      "id": "settings_page_handlesandboxsuccess",
+      "community": 3,
+      "norm_label": "handlesandboxsuccess()"
+    },
+    {
+      "label": "handleSandboxCancel()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L169",
+      "id": "settings_page_handlesandboxcancel",
+      "community": 3,
+      "norm_label": "handlesandboxcancel()"
+    },
+    {
+      "label": "handleCopyUrl()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L174",
+      "id": "settings_page_handlecopyurl",
+      "community": 3,
+      "norm_label": "handlecopyurl()"
+    },
+    {
+      "label": "async()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L377",
+      "id": "settings_page_async",
+      "community": 3,
+      "norm_label": "async()"
+    },
+    {
+      "label": "actions.test.ts",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/validate/actions.test.ts",
+      "source_location": "L1",
+      "id": "src_app_dashboard_validate_actions_test_ts",
+      "community": 7,
+      "norm_label": "actions.test.ts"
+    },
+    {
+      "label": "loadModule()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/validate/actions.test.ts",
+      "source_location": "L19",
+      "id": "validate_actions_test_loadmodule",
+      "community": 7,
+      "norm_label": "loadmodule()"
+    },
+    {
+      "label": "futureDate()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/validate/actions.test.ts",
+      "source_location": "L270",
+      "id": "validate_actions_test_futuredate",
+      "community": 7,
+      "norm_label": "futuredate()"
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/validate/actions.ts",
+      "source_location": "L1",
+      "id": "src_app_dashboard_validate_actions_ts",
+      "community": 7,
+      "norm_label": "actions.ts"
+    },
+    {
+      "label": "validateCoupon()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/validate/actions.ts",
+      "source_location": "L6",
+      "id": "validate_actions_validatecoupon",
+      "community": 7,
+      "norm_label": "validatecoupon()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/validate/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_dashboard_validate_page_tsx",
+      "community": 7,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "handleValidate()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/validate/page.tsx",
+      "source_location": "L19",
+      "id": "validate_page_handlevalidate",
+      "community": 7,
+      "norm_label": "handlevalidate()"
+    },
+    {
+      "label": "actions.test.ts",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/actions.test.ts",
+      "source_location": "L1",
+      "id": "src_app_form_slug_actions_test_ts",
+      "community": 6,
+      "norm_label": "actions.test.ts"
+    },
+    {
+      "label": "loadModule()",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/actions.test.ts",
+      "source_location": "L19",
+      "id": "slug_actions_test_loadmodule",
+      "community": 6,
+      "norm_label": "loadmodule()"
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/actions.ts",
+      "source_location": "L1",
+      "id": "src_app_form_slug_actions_ts",
+      "community": 6,
+      "norm_label": "actions.ts"
+    },
+    {
+      "label": "submitIntakeForm()",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/actions.ts",
+      "source_location": "L14",
+      "id": "slug_actions_submitintakeform",
+      "community": 6,
+      "norm_label": "submitintakeform()"
+    },
+    {
+      "label": "IntakeForm.tsx",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/IntakeForm.tsx",
+      "source_location": "L1",
+      "id": "src_app_form_slug_intakeform_tsx",
+      "community": 6,
+      "norm_label": "intakeform.tsx"
+    },
+    {
+      "label": "handleSubmit()",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/IntakeForm.tsx",
+      "source_location": "L16",
+      "id": "slug_intakeform_handlesubmit",
+      "community": 6,
+      "norm_label": "handlesubmit()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_form_slug_page_tsx",
+      "community": 6,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "IntakeFormPage()",
+      "file_type": "code",
+      "source_file": "src/app/form/[slug]/page.tsx",
+      "source_location": "L9",
+      "id": "slug_page_intakeformpage",
+      "community": 6,
+      "norm_label": "intakeformpage()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/login/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_login_page_tsx",
+      "community": 3,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "handleSubmit()",
+      "file_type": "code",
+      "source_file": "src/app/login/page.tsx",
+      "source_location": "L14",
+      "id": "login_page_handlesubmit",
+      "community": 3,
+      "norm_label": "handlesubmit()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/signup/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_signup_page_tsx",
+      "community": 3,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "handleSubmit()",
+      "file_type": "code",
+      "source_file": "src/app/signup/page.tsx",
+      "source_location": "L14",
+      "id": "signup_page_handlesubmit",
+      "community": 3,
+      "norm_label": "handlesubmit()"
+    },
+    {
+      "label": "razorpay.ts",
+      "file_type": "code",
+      "source_file": "src/lib/razorpay.ts",
+      "source_location": "L1",
+      "id": "src_lib_razorpay_ts",
+      "community": 0,
+      "norm_label": "razorpay.ts"
+    },
+    {
+      "label": "utils.test.ts",
+      "file_type": "code",
+      "source_file": "src/lib/utils.test.ts",
+      "source_location": "L1",
+      "id": "src_lib_utils_test_ts",
+      "community": 0,
+      "norm_label": "utils.test.ts"
+    },
+    {
+      "label": "utils.ts",
+      "file_type": "code",
+      "source_file": "src/lib/utils.ts",
+      "source_location": "L1",
+      "id": "src_lib_utils_ts",
+      "community": 0,
+      "norm_label": "utils.ts"
+    },
+    {
+      "label": "maskPhone()",
+      "file_type": "code",
+      "source_file": "src/lib/utils.ts",
+      "source_location": "L1",
+      "id": "lib_utils_maskphone",
+      "community": 0,
+      "norm_label": "maskphone()"
+    },
+    {
+      "label": "index.test.ts",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L1",
+      "id": "src_lib_campaigns_index_test_ts",
+      "community": 2,
+      "norm_label": "index.test.ts"
+    },
+    {
+      "label": "chain()",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L15",
+      "id": "campaigns_index_test_chain",
+      "community": 2,
+      "norm_label": "chain()"
+    },
+    {
+      "label": "tableHandler()",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L34",
+      "id": "campaigns_index_test_tablehandler",
+      "community": 2,
+      "norm_label": "tablehandler()"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L1",
+      "id": "src_lib_campaigns_index_ts",
+      "community": 2,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "generateCampaignCouponCode()",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L4",
+      "id": "campaigns_index_generatecampaigncouponcode",
+      "community": 2,
+      "norm_label": "generatecampaigncouponcode()"
+    },
+    {
+      "label": "runWelcomeReminders()",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L13",
+      "id": "campaigns_index_runwelcomereminders",
+      "community": 2,
+      "norm_label": "runwelcomereminders()"
+    },
+    {
+      "label": "runBirthdayCampaigns()",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L71",
+      "id": "campaigns_index_runbirthdaycampaigns",
+      "community": 2,
+      "norm_label": "runbirthdaycampaigns()"
+    },
+    {
+      "label": "runWinbackCampaigns()",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L150",
+      "id": "campaigns_index_runwinbackcampaigns",
+      "community": 2,
+      "norm_label": "runwinbackcampaigns()"
+    },
+    {
+      "label": "runExpiryReminders()",
+      "file_type": "code",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L226",
+      "id": "campaigns_index_runexpiryreminders",
+      "community": 2,
+      "norm_label": "runexpiryreminders()"
+    },
+    {
+      "label": "client.ts",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/client.ts",
+      "source_location": "L1",
+      "id": "src_lib_supabase_client_ts",
+      "community": 3,
+      "norm_label": "client.ts"
+    },
+    {
+      "label": "createClient()",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/client.ts",
+      "source_location": "L3",
+      "id": "supabase_client_createclient",
+      "community": 3,
+      "norm_label": "createclient()"
+    },
+    {
+      "label": "server.ts",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L1",
+      "id": "src_lib_supabase_server_ts",
+      "community": 0,
+      "norm_label": "server.ts"
+    },
+    {
+      "label": "createClient()",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L5",
+      "id": "supabase_server_createclient",
+      "community": 0,
+      "norm_label": "createclient()"
+    },
+    {
+      "label": "createServiceClient()",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L30",
+      "id": "supabase_server_createserviceclient",
+      "community": 2,
+      "norm_label": "createserviceclient()"
+    },
+    {
+      "label": "adapter.test.ts",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/adapter.test.ts",
+      "source_location": "L1",
+      "id": "src_lib_whatsapp_adapter_test_ts",
+      "community": 1,
+      "norm_label": "adapter.test.ts"
+    },
+    {
+      "label": "adapter.ts",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L1",
+      "id": "src_lib_whatsapp_adapter_ts",
+      "community": 1,
+      "norm_label": "adapter.ts"
+    },
+    {
+      "label": "createWhatsAppAdapter()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L5",
+      "id": "whatsapp_adapter_createwhatsappadapter",
+      "community": 2,
+      "norm_label": "createwhatsappadapter()"
+    },
+    {
+      "label": "meta.ts",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L1",
+      "id": "src_lib_whatsapp_meta_ts",
+      "community": 1,
+      "norm_label": "meta.ts"
+    },
+    {
+      "label": "MetaAdapter",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L3",
+      "id": "whatsapp_meta_metaadapter",
+      "community": 1,
+      "norm_label": "metaadapter"
+    },
+    {
+      "label": ".sendText()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L4",
+      "id": "whatsapp_meta_metaadapter_sendtext",
+      "community": 1,
+      "norm_label": ".sendtext()"
+    },
+    {
+      "label": ".sendTemplate()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L8",
+      "id": "whatsapp_meta_metaadapter_sendtemplate",
+      "community": 1,
+      "norm_label": ".sendtemplate()"
+    },
+    {
+      "label": ".validateWebhook()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L12",
+      "id": "whatsapp_meta_metaadapter_validatewebhook",
+      "community": 1,
+      "norm_label": ".validatewebhook()"
+    },
+    {
+      "label": ".parseInbound()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L16",
+      "id": "whatsapp_meta_metaadapter_parseinbound",
+      "community": 1,
+      "norm_label": ".parseinbound()"
+    },
+    {
+      "label": "openwa.test.ts",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.test.ts",
+      "source_location": "L1",
+      "id": "src_lib_whatsapp_openwa_test_ts",
+      "community": 1,
+      "norm_label": "openwa.test.ts"
+    },
+    {
+      "label": "openwa.ts",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L1",
+      "id": "src_lib_whatsapp_openwa_ts",
+      "community": 1,
+      "norm_label": "openwa.ts"
+    },
+    {
+      "label": "OpenWAAdapter",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L3",
+      "id": "whatsapp_openwa_openwaadapter",
+      "community": 1,
+      "norm_label": "openwaadapter"
+    },
+    {
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L8",
+      "id": "whatsapp_openwa_openwaadapter_constructor",
+      "community": 1,
+      "norm_label": ".constructor()"
+    },
+    {
+      "label": ".sendText()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L14",
+      "id": "whatsapp_openwa_openwaadapter_sendtext",
+      "community": 1,
+      "norm_label": ".sendtext()"
+    },
+    {
+      "label": ".sendTemplate()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L43",
+      "id": "whatsapp_openwa_openwaadapter_sendtemplate",
+      "community": 1,
+      "norm_label": ".sendtemplate()"
+    },
+    {
+      "label": ".validateWebhook()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L48",
+      "id": "whatsapp_openwa_openwaadapter_validatewebhook",
+      "community": 1,
+      "norm_label": ".validatewebhook()"
+    },
+    {
+      "label": ".parseInbound()",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L63",
+      "id": "whatsapp_openwa_openwaadapter_parseinbound",
+      "community": 1,
+      "norm_label": ".parseinbound()"
+    },
+    {
+      "label": "types.ts",
+      "file_type": "code",
+      "source_file": "src/lib/whatsapp/types.ts",
+      "source_location": "L1",
+      "id": "src_lib_whatsapp_types_ts",
+      "community": 1,
+      "norm_label": "types.ts"
+    },
+    {
+      "label": "slice-10.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-10.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_10_spec_ts",
+      "community": 16,
+      "norm_label": "slice-10.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-10.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_10_spec_uniquephone",
+      "community": 16,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-11.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-11.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_11_spec_ts",
+      "community": 17,
+      "norm_label": "slice-11.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-11.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_11_spec_uniquephone",
+      "community": 17,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-12.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-12.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_12_spec_ts",
+      "community": 18,
+      "norm_label": "slice-12.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-12.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_12_spec_uniquephone",
+      "community": 18,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-13.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-13.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_13_spec_ts",
+      "community": 33,
+      "norm_label": "slice-13.spec.ts"
+    },
+    {
+      "label": "slice-14.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-14.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_14_spec_ts",
+      "community": 34,
+      "norm_label": "slice-14.spec.ts"
+    },
+    {
+      "label": "slice-15.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-15.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_15_spec_ts",
+      "community": 35,
+      "norm_label": "slice-15.spec.ts"
+    },
+    {
+      "label": "slice-16.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-16.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_16_spec_ts",
+      "community": 36,
+      "norm_label": "slice-16.spec.ts"
+    },
+    {
+      "label": "slice-2.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-2.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_2_spec_ts",
+      "community": 19,
+      "norm_label": "slice-2.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-2.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_2_spec_uniquephone",
+      "community": 19,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-3.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-3.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_3_spec_ts",
+      "community": 20,
+      "norm_label": "slice-3.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-3.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_3_spec_uniquephone",
+      "community": 20,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-4.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-4.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_4_spec_ts",
+      "community": 21,
+      "norm_label": "slice-4.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-4.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_4_spec_uniquephone",
+      "community": 21,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-5.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-5.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_5_spec_ts",
+      "community": 22,
+      "norm_label": "slice-5.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-5.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_5_spec_uniquephone",
+      "community": 22,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-6.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-6.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_6_spec_ts",
+      "community": 23,
+      "norm_label": "slice-6.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-6.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_6_spec_uniquephone",
+      "community": 23,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-7.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-7.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_7_spec_ts",
+      "community": 24,
+      "norm_label": "slice-7.spec.ts"
+    },
+    {
+      "label": "uniquePhone()",
+      "file_type": "code",
+      "source_file": "tests/slice-7.spec.ts",
+      "source_location": "L13",
+      "id": "tests_slice_7_spec_uniquephone",
+      "community": 24,
+      "norm_label": "uniquephone()"
+    },
+    {
+      "label": "slice-8.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-8.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_8_spec_ts",
+      "community": 37,
+      "norm_label": "slice-8.spec.ts"
+    },
+    {
+      "label": "slice-9.spec.ts",
+      "file_type": "code",
+      "source_file": "tests/slice-9.spec.ts",
+      "source_location": "L1",
+      "id": "tests_slice_9_spec_ts",
+      "community": 38,
+      "norm_label": "slice-9.spec.ts"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_full.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "scripts_test_full_py",
+      "target": "scripts_test_full_screenshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_full2.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "scripts_test_full2_py",
+      "target": "scripts_test_full2_snap",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_login.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "scripts_test_login_py",
+      "target": "scripts_test_login_snap",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/proxy.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_proxy_ts",
+      "target": "src_proxy_proxy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_layout_tsx",
+      "target": "app_layout_rootlayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_admin_page_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_admin_page_tsx",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_admin_page_tsx",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_admin_id_actions_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_admin_id_actions_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_admin_id_actions_ts",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/actions.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_admin_id_actions_ts",
+      "target": "id_actions_addcreditsaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_app_admin_id_page_tsx",
+      "target": "src_app_admin_id_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_app_admin_id_page_tsx",
+      "target": "id_actions_addcreditsaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/admin/[id]/actions.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "id_actions_addcreditsaction",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_admin_id_page_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_admin_id_page_tsx",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/admin/[id]/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_admin_id_page_tsx",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_cron_welcome_reminder_route_ts",
+      "target": "src_lib_campaigns_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_cron_welcome_reminder_route_ts",
+      "target": "campaigns_index_runwelcomereminders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_cron_welcome_reminder_route_ts",
+      "target": "campaigns_index_runbirthdaycampaigns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_cron_welcome_reminder_route_ts",
+      "target": "campaigns_index_runwinbackcampaigns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_cron_welcome_reminder_route_ts",
+      "target": "campaigns_index_runexpiryreminders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_api_cron_welcome_reminder_route_ts",
+      "target": "welcome_reminder_route_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "welcome_reminder_route_get",
+      "target": "campaigns_index_runwelcomereminders"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "welcome_reminder_route_get",
+      "target": "campaigns_index_runbirthdaycampaigns"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "welcome_reminder_route_get",
+      "target": "campaigns_index_runwinbackcampaigns"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/api/cron/welcome-reminder/route.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "welcome_reminder_route_get",
+      "target": "campaigns_index_runexpiryreminders"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/razorpay/create-order/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_razorpay_create_order_route_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/razorpay/create-order/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_razorpay_create_order_route_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/razorpay/create-order/route.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_app_api_razorpay_create_order_route_ts",
+      "target": "src_lib_razorpay_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/razorpay/create-order/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_razorpay_create_order_route_ts",
+      "target": "create_order_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/razorpay/webhook/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_razorpay_webhook_route_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/razorpay/webhook/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_razorpay_webhook_route_ts",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/razorpay/webhook/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_razorpay_webhook_route_ts",
+      "target": "webhook_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/api/razorpay/webhook/route.ts",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "webhook_route_post",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/test/openwa-mock/chat/send/route.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_api_test_openwa_mock_chat_send_route_ts",
+      "target": "send_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/test/rls-check/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_test_rls_check_route_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/test/rls-check/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_test_rls_check_route_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/test/rls-check/route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_api_test_rls_check_route_ts",
+      "target": "rls_check_route_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_test_ts",
+      "target": "whatsapp_route_test_constructor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_test_ts",
+      "target": "whatsapp_route_test_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_test_ts",
+      "target": "whatsapp_route_test_chain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_test_ts",
+      "target": "whatsapp_route_test_tablehandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_test_ts",
+      "target": "src_app_api_whatsapp_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_test_ts",
+      "target": "whatsapp_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_test_ts",
+      "target": "whatsapp_route_test_makerequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.test.ts",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "whatsapp_route_test_tablehandler",
+      "target": "whatsapp_route_test_chain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_ts",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_ts",
+      "target": "src_lib_whatsapp_adapter_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_ts",
+      "target": "whatsapp_adapter_createwhatsappadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_whatsapp_route_ts",
+      "target": "whatsapp_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "whatsapp_route_post",
+      "target": "whatsapp_adapter_createwhatsappadapter"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/api/whatsapp/route.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "whatsapp_route_post",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/auth/callback/route.test.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "src_app_auth_callback_route_test_ts",
+      "target": "src_app_auth_callback_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/auth/callback/route.test.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "src_app_auth_callback_route_test_ts",
+      "target": "callback_route_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/auth/callback/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_auth_callback_route_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/auth/callback/route.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_auth_callback_route_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/auth/callback/route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_auth_callback_route_ts",
+      "target": "callback_route_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/layout.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_layout_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/layout.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_layout_tsx",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_page_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_page_tsx",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_dashboard_page_tsx",
+      "target": "src_lib_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_dashboard_page_tsx",
+      "target": "lib_utils_maskphone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/analytics/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_analytics_page_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/analytics/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_analytics_page_tsx",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/campaigns/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_campaigns_page_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/campaigns/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_campaigns_page_tsx",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/campaigns/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_app_dashboard_campaigns_page_tsx",
+      "target": "src_lib_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/campaigns/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_app_dashboard_campaigns_page_tsx",
+      "target": "lib_utils_maskphone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_actions_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_actions_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_actions_ts",
+      "target": "coupons_actions_generatecode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_actions_ts",
+      "target": "coupons_actions_createcouponaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_actions_ts",
+      "target": "coupons_actions_disablecouponaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_actions_ts",
+      "target": "coupons_actions_deletecouponaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "src_app_dashboard_coupons_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/actions.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "coupons_actions_createcouponaction",
+      "target": "coupons_actions_generatecode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "coupons_actions_createcouponaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "coupons_actions_disablecouponaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "coupons_actions_deletecouponaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "src_lib_supabase_client_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "supabase_client_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "src_lib_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "lib_utils_maskphone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "coupons_page_formatcents",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "coupons_page_handledisable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "coupons_page_handledelete",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/coupons/page.tsx",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "src_app_dashboard_coupons_page_tsx",
+      "target": "coupons_page_handlecreate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/actions.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_actions_test_ts",
+      "target": "create_actions_test_slugify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_actions_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_actions_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_actions_ts",
+      "target": "create_actions_slugify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_actions_ts",
+      "target": "create_actions_createrestaurant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_page_tsx",
+      "target": "src_app_dashboard_create_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/actions.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "create_actions_createrestaurant",
+      "target": "create_actions_slugify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_page_tsx",
+      "target": "create_actions_createrestaurant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/create/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_create_page_tsx",
+      "target": "create_page_createrestaurantpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/customers/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_customers_page_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/customers/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_dashboard_customers_page_tsx",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/customers/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_customers_page_tsx",
+      "target": "src_lib_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/customers/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_customers_page_tsx",
+      "target": "lib_utils_maskphone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/customers/page.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "src_app_dashboard_customers_page_tsx",
+      "target": "customers_page_getsegments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_actions_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_actions_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/actions.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_actions_ts",
+      "target": "settings_actions_updatediscountsaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/actions.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_actions_ts",
+      "target": "settings_actions_updatecampaignsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "src_app_dashboard_settings_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "settings_actions_updatediscountsaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "settings_actions_updatecampaignsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "src_lib_supabase_client_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "supabase_client_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "settings_page_handletopup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L126",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "settings_page_handlesandboxsuccess",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L169",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "settings_page_handlesandboxcancel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L174",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "settings_page_handlecopyurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/settings/page.tsx",
+      "source_location": "L449",
+      "weight": 1.0,
+      "source": "src_app_dashboard_settings_page_tsx",
+      "target": "settings_page_async",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/actions.test.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_actions_test_ts",
+      "target": "validate_actions_test_loadmodule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/actions.test.ts",
+      "source_location": "L270",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_actions_test_ts",
+      "target": "validate_actions_test_futuredate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/actions.test.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "validate_actions_test_loadmodule",
+      "target": "src_app_dashboard_validate_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_actions_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_actions_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/actions.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_actions_ts",
+      "target": "validate_actions_validatecoupon",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_page_tsx",
+      "target": "src_app_dashboard_validate_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_page_tsx",
+      "target": "validate_actions_validatecoupon",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/validate/page.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_app_dashboard_validate_page_tsx",
+      "target": "validate_page_handlevalidate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/actions.test.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_app_form_slug_actions_test_ts",
+      "target": "slug_actions_test_loadmodule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/actions.test.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "slug_actions_test_loadmodule",
+      "target": "src_app_form_slug_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_form_slug_actions_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_form_slug_actions_ts",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/actions.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_app_form_slug_actions_ts",
+      "target": "slug_actions_submitintakeform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/IntakeForm.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_form_slug_intakeform_tsx",
+      "target": "src_app_form_slug_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/IntakeForm.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_form_slug_intakeform_tsx",
+      "target": "slug_actions_submitintakeform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/form/[slug]/actions.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "slug_actions_submitintakeform",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/form/[slug]/IntakeForm.tsx",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "slug_intakeform_handlesubmit",
+      "target": "slug_actions_submitintakeform"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/IntakeForm.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_app_form_slug_intakeform_tsx",
+      "target": "slug_intakeform_handlesubmit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_form_slug_page_tsx",
+      "target": "src_app_form_slug_intakeform_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_form_slug_page_tsx",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_app_form_slug_page_tsx",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/form/[slug]/page.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_app_form_slug_page_tsx",
+      "target": "slug_page_intakeformpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/form/[slug]/page.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "slug_page_intakeformpage",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/login/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_login_page_tsx",
+      "target": "src_lib_supabase_client_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/login/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_login_page_tsx",
+      "target": "supabase_client_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/login/page.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_app_login_page_tsx",
+      "target": "login_page_handlesubmit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/signup/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_signup_page_tsx",
+      "target": "src_lib_supabase_client_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/signup/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_signup_page_tsx",
+      "target": "supabase_client_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/signup/page.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_app_signup_page_tsx",
+      "target": "signup_page_handlesubmit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/utils.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_utils_test_ts",
+      "target": "src_lib_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/utils.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_utils_test_ts",
+      "target": "lib_utils_maskphone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/utils.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_lib_utils_ts",
+      "target": "lib_utils_maskphone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_test_ts",
+      "target": "campaigns_index_test_chain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_test_ts",
+      "target": "campaigns_index_test_tablehandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_test_ts",
+      "target": "src_lib_campaigns_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_test_ts",
+      "target": "campaigns_index_runwelcomereminders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_test_ts",
+      "target": "campaigns_index_runbirthdaycampaigns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_test_ts",
+      "target": "campaigns_index_runwinbackcampaigns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.test.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "campaigns_index_test_tablehandler",
+      "target": "campaigns_index_test_chain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "src_lib_supabase_server_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "src_lib_whatsapp_adapter_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "whatsapp_adapter_createwhatsappadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "campaigns_index_generatecampaigncouponcode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "campaigns_index_runwelcomereminders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "campaigns_index_runbirthdaycampaigns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L150",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "campaigns_index_runwinbackcampaigns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L226",
+      "weight": 1.0,
+      "source": "src_lib_campaigns_index_ts",
+      "target": "campaigns_index_runexpiryreminders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "campaigns_index_runbirthdaycampaigns",
+      "target": "campaigns_index_generatecampaigncouponcode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L193",
+      "weight": 1.0,
+      "source": "campaigns_index_runwinbackcampaigns",
+      "target": "campaigns_index_generatecampaigncouponcode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "campaigns_index_runwelcomereminders",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "campaigns_index_runwelcomereminders",
+      "target": "whatsapp_adapter_createwhatsappadapter"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L72",
+      "weight": 1.0,
+      "source": "campaigns_index_runbirthdaycampaigns",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "campaigns_index_runbirthdaycampaigns",
+      "target": "whatsapp_adapter_createwhatsappadapter"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L151",
+      "weight": 1.0,
+      "source": "campaigns_index_runwinbackcampaigns",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L152",
+      "weight": 1.0,
+      "source": "campaigns_index_runwinbackcampaigns",
+      "target": "whatsapp_adapter_createwhatsappadapter"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L227",
+      "weight": 1.0,
+      "source": "campaigns_index_runexpiryreminders",
+      "target": "supabase_server_createserviceclient"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/lib/campaigns/index.ts",
+      "source_location": "L228",
+      "weight": 1.0,
+      "source": "campaigns_index_runexpiryreminders",
+      "target": "whatsapp_adapter_createwhatsappadapter"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/client.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_supabase_client_ts",
+      "target": "supabase_client_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_lib_supabase_server_ts",
+      "target": "supabase_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_lib_supabase_server_ts",
+      "target": "supabase_server_createserviceclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_test_ts",
+      "target": "src_lib_whatsapp_adapter_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_test_ts",
+      "target": "whatsapp_adapter_createwhatsappadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_test_ts",
+      "target": "src_lib_whatsapp_openwa_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_test_ts",
+      "target": "whatsapp_openwa_openwaadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_test_ts",
+      "target": "src_lib_whatsapp_meta_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_test_ts",
+      "target": "whatsapp_meta_metaadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_ts",
+      "target": "src_lib_whatsapp_types_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_ts",
+      "target": "src_lib_whatsapp_openwa_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_ts",
+      "target": "whatsapp_openwa_openwaadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_ts",
+      "target": "src_lib_whatsapp_meta_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_ts",
+      "target": "whatsapp_meta_metaadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/adapter.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_adapter_ts",
+      "target": "whatsapp_adapter_createwhatsappadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_meta_ts",
+      "target": "src_lib_whatsapp_types_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_meta_ts",
+      "target": "whatsapp_meta_metaadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "whatsapp_meta_metaadapter",
+      "target": "whatsapp_meta_metaadapter_sendtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "whatsapp_meta_metaadapter",
+      "target": "whatsapp_meta_metaadapter_sendtemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "whatsapp_meta_metaadapter",
+      "target": "whatsapp_meta_metaadapter_validatewebhook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/meta.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "whatsapp_meta_metaadapter",
+      "target": "whatsapp_meta_metaadapter_parseinbound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_openwa_test_ts",
+      "target": "src_lib_whatsapp_openwa_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_openwa_test_ts",
+      "target": "whatsapp_openwa_openwaadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_openwa_ts",
+      "target": "src_lib_whatsapp_types_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_whatsapp_openwa_ts",
+      "target": "whatsapp_openwa_openwaadapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "whatsapp_openwa_openwaadapter",
+      "target": "whatsapp_openwa_openwaadapter_constructor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "whatsapp_openwa_openwaadapter",
+      "target": "whatsapp_openwa_openwaadapter_sendtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "whatsapp_openwa_openwaadapter",
+      "target": "whatsapp_openwa_openwaadapter_sendtemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "whatsapp_openwa_openwaadapter",
+      "target": "whatsapp_openwa_openwaadapter_validatewebhook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "whatsapp_openwa_openwaadapter",
+      "target": "whatsapp_openwa_openwaadapter_parseinbound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/whatsapp/openwa.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "whatsapp_openwa_openwaadapter_sendtemplate",
+      "target": "whatsapp_openwa_openwaadapter_sendtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-10.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_10_spec_ts",
+      "target": "tests_slice_10_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-11.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_11_spec_ts",
+      "target": "tests_slice_11_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-12.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_12_spec_ts",
+      "target": "tests_slice_12_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-2.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_2_spec_ts",
+      "target": "tests_slice_2_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-3.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_3_spec_ts",
+      "target": "tests_slice_3_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-4.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_4_spec_ts",
+      "target": "tests_slice_4_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-5.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_5_spec_ts",
+      "target": "tests_slice_5_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-6.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_6_spec_ts",
+      "target": "tests_slice_6_spec_uniquephone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/slice-7.spec.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_slice_7_spec_ts",
+      "target": "tests_slice_7_spec_uniquephone",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "ec5d93fbaa0ccb06e045ab1c491c8f14247d9bd8"
+}

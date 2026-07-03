@@ -10,6 +10,8 @@ const supabase = createSupabaseClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+test.use({ storageState: { cookies: [], origins: [] } })
+
 test.describe('Slice 8: Admin Sees All', () => {
   let adminUserId: string
   let normalUserId: string

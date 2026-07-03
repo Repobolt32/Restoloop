@@ -103,7 +103,6 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
             name="phone"
             placeholder="+919876543210"
             required
-            pattern="^\+91\d{10}$"
             className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] placeholder-[--color-grey-300] font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150"
           />
           <p className="text-[--color-grey-400] text-[10px] font-bold">Must include country code, e.g. +91XXXXXXXXXX</p>

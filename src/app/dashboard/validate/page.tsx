@@ -125,13 +125,15 @@ export default function ValidatePage() {
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={isPending || !billAmount || !code}
-              className="w-full bg-[--color-accent] text-white py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-0 cursor-pointer transition-all hover:opacity-90 hover:-translate-y-px active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-            >
-              <span>{isPending ? 'Processing…' : 'Redeem 🎉'}</span>
-            </button>
+            <div className="flex justify-end mt-2">
+              <button
+                type="submit"
+                disabled={isPending || !billAmount || !code}
+                className="btn-primary disabled:opacity-50"
+              >
+                Redeem
+              </button>
+            </div>
           </form>
         </div>
 

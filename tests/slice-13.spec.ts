@@ -19,36 +19,36 @@ test.describe('Slice 13: Analytics Page', () => {
     await page.goto('/dashboard/analytics')
     const cards = page.locator('.glass-card')
     await expect(cards.first()).toBeVisible()
-    await expect(page.getByText(/total customers/i)).toBeVisible()
-    await expect(page.getByText(/coupons issued/i)).toBeVisible()
-    await expect(page.getByText(/campaigns sent/i)).toBeVisible()
-    await expect(page.getByText(/redemption rate/i)).toBeVisible()
+    await expect(page.getByText('Total Customers', { exact: true })).toBeVisible()
+    await expect(page.getByText('Coupons Issued', { exact: true })).toBeVisible()
+    await expect(page.getByText('Campaigns Sent', { exact: true })).toBeVisible()
+    await expect(page.getByText('Redemption Rate', { exact: true })).toBeVisible()
   })
 
   test('shows customer growth chart section', async ({ page }) => {
     await page.goto('/dashboard/analytics')
-    await expect(page.getByText(/customer growth/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Customer Growth' })).toBeVisible()
   })
 
   test('shows campaign breakdown section', async ({ page }) => {
     await page.goto('/dashboard/analytics')
-    await expect(page.getByText(/campaign breakdown/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Campaign Breakdown' })).toBeVisible()
   })
 
   test('shows customer health section', async ({ page }) => {
     await page.goto('/dashboard/analytics')
-    await expect(page.getByText(/customer health/i)).toBeVisible()
-    await expect(page.getByText(/active/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Customer Health' })).toBeVisible()
+    await expect(page.getByText(/active/i).first()).toBeVisible()
   })
 
   test('shows coupon performance section', async ({ page }) => {
     await page.goto('/dashboard/analytics')
-    await expect(page.getByText(/coupon performance/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Coupon Performance' })).toBeVisible()
   })
 
   test('dashboard overview links to analytics', async ({ page }) => {
     await page.goto('/dashboard')
-    const analyticsCard = page.getByRole('link', { name: /analytics/i })
+    const analyticsCard = page.locator('a.dash-quick-card[href="/dashboard/analytics"]')
     await expect(analyticsCard).toBeVisible()
     await analyticsCard.click()
     await page.waitForURL('/dashboard/analytics')

@@ -36,8 +36,9 @@ test.describe('Slice 14: Coupon Management', () => {
 
   test('coupons table renders when coupons exist', async ({ page }) => {
     await page.goto('/dashboard/coupons')
+    await expect(page.getByText('Loading…')).toBeHidden()
     const table = page.getByTestId('coupons-table')
-    const empty = page.getByText(/no coupons issued yet/i)
+    const empty = page.getByText('No coupons issued yet.')
     const hasData = await table.isVisible()
     const isEmpty = await empty.isVisible()
     expect(hasData || isEmpty).toBe(true)

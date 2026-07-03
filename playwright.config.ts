@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
+import { config } from 'dotenv'
+
+config({ path: '.env.local' })
 
 export default defineConfig({
   testDir: './tests',
@@ -17,7 +20,7 @@ export default defineConfig({
 
   webServer: {
     command: 'pnpm dev',
-    url: 'http://localhost:3000/login',
+    url: 'http://localhost:3000/',
     reuseExistingServer: true,
     timeout: 120000,
     stdout: 'pipe',
@@ -26,8 +29,16 @@ export default defineConfig({
 
   projects: [
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'tests/.auth/user.json',
+      },
+      dependencies: ['setup'],
     },
   ],
 })

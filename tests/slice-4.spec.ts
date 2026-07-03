@@ -128,7 +128,7 @@ test.describe('Slice 4: First Campaign Fires (Welcome Reminder)', () => {
       .select('*')
       .eq('restaurant_id', restaurantId)
       .eq('customer_id', customer!.id)
-      .eq('type', 'campaign')
+      .eq('type', 'welcome_reminder')
 
     expect(logs).not.toBeNull()
     expect(logs!.length).toBe(1)

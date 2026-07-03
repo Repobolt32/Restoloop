@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 const schema = z.object({
   name: z.string().min(1),
@@ -72,5 +73,6 @@ export async function createRestaurant(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
+  revalidatePath('/dashboard')
   redirect('/dashboard')
 }

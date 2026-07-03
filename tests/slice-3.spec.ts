@@ -10,6 +10,8 @@ const supabase = createSupabaseClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+test.use({ storageState: { cookies: [], origins: [] } })
+
 function uniquePhone() {
   return '91' + Math.floor(1000000000 + Math.random() * 9000000000)
 }

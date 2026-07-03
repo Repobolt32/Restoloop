@@ -24,6 +24,40 @@ Before implementing any slice, invoke relevant tech skills from `.claude/skills/
 - Never mention old framework brand name
 - Use `ui-ux-pro-max` + `frontend-design` for dashboard (reject old coral/navy/Inter/Stitch design system)
 
+## Search & Navigation
+
+**Default search tool: graphify MCP.** Before using `grep`, `glob`, or reading files manually, query graphify:
+
+- `query_graph` — find concepts, functions, patterns by keyword (BFS traversal)
+- `get_node` — inspect a specific entity (function, class, component)
+- `get_neighbors` — see what connects to a node (imports, calls, references)
+- `shortest_path` — trace how two concepts relate across the codebase
+- `god_nodes` — find the most connected files (architecture hubs)
+- `graph_stats` — overview of codebase structure
+
+**When to use graphify vs other tools:**
+
+| Task | Tool |
+|------|------|
+| Find where a concept/function lives | `query_graph` |
+| Understand connections between modules | `get_neighbors` / `shortest_path` |
+| Find all files matching a glob pattern | `glob` (graphify doesn't do filename patterns) |
+| Search for exact string/regex in files | `grep` (graphify searches concepts, not raw text) |
+| Read a specific file once you know the path | `read` |
+
+**When to dispatch explorer agents:**
+
+Dispatch an explorer agent (`task` with `subagent_type: "explore"`) when:
+- You need to search across 5+ files in parallel to gather context for a plan
+- You need to find all usages of a function/pattern across the codebase and summarize
+- You're exploring an unfamiliar part of the codebase and need a quick map
+- The task is "find everything related to X" and you don't know the scope yet
+
+Do NOT dispatch explorers when:
+- graphify `query_graph` or `get_neighbors` gives you the answer directly
+- You already know which 1-2 files to read
+- The search is a simple glob or grep pattern
+
 ## Directory Structure
 
 ```
