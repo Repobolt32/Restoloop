@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Users, Zap, Gift, TrendingUp } from 'lucide-react'
+import { Users, Zap, Gift, TrendingUp, UserCheck } from 'lucide-react'
 import { maskPhone } from '@/lib/utils'
 
 export default async function DashboardPage() {
@@ -19,7 +19,11 @@ export default async function DashboardPage() {
 
   if (!restaurant) redirect('/dashboard/create')
 
-  const [{ data: customers }, { data: recentLogs }, { data: allCoupons }] = await Promise.all([
+  const startOfMonth = new Date()
+  startOfMonth.setDate(1)
+  startOfMonth.setHours(0, 0, 0, 0)
+
+  const [{ data: customers }, { data: recentLogs }, { data: allCoupons }, { data: retainedData }, { data: monthlyCoupons }] = await Promise.all([
     supabase
       .from('customers')
       .select('id, last_visit_at')
@@ -34,6 +38,17 @@ export default async function DashboardPage() {
       .from('coupons')
       .select('id, type, status')
       .eq('restaurant_id', restaurant.id),
+    supabase
+      .from('coupons')
+      .select('customer_id')
+      .eq('restaurant_id', restaurant.id)
+      .eq('status', 'redeemed'),
+    supabase
+      .from('coupons')
+      .select('bill_amount_cents, discount_amount_cents')
+      .eq('restaurant_id', restaurant.id)
+      .eq('status', 'redeemed')
+      .gte('redeemed_at', startOfMonth.toISOString()),
   ])
 
   const customerCount = customers?.length ?? 0
@@ -45,6 +60,18 @@ export default async function DashboardPage() {
     if (!c.last_visit_at) return false
     return new Date(c.last_visit_at) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   }).length ?? 0
+
+  // Unique retained customers (ever redeemed a coupon)
+  const retainedCount = new Set((retainedData || []).map(c => c.customer_id)).size
+
+  // Monthly revenue = bill_amount_cents - discount_amount_cents summed
+  const monthlyRevenueCents = (monthlyCoupons || []).reduce(
+    (sum, c) => sum + ((c.bill_amount_cents ?? 0) - (c.discount_amount_cents ?? 0)),
+    0
+  )
+  const monthlyRevenueDisplay = monthlyRevenueCents > 0
+    ? `₹${(monthlyRevenueCents / 100).toFixed(0)}`
+    : '₹0'
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -62,17 +89,17 @@ export default async function DashboardPage() {
       {/* 4 Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
-          label="Total Guests"
-          value={String(customerCount)}
+          label="Retained Customers"
+          value={String(retainedCount)}
           sub={`${activeCustomers} active (30d)`}
           href="/dashboard/customers"
-          icon={<Users className="w-5 h-5 text-[--color-accent]" />}
+          icon={<UserCheck className="w-5 h-5 text-[--color-accent]" />}
         />
         <StatCard
-          label="Credits Remaining"
-          value={String(credits)}
-          sub="/ 1000 credits"
-          href="/dashboard/settings"
+          label="Revenue This Month"
+          value={monthlyRevenueDisplay}
+          sub="from coupon redemptions"
+          href="/dashboard/validate"
           icon={<Zap className="w-5 h-5 text-[--color-accent]" />}
         />
         <StatCard
