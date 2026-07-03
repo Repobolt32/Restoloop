@@ -177,7 +177,7 @@ describe('WhatsApp Webhook Route', () => {
         return c
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_cents: 5000 })
+        return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_percent: 10 })
       }
       if (table === 'customers') {
         return chain({ id: 'cust-1', opt_in_status: 'pending' })
@@ -198,7 +198,7 @@ describe('WhatsApp Webhook Route', () => {
 
     expect(res.body).toEqual({ status: 'ok' })
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('Welcome'))
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('50'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('10'))
   })
 
   it('handles STOP reply: opts out customer', async () => {
@@ -289,7 +289,7 @@ describe('WhatsApp Webhook Route', () => {
         return c
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_cents: 5000 })
+        return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_percent: 10 })
       }
       if (table === 'customers') {
         return chain({ id: 'cust-1', opt_in_status: 'pending' })

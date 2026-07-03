@@ -20,6 +20,7 @@ function chain(data: any = null, error: any = null) {
     eq: vi.fn().mockReturnThis(),
     gte: vi.fn().mockReturnThis(),
     lte: vi.fn().mockReturnThis(),
+    lt: vi.fn().mockReturnThis(),
     filter: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
@@ -42,7 +43,7 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 
 // Import AFTER mocks
-import { runWelcomeReminders, runBirthdayCampaigns, runWinbackCampaigns } from './index'
+import { runWelcomeReminders, runBirthdayCampaigns, runWinbackCampaigns, runExpiryReminders } from './index'
 
 describe('runWelcomeReminders', () => {
   beforeEach(() => {
@@ -65,7 +66,7 @@ describe('runWelcomeReminders', () => {
         ])
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 10 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
       }
       return chain(null)
     }
@@ -91,7 +92,7 @@ describe('runWelcomeReminders', () => {
         ])
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 10 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
       }
       return chain(null)
     }
@@ -117,7 +118,7 @@ describe('runWelcomeReminders', () => {
         ])
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 0 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 0, welcome_reminder_days: 25 }])
       }
       if (table === 'message_logs') {
         const c = chain(null)
@@ -169,7 +170,7 @@ describe('runWelcomeReminders', () => {
         ])
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 10 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
       }
       return chain(null)
     }
@@ -199,7 +200,7 @@ describe('runWelcomeReminders', () => {
         ])
       }
       if (table === 'restaurants') {
-        const c = chain({ id: 'rest-1', name: 'Spice Garden', credits: 10 })
+        const c = chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
         c.update = vi.fn().mockReturnValue(c)
         return c
       }
@@ -242,7 +243,7 @@ describe('runBirthdayCampaigns', () => {
         return chain(null) // no existing birthday coupon
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 10, birthday_discount_cents: 3800 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, birthday_discount_percent: 15 }])
       }
       return chain(null)
     }
@@ -250,7 +251,7 @@ describe('runBirthdayCampaigns', () => {
     await runBirthdayCampaigns()
 
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('Birthday'))
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('38'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('15'))
   })
 
   it('skips customer who already received birthday coupon this year', async () => {
@@ -300,7 +301,7 @@ describe('runBirthdayCampaigns', () => {
         return chain(null)
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 0, birthday_discount_cents: 3800 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 0, birthday_discount_percent: 15 }])
       }
       if (table === 'message_logs') {
         const c = chain(null)
@@ -342,7 +343,7 @@ describe('runWinbackCampaigns', () => {
         return chain(null) // no recent winback
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 10, winback_discount_cents: 3000 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, winback_discount_percent: 20, winback_days: 40 }])
       }
       return chain(null)
     }
@@ -350,7 +351,7 @@ describe('runWinbackCampaigns', () => {
     await runWinbackCampaigns()
 
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('miss'))
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('30'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('20'))
   })
 
   it('skips customer with winback coupon sent within 7 days', async () => {
@@ -400,7 +401,7 @@ describe('runWinbackCampaigns', () => {
         return chain(null)
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden', credits: 0, winback_discount_cents: 3000 })
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 0, winback_discount_percent: 20, winback_days: 40 }])
       }
       if (table === 'message_logs') {
         const c = chain(null)
@@ -413,5 +414,122 @@ describe('runWinbackCampaigns', () => {
     await runWinbackCampaigns()
 
     expect(mockSendText).not.toHaveBeenCalled()
+  })
+})
+
+describe('runExpiryReminders', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSendText.mockResolvedValue({ success: true, messageId: 'msg-1' })
+  })
+
+  it('sends expiry reminder for coupon expiring tomorrow', async () => {
+    const tomorrow = new Date(Date.now() + 1.5 * 24 * 60 * 60 * 1000).toISOString()
+
+    tableHandler = (table: string) => {
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, expiry_reminder_days: 1 }])
+      }
+      if (table === 'coupons') {
+        return chain([{
+          id: 'coupon-1',
+          code: 'EXP-ABC',
+          restaurant_id: 'rest-1',
+          status: 'sent',
+          enabled: true,
+          expires_at: tomorrow,
+          customers: { id: 'cust-1', phone: '919900000000', name: 'Alice', opt_in_status: 'opted_in' },
+        }])
+      }
+      return chain(null)
+    }
+
+    await runExpiryReminders()
+
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('EXP-ABC'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('expires'))
+  })
+
+  it('skips coupon for customer who is not opted_in', async () => {
+    const tomorrow = new Date(Date.now() + 1.5 * 24 * 60 * 60 * 1000).toISOString()
+
+    tableHandler = (table: string) => {
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, expiry_reminder_days: 1 }])
+      }
+      if (table === 'coupons') {
+        return chain([{
+          id: 'coupon-1',
+          code: 'EXP-ABC',
+          restaurant_id: 'rest-1',
+          status: 'sent',
+          enabled: true,
+          expires_at: tomorrow,
+          customers: { id: 'cust-1', phone: '919900000000', name: 'Alice', opt_in_status: 'pending' },
+        }])
+      }
+      return chain(null)
+    }
+
+    await runExpiryReminders()
+
+    expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('logs blocked_no_credits when credits = 0', async () => {
+    const tomorrow = new Date(Date.now() + 1.5 * 24 * 60 * 60 * 1000).toISOString()
+
+    tableHandler = (table: string) => {
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 0, expiry_reminder_days: 1 }])
+      }
+      if (table === 'coupons') {
+        return chain([{
+          id: 'coupon-1',
+          code: 'EXP-ABC',
+          restaurant_id: 'rest-1',
+          status: 'sent',
+          enabled: true,
+          expires_at: tomorrow,
+          customers: { id: 'cust-1', phone: '919900000000', name: 'Alice', opt_in_status: 'opted_in' },
+        }])
+      }
+      if (table === 'message_logs') {
+        const c = chain(null)
+        c.insert = vi.fn().mockReturnValue(c)
+        return c
+      }
+      return chain(null)
+    }
+
+    await runExpiryReminders()
+
+    expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('deducts credit via RPC on successful send', async () => {
+    const tomorrow = new Date(Date.now() + 1.5 * 24 * 60 * 60 * 1000).toISOString()
+
+    tableHandler = (table: string) => {
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, expiry_reminder_days: 1 }])
+      }
+      if (table === 'coupons') {
+        return chain([{
+          id: 'coupon-1',
+          code: 'EXP-ABC',
+          restaurant_id: 'rest-1',
+          status: 'sent',
+          enabled: true,
+          expires_at: tomorrow,
+          customers: { id: 'cust-1', phone: '919900000000', name: 'Alice', opt_in_status: 'opted_in' },
+        }])
+      }
+      return chain(null)
+    }
+
+    await runExpiryReminders()
+
+    expect(rpcMock).toHaveBeenCalledWith('deduct_credit', { restaurant_id: 'rest-1' })
   })
 })

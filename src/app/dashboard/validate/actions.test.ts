@@ -42,7 +42,7 @@ describe('validateCoupon', () => {
     mockGetUser.mockResolvedValue({ data: { user: null } })
     await loadModule()
 
-    await expect(validateCoupon('ABC123')).rejects.toThrow('REDIRECT:/login')
+    await expect(validateCoupon('ABC123', 10000)).rejects.toThrow('REDIRECT:/login')
   })
 
   it('redirects to /dashboard/create when user has no restaurant', async () => {
@@ -50,7 +50,7 @@ describe('validateCoupon', () => {
     mockFrom.mockReturnValue(createRestaurantMock(null))
     await loadModule()
 
-    await expect(validateCoupon('ABC123')).rejects.toThrow('REDIRECT:/dashboard/create')
+    await expect(validateCoupon('ABC123', 10000)).rejects.toThrow('REDIRECT:/dashboard/create')
   })
 
   it('returns error when coupon not found', async () => {
@@ -72,7 +72,7 @@ describe('validateCoupon', () => {
     })
     await loadModule()
 
-    const result = await validateCoupon('ABC123')
+    const result = await validateCoupon('ABC123', 10000)
     expect(result).toEqual({ error: 'Coupon not found' })
   })
 
@@ -98,7 +98,7 @@ describe('validateCoupon', () => {
     })
     await loadModule()
 
-    const result = await validateCoupon('ABC123')
+    const result = await validateCoupon('ABC123', 10000)
     expect(result).toEqual({ error: 'Wrong restaurant' })
   })
 
@@ -124,7 +124,7 @@ describe('validateCoupon', () => {
     })
     await loadModule()
 
-    const result = await validateCoupon('ABC123')
+    const result = await validateCoupon('ABC123', 10000)
     expect(result).toEqual({ error: 'Already redeemed' })
   })
 
@@ -156,7 +156,7 @@ describe('validateCoupon', () => {
     })
     await loadModule()
 
-    const result = await validateCoupon('ABC123')
+    const result = await validateCoupon('ABC123', 10000)
     expect(result).toEqual({ error: 'Expired' })
   })
 
@@ -180,7 +180,7 @@ describe('validateCoupon', () => {
                   restaurant_id: 'rest-1',
                   customer_id: 'cust-1',
                   code: 'W50-ABC123',
-                  discount_cents: 5000,
+                  discount_percent: 10,
                   status: 'sent',
                   expires_at: futureDate(),
                   customers: { id: 'cust-1', phone: '919900000000', name: 'Alice' },
@@ -199,11 +199,13 @@ describe('validateCoupon', () => {
     })
     await loadModule()
 
-    const result = await validateCoupon('ABC123')
+    const result = await validateCoupon('ABC123', 10000)
 
     expect(result.success).toBe(true)
     expect(result.code).toBe('W50-ABC123')
-    expect(result.discount).toBe(5000)
+    expect(result.discountPercent).toBe(10)
+    expect(result.discountAmountCents).toBe(1000)
+    expect(result.billAmountCents).toBe(10000)
     expect(updateMock).toHaveBeenCalled()
   })
 
@@ -231,7 +233,7 @@ describe('validateCoupon', () => {
     })
     await loadModule()
 
-    await validateCoupon('  abc123  ')
+    await validateCoupon('  abc123  ', 10000)
 
     expect(capturedCode).toBe('ABC123')
   })
