@@ -155,7 +155,8 @@ export async function POST(request: NextRequest) {
           .maybeSingle()
 
         if (welcomeCoupon) {
-          const welcomeMessage = `Hey ${customer.name || 'there'}! Welcome to ${restaurant.name}. Your coupon: ${welcomeCoupon.code} for ₹${restaurant.welcome_discount_cents / 100} OFF. Valid till ${new Date(welcomeCoupon.expires_at).toLocaleDateString('en-IN')}. Reply STOP to opt out.`
+          const discountPercent = welcomeCoupon.discount_percent || restaurant.welcome_discount_percent
+          const welcomeMessage = `Hey ${customer.name || 'there'}! Welcome to ${restaurant.name}. Your coupon: ${welcomeCoupon.code} for ${discountPercent}% OFF. Valid till ${new Date(welcomeCoupon.expires_at).toLocaleDateString('en-IN')}. Reply STOP to opt out.`
           const result = await adapter.sendText(fromPhone, welcomeMessage)
 
           await supabase.from('message_logs').insert({
@@ -190,19 +191,20 @@ export async function POST(request: NextRequest) {
       if (existingCoupon) {
         couponCode = existingCoupon.code
       } else {
-        couponCode = `W${restaurant.welcome_discount_cents / 100}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+        couponCode = `W${restaurant.welcome_discount_percent}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
         await supabase.from('coupons').insert({
           restaurant_id: restaurant.id,
           customer_id: customer.id,
           type: 'welcome',
           code: couponCode,
-          discount_cents: restaurant.welcome_discount_cents,
+          discount_percent: restaurant.welcome_discount_percent,
+          discount_cents: 0,
           status: 'sent',
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         })
       }
 
-      const welcomeMessage = `Welcome! Your coupon code is ${couponCode} for ₹${restaurant.welcome_discount_cents / 100} OFF. Reply STOP to opt out.`
+      const welcomeMessage = `Welcome! Your coupon code is ${couponCode} for ${restaurant.welcome_discount_percent}% OFF. Reply STOP to opt out.`
       const result = await adapter.sendText(fromPhone, welcomeMessage)
 
       await supabase.from('message_logs').insert({

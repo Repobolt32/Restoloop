@@ -22,14 +22,16 @@ export async function createCouponAction(formData: FormData) {
     .from('restaurants')
     .select('id')
     .eq('owner_id', user.id)
-    .single()
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   if (!restaurant) redirect('/dashboard/create')
 
   const customerId = formData.get('customer_id') as string
-  const discountCents = Number(formData.get('discount_cents'))
+  const discountPercent = Number(formData.get('discount_percent'))
 
-  if (!customerId || !discountCents) throw new Error('Missing required fields')
+  if (!customerId || !discountPercent) throw new Error('Missing required fields')
 
   const code = generateCode()
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -39,7 +41,8 @@ export async function createCouponAction(formData: FormData) {
     customer_id: customerId,
     type: 'manual',
     code,
-    discount_cents: discountCents,
+    discount_percent: discountPercent,
+    discount_cents: 0,
     status: 'sent',
     enabled: true,
     expires_at: expiresAt,
@@ -59,7 +62,9 @@ export async function disableCouponAction(couponId: string) {
     .from('restaurants')
     .select('id')
     .eq('owner_id', user.id)
-    .single()
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   if (!restaurant) redirect('/dashboard/create')
 
@@ -81,7 +86,9 @@ export async function deleteCouponAction(couponId: string) {
     .from('restaurants')
     .select('id')
     .eq('owner_id', user.id)
-    .single()
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   if (!restaurant) redirect('/dashboard/create')
 

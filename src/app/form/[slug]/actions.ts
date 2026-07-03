@@ -75,14 +75,15 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
     }
 
     // Create welcome coupon
-    const couponCode = `W${restaurant.welcome_discount_cents / 100}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+    const couponCode = `W${restaurant.welcome_discount_percent}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
 
     const { error: couponError } = await supabase.from('coupons').insert({
       restaurant_id: restaurant.id,
       customer_id: customer?.id,
       type: 'welcome',
       code: couponCode,
-      discount_cents: restaurant.welcome_discount_cents,
+      discount_percent: restaurant.welcome_discount_percent,
+      discount_cents: 0, // Keep 0 for legacy constraints
       status: 'sent',
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     })

@@ -10,6 +10,24 @@ function generateCampaignCouponCode(): string {
   return code
 }
 
+async function deductCredit(supabase: any, restaurantId: string) {
+  const { error } = await supabase.rpc('deduct_credit', { restaurant_id: restaurantId })
+  if (error) {
+    // Fallback if RPC function is not defined in Postgres
+    const { data: current } = await supabase
+      .from('restaurants')
+      .select('credits')
+      .eq('id', restaurantId)
+      .single()
+    if (current && current.credits > 0) {
+      await supabase
+        .from('restaurants')
+        .update({ credits: current.credits - 1 })
+        .eq('id', restaurantId)
+    }
+  }
+}
+
 export async function runWelcomeReminders() {
   const supabase = createServiceClient()
   const adapter = createWhatsAppAdapter()
@@ -62,7 +80,7 @@ export async function runWelcomeReminders() {
       })
 
       if (result.success) {
-        await supabase.rpc('deduct_credit', { restaurant_id: restaurant.id })
+        await deductCredit(supabase, restaurant.id)
       }
     }
   }
@@ -80,7 +98,7 @@ export async function runBirthdayCampaigns() {
 
   const { data: restaurants } = await supabase
     .from('restaurants')
-    .select('id, name, credits, birthday_discount_cents')
+    .select('id, name, credits, birthday_discount_percent')
     .eq('birthday_campaign_enabled', true)
 
   for (const restaurant of restaurants ?? []) {
@@ -121,14 +139,15 @@ export async function runBirthdayCampaigns() {
         customer_id: customer.id,
         type: 'birthday',
         code: couponCode,
-        discount_cents: restaurant.birthday_discount_cents,
+        discount_percent: restaurant.birthday_discount_percent,
+        discount_cents: 0,
         status: 'sent',
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
 
       if (couponError) continue
 
-      const msg = `Happy Birthday ${customer.name || 'there'}! Enjoy ₹${restaurant.birthday_discount_cents / 100} OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
+      const msg = `Happy Birthday ${customer.name || 'there'}! Enjoy ${restaurant.birthday_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
       const result = await adapter.sendText(customer.phone, msg)
 
       await supabase.from('message_logs').insert({
@@ -141,7 +160,7 @@ export async function runBirthdayCampaigns() {
       })
 
       if (result.success) {
-        await supabase.rpc('deduct_credit', { restaurant_id: restaurant.id })
+        await deductCredit(supabase, restaurant.id)
       }
     }
   }
@@ -153,7 +172,7 @@ export async function runWinbackCampaigns() {
 
   const { data: restaurants } = await supabase
     .from('restaurants')
-    .select('id, name, credits, winback_discount_cents, winback_days')
+    .select('id, name, credits, winback_discount_percent, winback_days')
     .eq('winback_campaign_enabled', true)
 
   for (const restaurant of restaurants ?? []) {
@@ -197,14 +216,15 @@ export async function runWinbackCampaigns() {
         customer_id: customer.id,
         type: 'winback',
         code: couponCode,
-        discount_cents: restaurant.winback_discount_cents,
+        discount_percent: restaurant.winback_discount_percent,
+        discount_cents: 0,
         status: 'sent',
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
 
       if (couponError) continue
 
-      const msg = `We miss you ${customer.name || 'there'}! Come back for ₹${restaurant.winback_discount_cents / 100} OFF. Code: ${couponCode}. Reply STOP to opt out.`
+      const msg = `We miss you ${customer.name || 'there'}! Come back for ${restaurant.winback_discount_percent}% OFF. Code: ${couponCode}. Reply STOP to opt out.`
       const result = await adapter.sendText(customer.phone, msg)
 
       await supabase.from('message_logs').insert({
@@ -217,7 +237,7 @@ export async function runWinbackCampaigns() {
       })
 
       if (result.success) {
-        await supabase.rpc('deduct_credit', { restaurant_id: restaurant.id })
+        await deductCredit(supabase, restaurant.id)
       }
     }
   }
@@ -278,7 +298,7 @@ export async function runExpiryReminders() {
       })
 
       if (result.success) {
-        await supabase.rpc('deduct_credit', { restaurant_id: restaurant.id })
+        await deductCredit(supabase, restaurant.id)
       }
     }
   }

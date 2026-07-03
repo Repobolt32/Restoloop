@@ -10,6 +10,7 @@ type CouponRow = {
   code: string
   type: string
   discount_cents: number
+  discount_percent: number | null
   status: string
   expires_at: string
   enabled: boolean
@@ -34,7 +35,7 @@ export default function CouponsPage() {
     setLoading(true)
     let query = supabase
       .from('coupons')
-      .select('id, code, type, discount_cents, status, expires_at, enabled, customers(phone)')
+      .select('id, code, type, discount_percent, discount_cents, status, expires_at, enabled, customers(phone)')
       .order('created_at', { ascending: false })
 
     if (filter !== 'all') {
@@ -100,16 +101,17 @@ export default function CouponsPage() {
             />
           </div>
           <div>
-            <label htmlFor="discount_cents" className="section-label mb-1 block">
-              Discount (₹)
+            <label htmlFor="discount_percent" className="section-label mb-1 block">
+              Discount (%)
             </label>
             <input
-              id="discount_cents"
+              id="discount_percent"
               type="number"
-              name="discount_cents"
-              placeholder="50"
+              name="discount_percent"
+              placeholder="10"
               required
               min={1}
+              max={100}
               className="border border-[--color-border] rounded-xl px-4 py-3 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20 w-28"
             />
           </div>
@@ -185,7 +187,7 @@ export default function CouponsPage() {
                       <TypeBadge type={coupon.type} />
                     </td>
                     <td className="px-6 py-4 text-sm font-black text-[--color-accent]">
-                      {formatCents(coupon.discount_cents)}
+                      {coupon.discount_percent !== null ? `${coupon.discount_percent}%` : formatCents(coupon.discount_cents)}
                     </td>
                     <td className="px-6 py-4">
                       <CouponStatusBadge status={coupon.status} />
