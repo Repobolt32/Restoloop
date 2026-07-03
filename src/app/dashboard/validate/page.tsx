@@ -63,11 +63,11 @@ export default function ValidatePage() {
 
       {/* Two column layout on desktop */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
-        
+
         {/* Left Column: Form (3/5 width) */}
         <div className="md:col-span-3 bg-white border border-[--color-border] rounded-2xl p-8 shadow-md">
           <p className="section-label mb-5">Step 1 — Enter Transaction details</p>
-          
+
           <form onSubmit={handleValidate} className="flex flex-col gap-5">
             {/* Bill Amount */}
             <div className="flex flex-col gap-2">
@@ -138,16 +138,14 @@ export default function ValidatePage() {
         {/* Right Column: Billing Summary (2/5 width) — Always Present */}
         <div className="md:col-span-2 space-y-4">
           <div
-            className={`rounded-2xl overflow-hidden shadow-md border transition-all duration-300 ${
-              isRedeemed
+            className={`rounded-2xl overflow-hidden shadow-md border transition-all duration-300 ${isRedeemed
                 ? 'border-emerald-200 bg-emerald-50/50'
                 : 'border-[--color-border] bg-white'
-            }`}
+              }`}
           >
             {/* Summary Header */}
-            <div className={`px-6 py-4 flex items-center justify-between transition-colors duration-300 ${
-              isRedeemed ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-[--color-foreground]'
-            }`}>
+            <div className={`px-6 py-4 flex items-center justify-between transition-colors duration-300 ${isRedeemed ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-[--color-foreground]'
+              }`}>
               <div className="flex items-center gap-2">
                 <Receipt className="w-4 h-4 shrink-0" />
                 <span className="font-black uppercase tracking-widest text-xs">
@@ -163,7 +161,7 @@ export default function ValidatePage() {
 
             {/* Breakdown Content */}
             <div className="p-6 space-y-4">
-              
+
               {/* Customer Info (Redeemed state only) */}
               {isRedeemed && result && (
                 <div className="flex justify-between items-center pb-3 border-b border-emerald-100 animate-fade-in">
@@ -184,7 +182,7 @@ export default function ValidatePage() {
               <div className="flex justify-between items-center">
                 <span className="text-xs font-bold text-[--color-grey-500] uppercase tracking-wider">Bill Total</span>
                 <span className={`text-sm font-black transition-opacity duration-300 ${enteredBillAmount > 0 ? 'text-[--color-foreground]' : 'text-[--color-grey-300]'}`}>
-                  {enteredBillAmount > 0 
+                  {enteredBillAmount > 0
                     ? `₹${(isRedeemed && result?.billAmountCents ? result.billAmountCents / 100 : enteredBillAmount).toFixed(2)}`
                     : '₹0.00'
                   }
@@ -209,14 +207,13 @@ export default function ValidatePage() {
               <div className={`border-t pt-4 ${isRedeemed ? 'border-emerald-200' : 'border-[--color-border]'}`}>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-black uppercase tracking-wider text-[--color-foreground]">You Pay</span>
-                  <span className={`text-2xl font-black tabular-nums transition-all ${
-                    isRedeemed 
-                      ? 'text-green-600 text-3xl font-extrabold' 
+                  <span className={`text-2xl font-black tabular-nums transition-all ${isRedeemed
+                      ? 'text-green-600 text-3xl font-extrabold'
                       : enteredBillAmount > 0 ? 'text-[--color-foreground]' : 'text-[--color-grey-300]'
-                  }`}>
+                    }`}>
                     {isRedeemed && result?.billAmountCents && result?.discountAmountCents
                       ? `₹${((result.billAmountCents - result.discountAmountCents) / 100).toFixed(2)}`
-                      : enteredBillAmount > 0 
+                      : enteredBillAmount > 0
                         ? `₹${enteredBillAmount.toFixed(2)}`
                         : '₹0.00'
                     }
@@ -226,14 +223,13 @@ export default function ValidatePage() {
             </div>
 
             {/* Bottom Info bar */}
-            <div className={`px-6 py-3 border-t text-[10px] font-bold text-center uppercase tracking-wider transition-colors duration-300 ${
-              isRedeemed 
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-100' 
+            <div className={`px-6 py-3 border-t text-[10px] font-bold text-center uppercase tracking-wider transition-colors duration-300 ${isRedeemed
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-100'
                 : 'bg-gray-50 text-[--color-grey-400] border-gray-100'
-            }`}>
-              {isRedeemed 
+              }`}>
+              {isRedeemed
                 ? '🎉 Coupon Redeemed Successfully!'
-                : enteredBillAmount > 0 
+                : enteredBillAmount > 0
                   ? 'Coupon discount will apply on validation'
                   : 'Enter bill amount to begin'
               }
