@@ -13,6 +13,8 @@ export default async function DashboardPage() {
     .from('restaurants')
     .select('*')
     .eq('owner_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle()
 
   if (!restaurant) redirect('/dashboard/create')
@@ -99,7 +101,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Campaign Performance */}
-      <section className="bg-white border border-[--color-border] rounded-2xl p-6 shadow-md mb-8">
+      <section className="bg-white rounded-2xl p-6 shadow-md mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[--color-foreground] font-display">
             Campaign Performance
@@ -135,7 +137,7 @@ export default async function DashboardPage() {
       {/* Recent Activity Feed */}
       <section
         data-testid="recent-activity"
-        className="bg-white border border-[--color-border] rounded-2xl p-6 shadow-md"
+        className="bg-white rounded-2xl p-6 shadow-md"
       >
         <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[--color-foreground] mb-4 font-display">
           Recent Activity

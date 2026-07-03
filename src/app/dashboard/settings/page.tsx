@@ -34,6 +34,8 @@ export default function SettingsPage() {
         .from('restaurants')
         .select('*')
         .eq('owner_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle()
         
       if (data) {
@@ -254,7 +256,7 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* Credits Management Card */}
-        <div className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-8 shadow-md flex flex-col justify-between">
           <div>
             <h2 className="font-display text-xl font-black text-[--color-foreground] mb-4 uppercase">Message Credits</h2>
             <div className="flex justify-between items-baseline mb-4">
@@ -303,7 +305,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Restaurant Details Card */}
-        <div className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md">
+        <div className="bg-white rounded-2xl p-8 shadow-md">
           <h2 className="font-display text-xl font-black text-[--color-foreground] mb-4 uppercase">Restaurant Details</h2>
           <div className="space-y-4 text-sm font-bold">
             <div>
@@ -337,7 +339,7 @@ export default function SettingsPage() {
       </div>
 
       {/* QR Code Card */}
-      <div className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md mb-8">
+      <div className="bg-white rounded-2xl p-8 shadow-md mb-8">
         <h2 className="font-display text-xl font-black text-[--color-foreground] mb-4 uppercase">
           Enrollment QR Code
         </h2>
@@ -368,7 +370,7 @@ export default function SettingsPage() {
 
       {/* Campaign Discount Settings */}
       {restaurant && (
-        <section className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md mb-8">
+        <section className="bg-white rounded-2xl p-8 shadow-md mb-8">
           <h2 className="font-display text-xl font-black text-[--color-foreground] mb-2 uppercase">
             Campaign Discounts
           </h2>
@@ -440,7 +442,7 @@ export default function SettingsPage() {
 
       {/* Campaign Settings Card */}
       {restaurant && (
-        <section className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md mb-8">
+        <section className="bg-white rounded-2xl p-8 shadow-md mb-8">
           <h2 className="font-display text-xl font-black text-[--color-foreground] mb-2 uppercase">
             Campaign Settings
           </h2>
@@ -559,7 +561,7 @@ export default function SettingsPage() {
       {/* Sandbox Payment Simulator Modal Overlay */}
       {showSandbox && sandboxOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs" data-testid="sandbox-modal">
-          <div className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-2xl max-w-md w-[90%] mx-auto animate-fade-in">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-[90%] mx-auto animate-fade-in">
             <h3 className="font-display text-2xl font-black text-[--color-foreground] mb-2 uppercase">
               Razorpay Sandbox
             </h3>
@@ -567,7 +569,7 @@ export default function SettingsPage() {
               This sandbox modal simulates Razorpay&apos;s checkout flow. Selecting a choice below fires the respective outcome event back to our system endpoints.
             </p>
 
-            <div className="bg-[--color-grey-50] border border-[--color-border] rounded-xl p-4 mb-6 text-sm space-y-2 font-bold">
+            <div className="bg-[--color-grey-50] rounded-xl p-4 mb-6 text-sm space-y-2 font-bold">
               <div className="flex justify-between">
                 <span className="text-[--color-grey-500]">Receipt Code:</span>
                 <span className="font-mono text-[--color-foreground]">{sandboxOrder.orderId}</span>
@@ -576,7 +578,7 @@ export default function SettingsPage() {
                 <span className="text-[--color-grey-500]">Simulated Package:</span>
                 <span className="text-[--color-foreground]">{sandboxOrder.credits} Credits</span>
               </div>
-              <div className="flex justify-between border-t border-[--color-border] pt-2 mt-2">
+              <div className="flex justify-between border-t border-[--color-grey-200] pt-2 mt-2">
                 <span className="text-[--color-foreground]">Total Price:</span>
                 <span className="text-[--color-primary] font-black text-base font-display">₹{sandboxOrder.amount}.00</span>
               </div>

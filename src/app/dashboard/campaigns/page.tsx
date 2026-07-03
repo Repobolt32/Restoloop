@@ -45,6 +45,8 @@ export default async function CampaignsPage() {
     .from('restaurants')
     .select('id')
     .eq('owner_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle()
 
   if (!restaurant) redirect('/dashboard/create')
@@ -84,7 +86,7 @@ export default async function CampaignsPage() {
           return (
             <div
               key={s.type}
-              className="bg-white border border-[--color-border] rounded-2xl p-5 shadow-sm"
+              className="bg-white rounded-2xl p-5 shadow-md"
             >
               <div className="flex items-center gap-2 mb-3">
                 <span className={`inline-flex items-center justify-center p-1.5 rounded-lg border ${meta.class}`}>
@@ -109,8 +111,8 @@ export default async function CampaignsPage() {
       </div>
 
       {/* Campaign Log Table */}
-      <div className="bg-white border border-[--color-border] rounded-2xl overflow-hidden shadow-md">
-        <div className="px-6 py-4 border-b border-[--color-border]">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-md">
+        <div className="px-6 py-4">
           <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[--color-foreground] font-display">
             Recent Campaign Activity
           </h2>
