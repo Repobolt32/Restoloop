@@ -21,6 +21,18 @@ async function loadModule() {
   validateCoupon = mod.validateCoupon
 }
 
+function createRestaurantMock(data: any, error: any = null) {
+  const builder = {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data, error }),
+    maybeSingle: vi.fn().mockResolvedValue({ data, error }),
+  }
+  return builder
+}
+
 describe('validateCoupon', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -35,13 +47,7 @@ describe('validateCoupon', () => {
 
   it('redirects to /dashboard/create when user has no restaurant', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
-    mockFrom.mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({ data: null, error: null }),
-        }),
-      }),
-    })
+    mockFrom.mockReturnValue(createRestaurantMock(null))
     await loadModule()
 
     await expect(validateCoupon('ABC123')).rejects.toThrow('REDIRECT:/dashboard/create')
@@ -51,13 +57,7 @@ describe('validateCoupon', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
     mockFrom.mockImplementation((table: string) => {
       if (table === 'restaurants') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: 'rest-1' }, error: null }),
-            }),
-          }),
-        }
+        return createRestaurantMock({ id: 'rest-1' })
       }
       if (table === 'coupons') {
         return {
@@ -80,13 +80,7 @@ describe('validateCoupon', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
     mockFrom.mockImplementation((table: string) => {
       if (table === 'restaurants') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: 'rest-1' }, error: null }),
-            }),
-          }),
-        }
+        return createRestaurantMock({ id: 'rest-1' })
       }
       if (table === 'coupons') {
         return {
@@ -112,13 +106,7 @@ describe('validateCoupon', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
     mockFrom.mockImplementation((table: string) => {
       if (table === 'restaurants') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: 'rest-1' }, error: null }),
-            }),
-          }),
-        }
+        return createRestaurantMock({ id: 'rest-1' })
       }
       if (table === 'coupons') {
         return {
@@ -144,13 +132,7 @@ describe('validateCoupon', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
     mockFrom.mockImplementation((table: string) => {
       if (table === 'restaurants') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: 'rest-1' }, error: null }),
-            }),
-          }),
-        }
+        return createRestaurantMock({ id: 'rest-1' })
       }
       if (table === 'coupons') {
         return {
@@ -186,13 +168,7 @@ describe('validateCoupon', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
     mockFrom.mockImplementation((table: string) => {
       if (table === 'restaurants') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: 'rest-1' }, error: null }),
-            }),
-          }),
-        }
+        return createRestaurantMock({ id: 'rest-1' })
       }
       if (table === 'coupons') {
         return {
@@ -237,13 +213,7 @@ describe('validateCoupon', () => {
     let capturedCode = ''
     mockFrom.mockImplementation((table: string) => {
       if (table === 'restaurants') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: 'rest-1' }, error: null }),
-            }),
-          }),
-        }
+        return createRestaurantMock({ id: 'rest-1' })
       }
       if (table === 'coupons') {
         return {
