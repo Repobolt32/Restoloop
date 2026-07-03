@@ -88,8 +88,8 @@
    ============================================ */
 .glass-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-grey-100);
-  border-radius: 1.5rem;
+  border: none;
+  border-radius: 1rem; /* 16px */
   box-shadow: var(--shadow-md);
 }
 
@@ -101,26 +101,26 @@
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
-  border-radius: 1rem;
-  margin-bottom: 4px;
+  border-radius: 9999px; /* Pill shape */
+  margin-bottom: 6px;
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: 0.75rem;
+  font-weight: 600; /* Medium bold */
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
   color: var(--color-grey-500);
   text-decoration: none;
-  transition: background 200ms, color 200ms, box-shadow 200ms;
+  transition: background 200ms, color 200ms;
   cursor: pointer;
 }
 .dash-nav-link:hover {
-  background: var(--color-grey-50);
+  background: var(--color-grey-100);
   color: var(--color-grey-800);
 }
 .dash-nav-link[data-active="true"] {
-  background: var(--color-surface);
-  color: var(--color-primary);
-  box-shadow: var(--shadow-xl) var(--shadow-primary);
+  background: var(--color-primary-light); /* #FFF4EB */
+  color: var(--color-primary); /* #FF8C00 */
+  box-shadow: none;
 }
 
 /* ============================================
@@ -129,16 +129,16 @@
 .dash-stat-card {
   display: block;
   background: var(--color-surface);
-  border: 1px solid var(--color-grey-100);
-  border-radius: 1.5rem;
+  border: none;
+  border-radius: 1rem; /* 16px */
   padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   text-decoration: none;
   transition: box-shadow 200ms, transform 200ms;
   cursor: pointer;
 }
 .dash-stat-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 
@@ -148,16 +148,18 @@
 .dash-quick-card {
   display: block;
   background: var(--color-surface);
-  border: 1px solid var(--color-grey-100);
-  border-radius: 1rem;
+  border: none;
+  border-radius: 1rem; /* 16px */
   padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-md);
   text-decoration: none;
-  transition: background 200ms, box-shadow 200ms;
+  transition: background 200ms, box-shadow 200ms, transform 200ms;
   cursor: pointer;
 }
 .dash-quick-card:hover {
   background: var(--color-grey-50);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
 }
 
 /* ============================================
@@ -309,76 +311,82 @@
    Buttons
    ============================================ */
 .btn-primary {
-  background: var(--color-grey-900);
+  background: var(--color-primary);
   color: white;
-  padding: 10px 24px;
-  border-radius: 0.75rem;
+  padding: 12px 24px;
+  border-radius: 0.75rem; /* 12px */
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   border: none;
   cursor: pointer;
-  transition: background 200ms;
+  transition: background 200ms, transform 150ms;
 }
 .btn-primary:hover {
-  background: var(--color-grey-800);
+  background: var(--color-primary-dark);
+}
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 .btn-accent {
-  background: var(--color-accent);
+  background: var(--color-primary);
   color: white;
-  padding: 10px 24px;
+  padding: 12px 24px;
   border-radius: 0.75rem;
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   border: none;
   cursor: pointer;
-  transition: background 200ms;
+  transition: background 200ms, transform 150ms;
 }
 .btn-accent:hover {
-  background: var(--color-accent-dark);
+  background: var(--color-primary-dark);
+}
+.btn-accent:active {
+  transform: scale(0.98);
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-grey-500);
-  padding: 10px 24px;
-  border-radius: 0.75rem;
+  color: var(--color-primary);
+  padding: 12px 24px;
+  border-radius: 9999px; /* Pill shape */
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border: 1px solid var(--color-grey-200);
+  letter-spacing: 0.05em;
+  border: 1.5px solid var(--color-primary);
   cursor: pointer;
   transition: background 200ms, color 200ms;
 }
 .btn-ghost:hover {
-  background: var(--color-grey-50);
-  color: var(--color-grey-800);
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
 }
 
 .btn-danger {
-  color: var(--color-grey-300);
-  padding: 10px 24px;
+  color: var(--color-grey-500);
+  padding: 12px 24px;
   border-radius: 0.75rem;
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   border: none;
   background: transparent;
   cursor: pointer;
   transition: color 200ms, background 200ms;
 }
 .btn-danger:hover {
-  color: #dc2626;
+  color: var(--color-destructive);
   background: #fef2f2;
 }
 
