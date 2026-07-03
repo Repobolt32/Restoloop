@@ -114,8 +114,8 @@
   cursor: pointer;
 }
 .dash-nav-link:hover {
-  background: var(--color-grey-100);
-  color: var(--color-grey-800);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 .dash-nav-link[data-active="true"] {
   background: var(--color-primary-light); /* #FFF4EB */
