@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700&family=Playfair+Display+SC:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -31,9 +31,9 @@
   --color-grey-800: #9B2C2C;
   --color-grey-900: #742A2A;
 
-  /* Typography — Playfair Display SC / Karla */
-  --font-display: 'Playfair Display SC', serif;
-  --font-body: 'Karla', sans-serif;
+  /* Typography — Poppins / Inter */
+  --font-display: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
   --font-mono: 'Fira Code', monospace;
 
   /* Spacing */
