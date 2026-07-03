@@ -113,8 +113,6 @@ export const NebulaCanvas: React.FC = () => {
 
     return (
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <div className="absolute inset-0 bg-black" />
-
             <motion.div
                 style={{ x: springX, y: springY, translateX: '-50%', translateY: '-50%' }}
                 className="absolute top-1/2 left-1/2 w-[800px] h-[800px] pointer-events-none"

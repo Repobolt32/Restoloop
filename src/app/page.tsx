@@ -338,7 +338,7 @@ const Comparison = () => {
 
 const ROIBlock = () => {
     return (
-        <section className="py-20 md:py-32 overflow-hidden">
+        <section className="py-20 md:py-32 bg-white/[0.01] overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 md:px-6">
                 <div className="glass-card rounded-[32px] md:rounded-[40px] p-8 md:p-24 text-center relative">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-lp-accent/5 blur-3xl -z-10" />
@@ -394,7 +394,7 @@ const TestimonialMarquee = () => {
     ];
 
     return (
-        <section className="py-20 overflow-hidden">
+        <section className="py-20 bg-white/[0.01] overflow-hidden">
             <div className="marquee-container">
                 <div className="marquee-content">
                     {[...testimonials, ...testimonials].map((t, i) => (
