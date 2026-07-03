@@ -18,29 +18,29 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#DC2626` | `--color-primary` |
+| Primary | `#FF8C00` | `--color-primary` |
 | On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#F87171` | `--color-secondary` |
-| Accent/CTA | `#A16207` | `--color-accent` |
-| Background | `#FEF2F2` | `--color-background` |
-| Foreground | `#450A0A` | `--color-foreground` |
-| Muted | `#F0EDF1` | `--color-muted` |
-| Border | `#FECACA` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| Ring | `#DC2626` | `--color-ring` |
+| Secondary | `#FFF4EB` | `--color-primary-light` |
+| Accent/CTA | `#FF8C00` | `--color-accent` |
+| Background | `#F8F9FA` | `--color-background` |
+| Foreground | `#1E1E1E` | `--color-foreground` |
+| Muted | `#E5E7EB` | `--color-muted` |
+| Border | `#E5E7EB` | `--color-border` |
+| Destructive | `#EF4444` | `--color-destructive` |
+| Ring | `#FF8C00` | `--color-ring` |
 
-**Color Notes:** Appetizing red + warm gold [Accent adjusted from #CA8A04 for WCAG 3:1]
+**Color Notes:** Vibrant orange + clean neutral grayscale [Contrast checked for WCAG AA 4.5:1 compliance]
 
 ### Typography
 
-- **Heading Font:** Playfair Display SC
-- **Body Font:** Karla
-- **Mood:** restaurant, menu, culinary, elegant, foodie, hospitality
-- **Google Fonts:** [Playfair Display SC + Karla](https://fonts.google.com/share?selection.family=Karla:wght@300;400;500;600;700|Playfair+Display+SC:wght@400;700)
+- **Heading Font:** Poppins
+- **Body Font:** Inter
+- **Mood:** modern, clean, friendly, soft UI, SaaS dashboard
+- **Google Fonts:** [Inter + Poppins](https://fonts.google.com/share?selection.family=Inter:wght@300;400;500;600;700|Poppins:wght@400;500;600;700)
 
 **CSS Import:**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700&family=Playfair+Display+SC:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 ```
 
 ### Spacing Variables
@@ -73,27 +73,26 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #A16207;
+  background: #FF8C00;
   color: white;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: background 200ms ease, transform 150ms ease;
   cursor: pointer;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  background: #E07B00;
 }
 
-/* Secondary Button */
-.btn-secondary {
+/* Secondary / Ghost Button */
+.btn-ghost {
   background: transparent;
-  color: #DC2626;
-  border: 2px solid #DC2626;
+  color: #FF8C00;
+  border: 1.5px solid #FF8C00;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 9999px;
   font-weight: 600;
   transition: all 200ms ease;
   cursor: pointer;
@@ -104,16 +103,16 @@
 
 ```css
 .card {
-  background: #FEF2F2;
-  border-radius: 12px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 200ms ease, transform 200ms ease;
   cursor: pointer;
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
 }
 ```
@@ -123,16 +122,16 @@
 ```css
 .input {
   padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
   font-size: 16px;
   transition: border-color 200ms ease;
 }
 
 .input:focus {
-  border-color: #DC2626;
+  border-color: #FF8C00;
   outline: none;
-  box-shadow: 0 0 0 3px #DC262620;
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.2);
 }
 ```
 
