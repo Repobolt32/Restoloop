@@ -3,7 +3,7 @@
 import { validateCoupon } from './actions'
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { Receipt, Percent, IndianRupee, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react'
+import { Receipt, Percent, IndianRupee, CheckCircle2, AlertCircle } from 'lucide-react'
 
 export default function ValidatePage() {
   const [code, setCode] = useState('')
@@ -130,8 +130,7 @@ export default function ValidatePage() {
               disabled={isPending || !billAmount || !code}
               className="w-full bg-[--color-accent] text-white py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-0 cursor-pointer transition-all hover:opacity-90 hover:-translate-y-px active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
             >
-              <Receipt className="w-4 h-4" />
-              {isPending ? 'Processing…' : 'Validate & Redeem'}
+              <span>{isPending ? 'Processing…' : 'Redeem 🎉'}</span>
             </button>
           </form>
         </div>
@@ -152,12 +151,12 @@ export default function ValidatePage() {
               <div className="flex items-center gap-2">
                 <Receipt className="w-4 h-4 shrink-0" />
                 <span className="font-black uppercase tracking-widest text-xs">
-                  {isRedeemed ? 'Redemption Invoice' : 'Billing Summary'}
+                  {isRedeemed ? 'Redemption Invoice 🎉' : 'Billing Summary'}
                 </span>
               </div>
               {isRedeemed && (
-                <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md">
-                  Active
+                <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md animate-bounce">
+                  Success!
                 </span>
               )}
             </div>
@@ -194,11 +193,11 @@ export default function ValidatePage() {
 
               {/* Discount Row (Always Present) */}
               <div className="flex justify-between items-center">
-                <span className={`text-xs font-bold flex items-center gap-1 uppercase tracking-wider ${isRedeemed ? 'text-emerald-700' : 'text-[--color-grey-500]'}`}>
+                <span className={`text-xs font-bold flex items-center gap-1 uppercase tracking-wider ${isRedeemed ? 'text-red-600 font-extrabold' : 'text-[--color-grey-500]'}`}>
                   <Percent className="w-3.5 h-3.5" />
                   {isRedeemed ? `Discount (${result?.discountPercent}%)` : 'Discount'}
                 </span>
-                <span className={`text-sm font-black transition-all ${isRedeemed ? 'text-emerald-600' : 'text-[--color-grey-300]'}`}>
+                <span className={`text-sm font-black transition-all ${isRedeemed ? 'text-red-600' : 'text-[--color-grey-300]'}`}>
                   {isRedeemed && result?.discountAmountCents
                     ? `−₹${(result.discountAmountCents / 100).toFixed(2)}`
                     : '— —'
@@ -212,7 +211,7 @@ export default function ValidatePage() {
                   <span className="text-sm font-black uppercase tracking-wider text-[--color-foreground]">You Pay</span>
                   <span className={`text-2xl font-black tabular-nums transition-all ${
                     isRedeemed 
-                      ? 'text-emerald-600' 
+                      ? 'text-green-600 text-3xl font-extrabold' 
                       : enteredBillAmount > 0 ? 'text-[--color-foreground]' : 'text-[--color-grey-300]'
                   }`}>
                     {isRedeemed && result?.billAmountCents && result?.discountAmountCents
@@ -233,7 +232,7 @@ export default function ValidatePage() {
                 : 'bg-gray-50 text-[--color-grey-400] border-gray-100'
             }`}>
               {isRedeemed 
-                ? 'Transaction Completed & Logged'
+                ? '🎉 Coupon Redeemed Successfully!'
                 : enteredBillAmount > 0 
                   ? 'Coupon discount will apply on validation'
                   : 'Enter bill amount to begin'
