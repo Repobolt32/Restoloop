@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { SidebarNav } from './sidebar-nav'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -11,6 +12,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .from('restaurants')
     .select('name, credits')
     .eq('owner_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle()
 
   const credits = restaurant?.credits ?? 0
@@ -61,15 +64,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, padding: '16px 12px' }}>
-          <NavLink href="/dashboard" label="Overview" />
-          <NavLink href="/dashboard/customers" label="Guests" />
-          <NavLink href="/dashboard/campaigns" label="Campaigns" />
-          <NavLink href="/dashboard/coupons" label="Coupons" />
-          <NavLink href="/dashboard/analytics" label="Analytics" />
-          <NavLink href="/dashboard/validate" label="Validate" />
-          <NavLink href="/dashboard/settings" label="Settings" />
-        </nav>
+        <SidebarNav />
 
         {/* Credits indicator */}
         <div
@@ -115,13 +110,3 @@ export default async function DashboardLayout({ children }: { children: React.Re
   )
 }
 
-function NavLink({ href, label }: { href: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="dash-nav-link"
-    >
-      {label}
-    </Link>
-  )
-}
