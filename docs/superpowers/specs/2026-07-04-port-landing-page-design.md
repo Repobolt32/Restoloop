@@ -48,13 +48,18 @@ src/app/contact/page.tsx   (client — static content)
 | `src/index.css` | `src/app/globals.css` (append) | Merge LP styles scoped under `.landing-theme` |
 | `src/App.tsx` | `src/app/page.tsx` | Convert router imports, add `'use client'`, replace image imports |
 | `src/components/NebulaCanvas.tsx` | `src/components/landing/NebulaCanvas.tsx` | Extract, add `'use client'` |
-| `src/pages/About.tsx` | `src/app/about/page.tsx` | Convert router, add `'use client'` |
-| `src/pages/Privacy.tsx` | `src/app/privacy/page.tsx` | Convert router, add `'use client'` |
-| `src/pages/Terms.tsx` | `src/app/terms/page.tsx` | Convert router, add `'use client'` |
-| `src/pages/Contact.tsx` | `src/app/contact/page.tsx` | Convert router, add `'use client'` |
+| — (new) | `src/components/landing/SubpageNav.tsx` | Shared navbar for subpages |
+| `src/pages/About.tsx` | `src/app/about/page.tsx` | Convert router, add `'use client'`, use SubpageNav |
+| `src/pages/Privacy.tsx` | `src/app/privacy/page.tsx` | Convert router, add `'use client'`, use SubpageNav |
+| `src/pages/Terms.tsx` | `src/app/terms/page.tsx` | Convert router, add `'use client'`, use SubpageNav |
+| `src/pages/Contact.tsx` | `src/app/contact/page.tsx` | Convert router, add `'use client'`, use SubpageNav |
 | Static images (step2.jpg, qr-code.png, etc.) | `public/landing/` | Copy as-is |
 
 **Skipped LP files** (not imported anywhere in App.tsx): `ScrollReveal.tsx`, `GlowCard.tsx`, `FloatingBadge.tsx`, `SpringReveal.tsx`, `GlobalBackground.tsx`, `ErrorBoundary.tsx`.
+
+**Design fixes applied during port:**
+- Subpages originally hardcoded `bg-[#0a0a0a]` on their root div. Normalized to inherit `#000000` from `.landing-theme` (matches the main landing page).
+- Subpage navbar extracted as shared `SubpageNav` component (4 pages had identical 15-line navbars).
 
 ### Routing
 
