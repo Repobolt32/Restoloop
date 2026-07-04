@@ -24,11 +24,21 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
   const path = request.nextUrl.pathname
 
-  if (!user && path.startsWith('/dashboard')) {
+  // Unauthenticated → redirect to login for protected routes
+  if (!user && (path.startsWith('/dashboard') || path.startsWith('/admin'))) {
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Admin user trying to access merchant dashboard → redirect to /admin
+  if (user?.email === 'admin@restoloop.com' && path.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
+
+  // Non-admin user trying to access /admin → redirect to /dashboard
+  if (user && user.email !== 'admin@restoloop.com' && path.startsWith('/admin')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return response
