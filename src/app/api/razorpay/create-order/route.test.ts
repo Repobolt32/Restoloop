@@ -97,4 +97,29 @@ describe('POST /api/razorpay/create-order', () => {
     expect(res.status).toBe(200)
     expect(data.orderId).toMatch(/^order_mock_/)
   })
+
+  it('returns 400 when trial is already activated', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+    mockMaybeSingle.mockResolvedValue({ data: { id: 'rest-1', trial_activated_at: '2026-07-01T00:00:00Z' }, error: null })
+    await loadModule()
+
+    const res = await POST(makeRequest({ purchaseType: 'trial' }))
+    const data = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(data.error).toBe('Trial already activated')
+  })
+
+  it('creates mock order for trial when not yet activated', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+    mockMaybeSingle.mockResolvedValue({ data: { id: 'rest-1', trial_activated_at: null }, error: null })
+    await loadModule()
+
+    const res = await POST(makeRequest({ purchaseType: 'trial' }))
+    const data = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(data.orderId).toMatch(/^order_mock_/)
+  })
 })
+

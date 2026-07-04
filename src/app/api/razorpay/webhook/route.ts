@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
     if (event.event === 'payment.captured') {
       const payment = event.payload.payment.entity
       const userId = payment.notes.userId
-      const credits = parseInt(payment.notes.credits, 10)
+      const purchaseType = payment.notes.purchaseType
 
-      if (!userId || isNaN(credits)) {
+      if (!userId) {
         return NextResponse.json({ error: 'Missing payment notes metadata' }, { status: 400 })
       }
 
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
       const { data: restaurant, error: fetchError } = await supabase
         .from('restaurants')
-        .select('credits')
+        .select('*')
         .eq('owner_id', userId)
         .maybeSingle()
 
@@ -51,15 +51,33 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 })
       }
 
-      const newCredits = (restaurant.credits || 0) + credits
+      let updatePayload: any = {}
+
+      if (purchaseType === 'trial') {
+        const trialExpiresAt = new Date()
+        trialExpiresAt.setDate(trialExpiresAt.getDate() + 21)
+        updatePayload = {
+          plan: 'trial',
+          trial_activated_at: new Date().toISOString(),
+          trial_expires_at: trialExpiresAt.toISOString(),
+        }
+      } else {
+        const credits = parseInt(payment.notes.credits, 10)
+        if (isNaN(credits)) {
+          return NextResponse.json({ error: 'Missing payment notes metadata' }, { status: 400 })
+        }
+        updatePayload = {
+          credits: (restaurant.credits || 0) + credits,
+        }
+      }
 
       const { error: updateError } = await supabase
         .from('restaurants')
-        .update({ credits: newCredits })
+        .update(updatePayload)
         .eq('owner_id', userId)
 
       if (updateError) {
-        console.error('Webhook: Failed to update credits:', updateError)
+        console.error('Webhook: Failed to update restaurant:', updateError)
         return NextResponse.json({ error: 'Database update failed' }, { status: 500 })
       }
     }

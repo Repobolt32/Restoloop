@@ -146,4 +146,36 @@ describe('POST /api/razorpay/webhook', () => {
     expect(res.status).toBe(500)
     expect(data.error).toBe('Database update failed')
   })
+
+  it('activates 21-day trial on valid trial payment', async () => {
+    mockMaybeSingle.mockResolvedValue({ data: { credits: 0 }, error: null })
+    await loadModule()
+
+    const body = JSON.stringify({
+      event: 'payment.captured',
+      payload: {
+        payment: {
+          entity: {
+            notes: {
+              userId: 'user-1',
+              purchaseType: 'trial',
+            },
+          },
+        },
+      },
+    })
+    const res = await POST(makeRequest(body, 'sig_mock'))
+    const data = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(data.status).toBe('ok')
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        plan: 'trial',
+        trial_activated_at: expect.any(String),
+        trial_expires_at: expect.any(String),
+      })
+    )
+  })
 })
+
