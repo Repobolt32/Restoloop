@@ -125,11 +125,71 @@ export default function SettingsPage() {
     })
   }
 
+  const handlePayToUnlock = async () => {
+    setPaymentSuccess(null)
+    setPaymentError(null)
+    
+    startTransition(async () => {
+      try {
+        const res = await fetch('/api/razorpay/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ purchaseType: 'trial' }),
+        })
+        
+        if (!res.ok) {
+          const errData = await res.json()
+          throw new Error(errData.error || 'Failed to create order')
+        }
+        
+        const { orderId } = await res.json()
+        
+        const isMock = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'mock' || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+        
+        if (isMock) {
+          setSandboxOrder({ orderId, amount: 599, credits: 0 })
+          setShowSandbox(true)
+        } else {
+          const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+            amount: 59900,
+            currency: 'INR',
+            name: 'Restoloop',
+            description: '21-Day Unlimited Trial Plan',
+            order_id: orderId,
+            handler: async (response: any) => {
+              setPaymentSuccess('Trial successfully activated! Please refresh.')
+              fetchRestaurant()
+            },
+            prefill: {
+              email: restaurant?.email || '',
+            },
+            theme: {
+              color: '#A16207',
+            },
+            modal: {
+              ondismiss: function() {
+                setPaymentError('Payment cancelled by user.')
+              }
+            }
+          }
+          
+          const rzp = new (window as any).Razorpay(options)
+          rzp.open()
+        }
+      } catch (err: any) {
+        console.error('Razorpay checkout error:', err)
+        setPaymentError(err.message || 'Payment initiation failed.')
+      }
+    })
+  }
+
   const handleSandboxSuccess = async () => {
     if (!sandboxOrder || !restaurant) return
     setShowSandbox(false)
     
     try {
+      const isTrial = sandboxOrder.credits === 0
       const payload = {
         event: 'payment.captured',
         payload: {
@@ -138,10 +198,15 @@ export default function SettingsPage() {
               id: `pay_mock_${Date.now()}`,
               amount: sandboxOrder.amount * 100,
               currency: 'INR',
-              notes: {
-                credits: sandboxOrder.credits.toString(),
-                userId: restaurant.owner_id
-              }
+              notes: isTrial 
+                ? {
+                    purchaseType: 'trial',
+                    userId: restaurant.owner_id
+                  }
+                : {
+                    credits: sandboxOrder.credits.toString(),
+                    userId: restaurant.owner_id
+                  }
             }
           }
         }
@@ -157,7 +222,7 @@ export default function SettingsPage() {
       })
       
       if (res.ok) {
-        setPaymentSuccess(`Successfully purchased ${sandboxOrder.credits} credits!`)
+        setPaymentSuccess(isTrial ? 'Trial successfully activated!' : `Successfully purchased ${sandboxOrder.credits} credits!`)
         fetchRestaurant()
       } else {
         const errData = await res.json()
@@ -167,6 +232,7 @@ export default function SettingsPage() {
       setPaymentError(err.message || 'Sandbox simulator error')
     }
   }
+
 
   const handleSandboxCancel = () => {
     setShowSandbox(false)
@@ -198,6 +264,7 @@ export default function SettingsPage() {
   }
 
   const creditPct = Math.min(100, Math.round((restaurant.credits / 1000) * 100))
+  const isGated = restaurant.plan === 'free' || (restaurant.plan === 'trial' && new Date(restaurant.trial_expires_at) < new Date())
 
   return (
     <div className="p-8 max-w-4xl mx-auto relative">
@@ -339,32 +406,62 @@ export default function SettingsPage() {
       </div>
 
       {/* QR Code Card */}
-      <div className="bg-white rounded-2xl p-8 shadow-md mb-8">
+      <div className="bg-white rounded-2xl p-8 shadow-md mb-8 relative overflow-hidden">
         <h2 className="font-display text-xl font-black text-[--color-foreground] mb-4 uppercase">
           Enrollment QR Code
         </h2>
         <p className="text-sm text-[--color-grey-800] mb-6 font-bold">
           Print this QR code on tables, receipts, or the entrance. Customers scan it to join your loyalty club.
         </p>
-        <div className="flex flex-col items-center gap-4">
-          {qrDataUrl ? (
-            <img
-              src={qrDataUrl}
-              alt={`QR code for ${restaurant.name} intake form`}
-              className="w-48 h-48 rounded-xl border border-[--color-border]"
-              data-testid="qr-code-image"
-            />
-          ) : (
-            <div className="w-48 h-48 rounded-xl bg-[--color-grey-50] animate-pulse" />
+        
+        <div className="relative">
+          {/* Blurred layer when gated */}
+          <div className={`flex flex-col items-center gap-4 ${isGated ? 'blur-sm pointer-events-none select-none' : ''}`}>
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt={`QR code for ${restaurant.name} intake form`}
+                className="w-48 h-48 rounded-xl border border-[--color-border]"
+                data-testid="qr-code-image"
+              />
+            ) : (
+              <div className="w-48 h-48 rounded-xl bg-[--color-grey-50] animate-pulse" />
+            )}
+            <a
+              href={isGated ? undefined : qrDataUrl}
+              download={`${restaurant.slug}-qr.png`}
+              className="bg-[--color-primary] hover:bg-[--color-primary-dark] text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer inline-flex items-center gap-2 font-bold"
+              data-testid="download-qr-btn"
+            >
+              Download QR Code
+            </a>
+          </div>
+
+          {/* Gated Unlock Overlay */}
+          {isGated && (
+            <div 
+              data-testid="qr-lock-overlay"
+              className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 text-center p-4 z-10"
+            >
+              <div className="max-w-xs bg-white border border-[--color-border] rounded-2xl p-6 shadow-lg flex flex-col items-center gap-4 text-black">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[--color-primary]" aria-hidden="true">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <p className="text-xs font-bold text-gray-800">
+                  Pay ₹599 to unlock unlimited campaign sends and get your table QR Code.
+                </p>
+                <button
+                  data-testid="pay-to-unlock-btn"
+                  onClick={handlePayToUnlock}
+                  disabled={isPending}
+                  className="bg-[--color-primary] hover:bg-[--color-primary-dark] text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer font-bold shadow-md disabled:opacity-50"
+                >
+                  {isPending ? 'Processing...' : 'Pay to Unlock'}
+                </button>
+              </div>
+            </div>
           )}
-          <a
-            href={qrDataUrl}
-            download={`${restaurant.slug}-qr.png`}
-            className="bg-[--color-primary] hover:bg-[--color-primary-dark] text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer inline-flex items-center gap-2 font-bold"
-            data-testid="download-qr-btn"
-          >
-            Download QR Code
-          </a>
         </div>
       </div>
 
@@ -372,26 +469,28 @@ export default function SettingsPage() {
       {/* Sandbox Payment Simulator Modal Overlay */}
       {showSandbox && sandboxOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs" data-testid="sandbox-modal">
-          <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-[90%] mx-auto animate-fade-in">
-            <h3 className="font-display text-2xl font-black text-[--color-foreground] mb-2 uppercase">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-[90%] mx-auto animate-fade-in text-black">
+            <h3 className="font-display text-2xl font-black text-gray-900 mb-2 uppercase">
               Razorpay Sandbox
             </h3>
-            <p className="text-xs font-bold text-[--color-grey-500] mb-6">
+            <p className="text-xs font-bold text-gray-500 mb-6">
               This sandbox modal simulates Razorpay&apos;s checkout flow. Selecting a choice below fires the respective outcome event back to our system endpoints.
             </p>
 
-            <div className="bg-[--color-grey-50] rounded-xl p-4 mb-6 text-sm space-y-2 font-bold">
+            <div className="bg-gray-50 rounded-xl p-4 mb-6 text-sm space-y-2 font-bold">
               <div className="flex justify-between">
-                <span className="text-[--color-grey-500]">Receipt Code:</span>
-                <span className="font-mono text-[--color-foreground]">{sandboxOrder.orderId}</span>
+                <span className="text-gray-500">Receipt Code:</span>
+                <span className="font-mono text-gray-900">{sandboxOrder.orderId}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[--color-grey-500]">Simulated Package:</span>
-                <span className="text-[--color-foreground]">{sandboxOrder.credits} Credits</span>
+                <span className="text-gray-500">Simulated Package:</span>
+                <span className="text-gray-900">
+                  {sandboxOrder.credits === 0 ? '21-Day Unlimited Trial' : `${sandboxOrder.credits} Credits`}
+                </span>
               </div>
-              <div className="flex justify-between border-t border-[--color-grey-200] pt-2 mt-2">
-                <span className="text-[--color-foreground]">Total Price:</span>
-                <span className="text-[--color-primary] font-black text-base font-display">₹{sandboxOrder.amount}.00</span>
+              <div className="flex justify-between border-t border-gray-200 pt-2 mt-2">
+                <span className="text-gray-900">Total Price:</span>
+                <span className="text-amber-700 font-black text-base font-display">₹{sandboxOrder.amount}.00</span>
               </div>
             </div>
 
@@ -399,14 +498,14 @@ export default function SettingsPage() {
               <button
                 data-testid="sandbox-simulate-success"
                 onClick={handleSandboxSuccess}
-                className="w-full bg-[--color-accent] text-white py-3.5 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest border-0 cursor-pointer transition-all hover:bg-[--color-accent-dark]"
+                className="w-full bg-amber-700 text-white py-3.5 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest border-0 cursor-pointer transition-all hover:bg-amber-800"
               >
                 Simulate Success
               </button>
               <button
                 data-testid="sandbox-simulate-fail"
                 onClick={handleSandboxCancel}
-                className="w-full bg-transparent text-[--color-grey-600] py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest border border-[--color-border] cursor-pointer transition-all hover:bg-[--color-grey-50]"
+                className="w-full bg-transparent text-gray-600 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-200 cursor-pointer transition-all hover:bg-gray-50"
               >
                 Simulate Failure / Cancel
               </button>
