@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import Script from 'next/script'
 
 interface TrialBannerProps {
@@ -20,7 +20,7 @@ export function TrialBanner({
   email,
   restaurantName,
 }: TrialBannerProps) {
-  const [isPending, startTransition] = useTransition()
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false)
   const [showSandbox, setShowSandbox] = useState(false)
   const [sandboxOrderId, setSandboxOrderId] = useState<string | null>(null)
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null)
@@ -31,57 +31,58 @@ export function TrialBanner({
   const handleClaimTrial = async () => {
     setPaymentSuccess(null)
     setPaymentError(null)
+    setIsPaymentLoading(true)
 
-    startTransition(async () => {
-      try {
-        const res = await fetch('/api/razorpay/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ purchaseType: 'trial' }),
-        })
+    try {
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purchaseType: 'trial' }),
+      })
 
-        if (!res.ok) {
-          const errData = await res.json()
-          throw new Error(errData.error || 'Failed to initiate order')
-        }
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.error || 'Failed to initiate order')
+      }
 
-        const { orderId } = await res.json()
+      const { orderId } = await res.json()
 
-        if (isMock) {
-          setSandboxOrderId(orderId)
-          setShowSandbox(true)
-        } else {
-          const options = {
-            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-            amount: 59900,
-            currency: 'INR',
-            name: 'Restoloop',
-            description: '21-Day Unlimited Trial Plan',
-            order_id: orderId,
-            handler: async () => {
-              setPaymentSuccess('Trial successfully activated! Please refresh.')
-              window.location.reload()
-            },
-            prefill: {
-              email: email || '',
-            },
-            theme: {
-              color: '#A16207',
-            },
-            modal: {
-              ondismiss: function() {
-                setPaymentError('Payment cancelled by user.')
-              }
+      if (isMock) {
+        setSandboxOrderId(orderId)
+        setShowSandbox(true)
+      } else {
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: 59900,
+          currency: 'INR',
+          name: 'Restoloop',
+          description: '21-Day Unlimited Trial Plan',
+          order_id: orderId,
+          handler: async () => {
+            setPaymentSuccess('Trial successfully activated! Please refresh.')
+            window.location.reload()
+          },
+          prefill: {
+            email: email || '',
+          },
+          theme: {
+            color: '#A16207',
+          },
+          modal: {
+            ondismiss: function() {
+              setPaymentError('Payment cancelled by user.')
             }
           }
-          const rzp = new (window as any).Razorpay(options)
-          rzp.open()
         }
-      } catch (err: any) {
-        console.error('Razorpay trial error:', err)
-        setPaymentError(err.message || 'Payment initiation failed.')
+        const rzp = new (window as any).Razorpay(options)
+        rzp.open()
       }
-    })
+    } catch (err: any) {
+      console.error('Razorpay trial error:', err)
+      setPaymentError(err.message || 'Payment initiation failed.')
+    } finally {
+      setIsPaymentLoading(false)
+    }
   }
 
   const handleSandboxSuccess = async () => {
@@ -185,16 +186,16 @@ export function TrialBanner({
           <div>
             <h2 className="font-display text-xl font-black uppercase tracking-tight mb-2">Claim 21-Day Unlimited Growth Trial!</h2>
             <p className="text-sm font-medium opacity-90 max-w-2xl">
-              Get unlimited campaign message sends, unlock your enrollment QR code, and accelerate your restaurant's retention for just ₹599.
+              Get unlimited campaign message sends, unlock your enrollment QR code, and accelerate your restaurant&apos;s retention for just ₹599.
             </p>
           </div>
           <button
             data-testid="claim-trial-btn"
             onClick={handleClaimTrial}
-            disabled={isPending}
+            disabled={isPaymentLoading}
             className="shrink-0 bg-white text-rose-900 hover:bg-gray-100 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest cursor-pointer transition-colors shadow-md disabled:opacity-50"
           >
-            {isPending ? 'Processing...' : 'Claim Trial (₹599)'}
+            {isPaymentLoading ? 'Processing...' : 'Claim Trial (₹599)'}
           </button>
         </div>
       )}
@@ -225,7 +226,7 @@ export function TrialBanner({
               Razorpay Sandbox
             </h3>
             <p className="text-xs font-bold text-gray-500 mb-6">
-              This sandbox modal simulates Razorpay's checkout flow for the Trial Plan.
+              This sandbox modal simulates Razorpay&apos;s checkout flow for the Trial Plan.
             </p>
 
             <div className="bg-gray-50 rounded-xl p-4 mb-6 text-sm space-y-2 font-bold">
