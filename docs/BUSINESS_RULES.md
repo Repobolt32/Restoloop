@@ -161,18 +161,21 @@ The target architecture routes all sends through a single adapter selected by `W
 ## 7. User Roles
 
 ### Restaurant Owner
-- Signs up, creates profile
-- Views dashboard hub (3 quick-action cards: Add Customer, Active Guests, Coupons)
-- Views active guests (customers with unredeemed coupons)
-- Views coupon history with type filter
-- Edits restaurant profile and coupon amounts
-- Validates coupon codes at the counter
-- Cannot add credits (admin only)
+- Signs up and creates a profile with exploratory access to all dashboard areas without paying upfront.
+- Claims the one-time 21-Day Unlimited Trial for ₹599 to unlock marketing campaigns and QR codes.
+- Views a dashboard banner indicating trial details (Offer, Active Countdown, or Expired notice).
+- Views a header status widget displaying trial days remaining or credit balance, with warning states under 200 credits.
+- Manages guests, edits profile settings, and validates coupon codes at the counter.
 
 ### Super Admin
-- Accesses `/admin` dashboard
-- Views all restaurants and credit balances
-- Adds credits to restaurants
+- Views all registered restaurants and credit balances.
+- Manages manual credit overrides and logged reasons.
+- Adjusts plan tiers and custom trial expiration dates.
+- Suspends/activates restaurant accounts (blocking forms and pausing campaign queues).
+- Impersonates restaurant owners securely to troubleshoot configuration issues.
+- Force-runs daily campaign workflows manually for any single restaurant.
+- Resets WhatsApp session states when credentials get stuck.
+- Searches and overrides coupon validation states globally.
 
 ---
 
@@ -207,6 +210,18 @@ Returns a WhatsApp Click-to-Chat URL with the coupon code. No push message is se
 
 ---
 
+## 10. Trial Onboarding & Payments
 
+### 10.1 Trial Phase Rules
+- **No Signup Barriers:** New restaurants sign up without upfront payment blocks. They begin on a free tier with 0 credits and can explore the dashboard but cannot download marketing QR codes.
+- **21-Day Unlimited Trial:** Restaurants can purchase a one-time trial for ₹599. During this trial, they receive unlimited campaign message sends for 21 days.
+- **One-time Purchase:** The ₹599 trial is restricted to one purchase per restaurant. Once used, the option is permanently disabled.
+- **Expiry Behavior:** Once the 21 days pass, all campaign messaging stops, the QR code download is locked, and the owner must choose a subscription plan to continue.
 
-*Last updated: June 2026 — verified against actual code.*
+### 10.2 Account Suspension Rules
+- **Deactivation:** If a restaurant account is suspended by the super-admin, its public intake form is disabled and displays an "Under Maintenance" page.
+- **Campaign Exclusions:** Suspended accounts are excluded from the daily automated campaign checks and messaging schedules.
+
+---
+
+*Last updated: July 2026 — updated with Trial and Super-Admin fallback specifications.*

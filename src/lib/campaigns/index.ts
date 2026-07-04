@@ -36,6 +36,7 @@ export async function runWelcomeReminders() {
     .from('restaurants')
     .select('id, name, credits, welcome_reminder_days')
     .eq('welcome_reminder_enabled', true)
+    .eq('is_suspended', false)
 
   for (const restaurant of restaurants ?? []) {
     const days = restaurant.welcome_reminder_days ?? 25
@@ -100,6 +101,7 @@ export async function runBirthdayCampaigns() {
     .from('restaurants')
     .select('id, name, credits, birthday_discount_percent')
     .eq('birthday_campaign_enabled', true)
+    .eq('is_suspended', false)
 
   for (const restaurant of restaurants ?? []) {
     const { data: customers } = await supabase
@@ -174,6 +176,7 @@ export async function runWinbackCampaigns() {
     .from('restaurants')
     .select('id, name, credits, winback_discount_percent, winback_days')
     .eq('winback_campaign_enabled', true)
+    .eq('is_suspended', false)
 
   for (const restaurant of restaurants ?? []) {
     const days = restaurant.winback_days ?? 40
@@ -251,6 +254,7 @@ export async function runExpiryReminders() {
     .from('restaurants')
     .select('id, name, credits, expiry_reminder_days')
     .eq('expiry_reminder_enabled', true)
+    .eq('is_suspended', false)
 
   for (const restaurant of restaurants ?? []) {
     const days = restaurant.expiry_reminder_days ?? 1
@@ -302,4 +306,23 @@ export async function runExpiryReminders() {
       }
     }
   }
+}
+
+export async function runAllCampaignsForRestaurant(restaurantId: string) {
+  const supabase = createServiceClient()
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('id', restaurantId)
+    .eq('is_suspended', false)
+    .single()
+
+  if (!restaurant) {
+    throw new Error('Restaurant not found or is suspended')
+  }
+
+  await runWelcomeReminders()
+  await runBirthdayCampaigns()
+  await runWinbackCampaigns()
+  await runExpiryReminders()
 }

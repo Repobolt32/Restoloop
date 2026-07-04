@@ -44,6 +44,8 @@ export async function POST(request: NextRequest) {
         .from('restaurants')
         .select('*')
         .eq('owner_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle()
 
       if (fetchError || !restaurant) {
@@ -74,7 +76,7 @@ export async function POST(request: NextRequest) {
       const { error: updateError } = await supabase
         .from('restaurants')
         .update(updatePayload)
-        .eq('owner_id', userId)
+        .eq('id', restaurant.id)
 
       if (updateError) {
         console.error('Webhook: Failed to update restaurant:', updateError)

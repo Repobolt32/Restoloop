@@ -113,7 +113,7 @@ test.describe('Slice 8: Admin Sees All', () => {
     await page.getByLabel('Email').fill('admin@restoloop.com')
     await page.getByLabel('Password').fill('adminpassword123')
     await page.getByRole('button', { name: /log in/i }).click()
-    await expect(page).toHaveURL(/.*dashboard/)
+    await expect(page).toHaveURL(/.*admin/)
 
     // 2. Navigate to admin panel
     await page.goto('http://localhost:3000/admin')

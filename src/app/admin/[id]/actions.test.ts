@@ -155,3 +155,96 @@ describe('updatePlanAction', () => {
   })
 })
 
+describe('addCreditsWithLogAction', () => {
+  let addCreditsWithLogAction: any
+
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    const mod = await import('./actions')
+    addCreditsWithLogAction = mod.addCreditsWithLogAction
+  })
+
+  it('throws when reason is empty', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'admin-1', email: 'admin@restoloop.com' } } })
+    await expect(addCreditsWithLogAction(makeFormData({ restaurantId: 'rest-1', amount: '100', reason: '' })))
+      .rejects.toThrow('Reason is required')
+  })
+
+  it('adds credits, logs reason, and redirects', async () => {
+    const eqMock = vi.fn().mockResolvedValue({ error: null })
+    const insertMock = vi.fn().mockResolvedValue({ error: null })
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'admin-1', email: 'admin@restoloop.com' } } })
+    mockServiceFrom.mockImplementation((table: string) => {
+      if (table === 'admin_credit_logs') {
+        return { insert: insertMock }
+      }
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: { credits: 50 }, error: null }),
+          }),
+        }),
+        update: vi.fn().mockReturnValue({ eq: eqMock }),
+      }
+    })
+
+    await expect(addCreditsWithLogAction(makeFormData({ restaurantId: 'rest-1', amount: '100', reason: 'Loyalty bonus' })))
+      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true&added=100')
+
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      restaurant_id: 'rest-1',
+      admin_user_id: 'admin-1',
+      amount: 100,
+      reason: 'Loyalty bonus',
+    }))
+  })
+
+  it('supports negative amounts for deductions', async () => {
+    const eqMock = vi.fn().mockResolvedValue({ error: null })
+    const insertMock = vi.fn().mockResolvedValue({ error: null })
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'admin-1', email: 'admin@restoloop.com' } } })
+    mockServiceFrom.mockImplementation((table: string) => {
+      if (table === 'admin_credit_logs') {
+        return { insert: insertMock }
+      }
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: { credits: 500 }, error: null }),
+          }),
+        }),
+        update: vi.fn().mockReturnValue({ eq: eqMock }),
+      }
+    })
+
+    await expect(addCreditsWithLogAction(makeFormData({ restaurantId: 'rest-1', amount: '-50', reason: 'Refund adjustment' })))
+      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true&added=-50')
+  })
+})
+
+describe('toggleSuspensionAction', () => {
+  let toggleSuspensionAction: any
+
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    const mod = await import('./actions')
+    toggleSuspensionAction = mod.toggleSuspensionAction
+  })
+
+  it('throws when user is not admin', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1', email: 'user@example.com' } } })
+    await expect(toggleSuspensionAction(makeFormData({ restaurantId: 'rest-1', suspend: 'true' }))).rejects.toThrow('Unauthorized')
+  })
+
+  it('suspends restaurant and redirects', async () => {
+    const eqMock = vi.fn().mockResolvedValue({ error: null })
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'admin-1', email: 'admin@restoloop.com' } } })
+    mockServiceFrom.mockReturnValue({
+      update: vi.fn().mockReturnValue({ eq: eqMock }),
+    })
+
+    await expect(toggleSuspensionAction(makeFormData({ restaurantId: 'rest-1', suspend: 'true' })))
+      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true')
+  })
+})
+

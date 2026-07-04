@@ -1,5 +1,5 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { addCreditsAction, updatePlanAction } from './actions'
+import { addCreditsAction, addCreditsWithLogAction, updatePlanAction, toggleSuspensionAction, triggerCronAction, resetWhatsAppSessionAction } from './actions'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -112,45 +112,48 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
           </div>
 
           <h3 className="text-[10px] font-black mb-3 uppercase tracking-widest text-[var(--color-grey-500)]">
-            Add Credits
+            Add / Deduct Credits
           </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <form action={addCreditsAction}>
-              <input type="hidden" name="restaurantId" value={restaurant.id} />
-              <input type="hidden" name="amount" value="100" />
-              <button
-                type="submit"
-                data-testid="add-100-btn"
-                className="w-full py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
-              >
-                +100 Credits
-              </button>
-            </form>
 
-            <form action={addCreditsAction}>
-              <input type="hidden" name="restaurantId" value={restaurant.id} />
-              <input type="hidden" name="amount" value="500" />
-              <button
-                type="submit"
-                data-testid="add-500-btn"
-                className="w-full py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
-              >
-                +500 Credits
-              </button>
-            </form>
-
-            <form action={addCreditsAction}>
-              <input type="hidden" name="restaurantId" value={restaurant.id} />
-              <input type="hidden" name="amount" value="1000" />
-              <button
-                type="submit"
-                data-testid="add-1000-btn"
-                className="w-full py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
-              >
-                +1000 Credits
-              </button>
-            </form>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            {[100, 500, 1000].map((amt) => (
+              <form key={amt} action={addCreditsWithLogAction}>
+                <input type="hidden" name="restaurantId" value={restaurant.id} />
+                <input type="hidden" name="amount" value={String(amt)} />
+                <input type="hidden" name="reason" value={`Quick add +${amt}`} />
+                <button type="submit" data-testid={`add-${amt}-btn`}
+                  className="w-full py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer">
+                  +{amt} Credits
+                </button>
+              </form>
+            ))}
           </div>
+
+          <form action={addCreditsWithLogAction} className="space-y-3">
+            <input type="hidden" name="restaurantId" value={restaurant.id} />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)] mb-1">
+                  Amount (negative to deduct)
+                </label>
+                <input type="number" name="amount" data-testid="custom-credit-amount" required
+                  className="w-full px-4 py-3 bg-[var(--color-background)] border border-[var(--color-border)] rounded-xl font-bold text-sm outline-none focus:border-[var(--color-primary)]"
+                  placeholder="e.g. 250 or -50" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)] mb-1">
+                  Reason (required)
+                </label>
+                <input type="text" name="reason" data-testid="custom-credit-reason" required
+                  className="w-full px-4 py-3 bg-[var(--color-background)] border border-[var(--color-border)] rounded-xl font-bold text-sm outline-none focus:border-[var(--color-primary)]"
+                  placeholder="e.g. Loyalty bonus, refund, correction" />
+              </div>
+            </div>
+            <button type="submit" data-testid="custom-credit-btn"
+              className="w-full py-3.5 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer">
+              Apply Credit Change
+            </button>
+          </form>
         </div>
 
         {/* Plan & Trial Override Block */}
@@ -206,6 +209,73 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
               className="w-full py-3.5 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
             >
               Update Plan & Expiry
+            </button>
+          </form>
+        </div>
+
+        {/* Account Suspension */}
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-md p-8 mb-6">
+          <h2 className="font-display text-lg font-black mb-4 text-[var(--color-foreground)] uppercase">
+            Account Status
+          </h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <span
+                data-testid="suspension-status"
+                className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                  restaurant.is_suspended
+                    ? 'border-red-200 bg-red-50 text-red-700'
+                    : 'border-green-200 bg-green-50 text-green-700'
+                }`}
+              >
+                {restaurant.is_suspended ? 'Suspended' : 'Active'}
+              </span>
+            </div>
+            <form action={toggleSuspensionAction}>
+              <input type="hidden" name="restaurantId" value={restaurant.id} />
+              <input type="hidden" name="suspend" value={restaurant.is_suspended ? 'false' : 'true'} />
+              <button
+                type="submit"
+                data-testid="toggle-suspension-btn"
+                className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer ${
+                  restaurant.is_suspended
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-red-600 hover:bg-red-700 text-white'
+                }`}
+              >
+                {restaurant.is_suspended ? 'Reactivate Account' : 'Suspend Account'}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Impersonation */}
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-md p-8 mb-6">
+          <h2 className="font-display text-lg font-black mb-2 text-[var(--color-foreground)] uppercase">
+            Support Tools
+          </h2>
+          <p className="text-xs font-bold text-[var(--color-grey-500)] mb-4">
+            Login as this restaurant&apos;s owner to troubleshoot their dashboard. This will sign you out of the admin session.
+          </p>
+          <a
+            href={`/admin/${restaurant.id}/impersonate`}
+            data-testid="impersonate-btn"
+            className="inline-block px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer"
+          >
+            Login as Owner
+          </a>
+          <form action={triggerCronAction} className="inline-block mr-3 ml-3">
+            <input type="hidden" name="restaurantId" value={restaurant.id} />
+            <button type="submit" data-testid="trigger-cron-btn"
+              className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer">
+              Run Campaigns Now
+            </button>
+          </form>
+          <form action={resetWhatsAppSessionAction} className="inline-block">
+            <input type="hidden" name="restaurantId" value={restaurant.id} />
+            <button type="submit" data-testid="reset-whatsapp-btn"
+              className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer">
+              Reset WhatsApp Session
             </button>
           </form>
         </div>

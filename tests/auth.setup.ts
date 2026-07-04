@@ -37,6 +37,6 @@ setup('login as admin user', async ({ page }) => {
   await page.fill('#email', TEST_ADMIN_EMAIL)
   await page.fill('#password', TEST_ADMIN_PASSWORD)
   await page.click('button[type="submit"]')
-  await expect(page).toHaveURL(/\/dashboard/, { timeout: 30000 })
+  await expect(page).toHaveURL(/\/admin/, { timeout: 30000 })
   await page.context().storageState({ path: 'tests/.auth/admin.json' })
 })

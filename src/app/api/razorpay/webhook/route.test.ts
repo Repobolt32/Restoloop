@@ -10,7 +10,11 @@ vi.mock('@/lib/supabase/server', () => ({
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: mockMaybeSingle,
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockReturnValue({
+                  maybeSingle: mockMaybeSingle,
+                }),
+              }),
             }),
           }),
           update: mockUpdate,

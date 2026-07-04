@@ -15,12 +15,16 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setError(error.message)
       return
     }
-    router.push('/dashboard')
+    if (data.user?.email === 'admin@restoloop.com') {
+      router.push('/admin')
+    } else {
+      router.push('/dashboard')
+    }
   }
 
   return (

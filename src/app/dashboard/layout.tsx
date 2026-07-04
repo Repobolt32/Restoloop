@@ -8,6 +8,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  if (user.email === 'admin@restoloop.com') {
+    redirect('/admin')
+  }
+
   const { data: restaurant } = await supabase
     .from('restaurants')
     .select('name, credits, plan, trial_activated_at, trial_expires_at')

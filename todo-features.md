@@ -1,80 +1,46 @@
-# To-Do Features: 21-Day Unlimited Trial (₹599) & Onboarding Flow
+# Checklist: 21-Day Unlimited Trial (₹599) & Onboarding Flow
 
-This file lists the checklist and technical specifications for implementing the low-friction account-first trial activation, payment integration, and UI warning widgets for Restoloop.
+This file lists the checklist for implementing the low-friction account-first trial activation, payment integration, dashboard widgets, and administrative fallback tools.
 
 ---
 
 ## 0. Account-First Flow (Onboarding Foundation)
-* [ ] **Low-Friction Signup:** Keep the signup flow simple. Once the user submits email, password, and restaurant details, log them in and redirect them directly to the main dashboard page at `/dashboard`.
-* [ ] **Exploratory Access:** Enable the user to view all dashboard tabs (Guests, Coupons, Campaigns, Settings) but gate core execution actions (like downloading the table QR code) until the trial is active.
-* [ ] **Restaurant Default State:** Initialize new restaurants with `plan = 'free'`, `credits = 0`, and `has_used_trial = false`.
+* [ ] **Fast Signup:** Allow restaurant owners to register quickly using their email, password, and restaurant name, then log them in and redirect them directly to the main dashboard.
+* [ ] **Exploratory Access:** Allow new users to view all dashboard sections (like guests, coupons, campaigns, and settings) without paying upfront, but lock live features (like downloading the table QR code) until they activate their trial.
+* [ ] **Restaurant Default State:** New restaurant accounts are initialized on the free plan with 0 credits and have not yet used their trial.
 
 ---
 
-## 1. The "Premium Membership Card" Banner (Dashboard CTA)
-* [ ] **Visual Mockup Card:** Place a glassmorphic banner at the top of the dashboard (`/dashboard`) using a crimson-to-saffron gradient.
-  * **Exploratory State (`has_used_trial === false`):**
-    * Display Title: **🎁 Claim 21-Day Unlimited Growth Trial**
-    * Display Description: *"Start capturing customer contacts, auto-send coupons on WhatsApp, and bring back 4-5 guests in your first week for ₹599. Pay securely with UPI/Card."*
-    * Display Button: **Claim Trial (₹599) 🚀**
-  * **Active Trial State (`has_used_trial === true` and `trial_ends_at > now()`):**
-    * Render an elegant SVG **Circular Countdown Dial** showing the remaining trial days (e.g., `18 Days Left`).
-    * Display status: *"Unlimited WhatsApp campaigns active."*
-  * **Expired Trial State (`has_used_trial === true` and `trial_ends_at < now()`):**
-    * Show warning banner: *"Your trial has ended. Please choose a subscription plan to continue sending campaigns."*
-    * Hide the ₹599 trial button so they cannot abuse or re-claim it.
-* [ ] **Table QR Code Gating:**
-  * When in Exploratory or Expired state, apply a blurred overlay on the QR code download card in Settings, with a prompt: *"Unlock QR code by activating your 21-day trial."*
+## 1. Premium Membership Banner (Dashboard Invite)
+* [ ] **Promotional Banner:** Add a visual banner at the top of the dashboard page with a crimson-to-saffron gradient.
+  * **Not Started Trial:** Displays a message to claim the 21-Day Unlimited Growth Trial for ₹599.
+  * **Active Trial:** Displays a countdown showing how many days are left on the trial and confirms that campaign messaging is running.
+  * **Expired Trial:** Shows a warning that the trial has ended and prompts the owner to choose a subscription plan.
+* [ ] **Locked Feature Overlay:** Apply a blurred lock overlay on features like the table QR code download card when the restaurant is on the free plan or their trial has expired.
 
 ---
 
 ## 2. Payment Integration Layer
-* [ ] **Reuse Existing Razorpay Integration:**
-  * Build directly on top of the current Razorpay implementation to leverage existing client scripts, backend order generation, and signature-verified webhook handlers.
-* [ ] **Trial Order Creation Gating (`/api/razorpay/create-order`):**
-  * Support the `'trial'` plan type in the request payload: `{ "amount": 599, "plan": "trial" }`.
-  * Validate against the database first. If the restaurant has `has_used_trial === true`, reject the order with a `400 Bad Request` error to prevent abuse.
-  * Set the order amount to `59900` (paise) and add metadata notes: `notes: { "userId": user.id, "plan": "trial" }`.
-* [ ] **Webhook Trial Handler (`/api/razorpay/webhook`):**
-  * When a `payment.captured` event arrives containing `"plan": "trial"` in the notes, intercept the flow to activate the trial in Supabase:
-    * Set `plan = 'trial'`
-    * Set `has_used_trial = true`
-    * Set `trial_activated_at = now()`
-    * Set `trial_ends_at = now() + 21 days`
-* [ ] **Sandbox Mode Support:**
-  * Support testing in localhost by checking if keys are set to `'mock'` inside `.env.local`. 
-  * Open the Sandbox Payment Simulator overlay on the main dashboard `/dashboard` when clicking `Claim Trial (₹599)`.
-  * Trigger mock webhook callback to `/api/razorpay/webhook` with signature `sig_mock` to update database state locally during development.
+* [ ] **Secure Payments:** Integrate the ₹599 trial activation using the platform's payment provider.
+* [ ] **Trial Limit Enforcement:** Ensure that a restaurant can only buy/use this 21-day unlimited trial once to prevent abuse.
+* [ ] **Trial Status Update:** When the payment is successful, automatically activate the 21-day unlimited trial for that restaurant.
+* [ ] **Local Simulator Support:** Support a mock testing environment to simulate payments locally during development.
 
 ---
 
-## 3. Circular Credit Progress Indicator (Header Widget)
-* [ ] **Top-Right Header Component:**
-  * Add a circular credit balance indicator to the top-right corner of the dashboard sidebar/header layout.
-* [ ] **SVG Circular Chart:**
-  * Draw a clean, compact SVG circular progress ring indicating remaining credits as a percentage of standard credit capacity (1000 credits).
-  * Display the raw number of credits in the center of the ring.
-  * Clicking the circular indicator redirects the user directly to the Settings page (`/dashboard/settings`).
-* [ ] **Threshold States & Warnings:**
-  * **Safe State ($\ge$ 200 credits):** Stroke is green or warm saffron (`text-[--color-accent]`). No warning shown.
-  * **Warning State ($<$ 200 credits):** Progress stroke turns red/orange (`text-red-500`), and a pulsing pill badge is rendered next to the circle with the text: **`please top up`**.
-* [ ] **Active Trial Mode State (Option 2B):**
-  * If the trial is active (`plan === 'trial'`), the header widget displays the **number of days left in the trial** (e.g., `21d`, `18d`) with a green border and no warning badge.
+## 3. Credit & Trial Progress Indicator
+* [ ] **Header Widget:** Add a progress dial in the top-right corner of the dashboard header.
+* [ ] **Trial Indicator:** If the trial is active, display the number of days left in the trial (e.g., "21d").
+* [ ] **Credit Indicator:** If the trial is not active, display the number of remaining credits.
+* [ ] **Low Credit Warnings:** If credits drop below 200, turn the indicator red/orange and display a "please top up" warning.
+* [ ] **Settings Shortcut:** Make the widget clickable so that clicking it redirects the owner to the Settings page.
 
 ---
 
-## 4. Super-Admin Fallback & Control Center
-* [ ] **Plan & Trial Override:**
-  * Add a manual selection dropdown on the restaurant detail page (`/admin/[id]`) to switch plans (`free`, `trial`, `starter`, `pro`).
-  * Add a date-picker or relative input to set/extend the trial expiry date (`trial_ends_at`).
-* [ ] **Account Suspension Toggle:**
-  * Add an `active` / `suspended` toggle.
-  * If a restaurant is suspended, gate their public intake form at `/form/[slug]` with an administrative warning, and exclude their customers/campaigns from the daily campaign execution cron.
-* [ ] **Support Impersonation ("Login-As"):**
-  * Implement a button on the restaurant details page to securely authenticate and redirect the super-admin session to that restaurant's dashboard as a virtual owner session.
-* [ ] **Manual Cron Trigger:**
-  * Add a button on `/admin/[id]` to manually run the daily campaign generator (welcome, birthday, winback check) for that restaurant immediately.
-* [ ] **WhatsApp Session Reset:**
-  * Provide a button to clear/reset the restaurant's WhatsApp provider credentials or token metadata if their instance status is stuck.
-* [ ] **Global Coupon Override Validator:**
-  * Add a simple search field on the main admin page `/admin` to look up *any* coupon code globally and manually force-redeem or reactivate it if needed.
+## 4. Super-Admin Fallback & Support Controls
+* [ ] **Plan & Trial Override:** Provide controls on the restaurant detail admin page to manually change any restaurant's plan status (Free, Trial, Starter, Pro) and set custom trial expiry dates.
+* [ ] **Account Suspension:** Add a status switch to suspend/deactivate a restaurant. When suspended, block their public intake form and skip sending their campaigns in the daily messaging queue.
+* [ ] **Support Impersonation ("Login-As"):** Implement a button in the admin portal to securely log into any restaurant owner's dashboard to troubleshoot setup issues.
+* [ ] **Manual Cron Trigger:** Add a button in the admin portal to manually force-run the daily automated campaign checks for a single restaurant immediately.
+* [ ] **WhatsApp Session Reset:** Provide a button to clear and reset a restaurant's WhatsApp provider connection details if they get stuck.
+* [ ] **Global Coupon Finder:** Add a search field in the admin panel to look up any coupon code globally and manually force-redeem or reactivate it to resolve customer support issues.

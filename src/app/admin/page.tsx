@@ -33,12 +33,20 @@ export default async function AdminPage() {
               Restoloop SaaS Administration Overview
             </p>
           </div>
-          <Link
-            href="/dashboard"
-            className="px-4 py-2 border border-[var(--color-accent)] text-[var(--color-accent)] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[var(--color-border)] transition-colors duration-200 cursor-pointer"
-          >
-            Go to Dashboard
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/admin/coupons"
+              className="px-4 py-2 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              Coupon Finder
+            </Link>
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 border border-[var(--color-accent)] text-[var(--color-accent)] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[var(--color-border)] transition-colors duration-200 cursor-pointer"
+            >
+              Go to Dashboard
+            </Link>
+          </div>
         </div>
 
         {/* Restaurant List Section */}
@@ -58,6 +66,7 @@ export default async function AdminPage() {
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">WhatsApp Number</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Credits</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Plan</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Status</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)]">Registered On</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[var(--color-grey-600)] text-right">Actions</th>
                 </tr>
@@ -65,7 +74,7 @@ export default async function AdminPage() {
               <tbody>
                 {!restaurants || restaurants.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center text-sm font-bold text-[var(--color-grey-500)]">
+                    <td colSpan={8} className="p-8 text-center text-sm font-bold text-[var(--color-grey-500)]">
                       No restaurants registered yet.
                     </td>
                   </tr>
