@@ -10,14 +10,30 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const { data: restaurant } = await supabase
     .from('restaurants')
-    .select('name, credits')
+    .select('name, credits, plan, trial_activated_at, trial_expires_at')
     .eq('owner_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 
+
+  const plan = restaurant?.plan ?? 'free'
+  const trialActivatedAt = restaurant?.trial_activated_at
+  const trialExpiresAt = restaurant?.trial_expires_at
   const credits = restaurant?.credits ?? 0
   const creditPct = Math.min(100, Math.round((credits / 1000) * 100))
+
+  let isTrialActive = false
+  let trialDaysLeft = 0
+
+  if (plan === 'trial' && trialExpiresAt) {
+    const expiryDate = new Date(trialExpiresAt)
+    const now = new Date()
+    isTrialActive = expiryDate >= now
+    if (isTrialActive) {
+      trialDaysLeft = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    }
+  }
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-background)' }}>
@@ -103,9 +119,63 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, minWidth: 0, animation: 'fade-in 0.2s ease-out' }}>
-        {children}
+      <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        {/* Header containing progress widget */}
+        <header
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            padding: '24px 32px 0 32px',
+          }}
+        >
+          <Link
+            href="/dashboard/settings"
+            data-testid="header-trial-widget"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 12px',
+              borderRadius: '9999px',
+              background: 'white',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'all 200ms ease',
+            }}
+          >
+            {isTrialActive ? (
+              <>
+                <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  ⚡ Trial Plan
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'white', background: 'var(--color-primary)', padding: '2px 8px', borderRadius: '9999px', fontFamily: 'var(--font-mono)' }}>
+                  {trialDaysLeft}d left
+                </span>
+              </>
+            ) : (
+              <>
+                <span style={{ fontSize: '0.75rem', fontWeight: 900, color: credits < 200 ? 'var(--color-destructive)' : 'var(--color-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  {credits < 200 ? '⚠️ Low Credits' : '🪙 Credits'}
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'white', background: credits < 200 ? 'var(--color-destructive)' : 'var(--color-foreground)', padding: '2px 8px', borderRadius: '9999px', fontFamily: 'var(--font-mono)' }}>
+                  {credits}
+                </span>
+                {credits < 200 && (
+                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-destructive)', textTransform: 'uppercase', letterSpacing: '0.05em', marginLeft: '4px' }}>
+                    Please top up
+                  </span>
+                )}
+              </>
+            )}
+          </Link>
+        </header>
+        <div style={{ flex: 1 }}>
+          {children}
+        </div>
       </main>
+
     </div>
   )
 }

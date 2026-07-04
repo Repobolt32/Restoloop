@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Users, Zap, Gift, TrendingUp, UserCheck } from 'lucide-react'
 import { maskPhone } from '@/lib/utils'
+import { TrialBanner } from './trial-banner'
+
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -85,6 +87,16 @@ export default async function DashboardPage() {
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent] mb-8">
         Dashboard Overview
       </p>
+
+      <TrialBanner
+        plan={restaurant.plan}
+        trialActivatedAt={restaurant.trial_activated_at}
+        trialExpiresAt={restaurant.trial_expires_at}
+        ownerId={restaurant.owner_id}
+        email={user.email || ''}
+        restaurantName={restaurant.name}
+      />
+
 
       {/* 4 Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
