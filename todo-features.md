@@ -1,11 +1,11 @@
 # To-Do Features: 21-Day Unlimited Trial (₹599) & Onboarding Flow
 
-This file lists the checklist and technical specifications for implementing the low-friction account-first trial activation and payment integration for Restoloop.
+This file lists the checklist and technical specifications for implementing the low-friction account-first trial activation, payment integration, and UI warning widgets for Restoloop.
 
 ---
 
 ## 0. Account-First Flow (Onboarding Foundation)
-* [ ] **Low-Friction Signup:** Keep the signup flow simple. Once the user submits email, password, and restaurant details, log them in and redirect them directly to the main dashboard `/dashboard`.
+* [ ] **Low-Friction Signup:** Keep the signup flow simple. Once the user submits email, password, and restaurant details, log them in and redirect them directly to the main dashboard page at `/dashboard`.
 * [ ] **Exploratory Access:** Enable the user to view all dashboard tabs (Guests, Coupons, Campaigns, Settings) but gate core execution actions (like downloading the table QR code) until the trial is active.
 * [ ] **Restaurant Default State:** Initialize new restaurants with `plan = 'free'`, `credits = 0`, and `has_used_trial = false`.
 
@@ -30,21 +30,21 @@ This file lists the checklist and technical specifications for implementing the 
 
 ## 2. Payment Integration Layer
 * [ ] **Reuse Existing Razorpay Integration:**
-  * Restoloop already has an established payment flow. We will integrate the ₹599 trial into the existing order creation, SDK overlay, and webhook handlers.
-* [ ] **Order Creation API (`/api/razorpay/create-order`):**
-  * Support the `'trial'` package with a price of `₹599` (59900 paise).
-  * Check if the user has already activated a trial (`has_used_trial === true`). If so, throw an error to prevent re-purchasing.
-* [ ] **Webhook Signature Handler (`/api/razorpay/webhook`):**
-  * For a successful `'trial'` payment:
-    * Update the restaurant row in the database:
-      * `plan = 'trial'`
-      * `has_used_trial = true`
-      * `trial_activated_at = now()`
-      * `trial_ends_at = now() + 21 days`
+  * Build directly on top of the current Razorpay implementation to leverage existing client scripts, backend order generation, and signature-verified webhook handlers.
+* [ ] **Trial Order Creation Gating (`/api/razorpay/create-order`):**
+  * Support the `'trial'` plan type in the request payload: `{ "amount": 599, "plan": "trial" }`.
+  * Validate against the database first. If the restaurant has `has_used_trial === true`, reject the order with a `400 Bad Request` error to prevent abuse.
+  * Set the order amount to `59900` (paise) and add metadata notes: `notes: { "userId": user.id, "plan": "trial" }`.
+* [ ] **Webhook Trial Handler (`/api/razorpay/webhook`):**
+  * When a `payment.captured` event arrives containing `"plan": "trial"` in the notes, intercept the flow to activate the trial in Supabase:
+    * Set `plan = 'trial'`
+    * Set `has_used_trial = true`
+    * Set `trial_activated_at = now()`
+    * Set `trial_ends_at = now() + 21 days`
 * [ ] **Sandbox Mode Support:**
   * Support testing in localhost by checking if keys are set to `'mock'` inside `.env.local`. 
-  * Open the Sandbox Payment Simulator overlay on `/dashboard` when clicking `Claim Trial (₹599)`.
-  * Trigger mock signatures (`sig_mock`) on the webhook route just like the existing settings flow.
+  * Open the Sandbox Payment Simulator overlay on the main dashboard `/dashboard` when clicking `Claim Trial (₹599)`.
+  * Trigger mock webhook callback to `/api/razorpay/webhook` with signature `sig_mock` to update database state locally during development.
 
 ---
 
@@ -52,21 +52,11 @@ This file lists the checklist and technical specifications for implementing the 
 * [ ] **Top-Right Header Component:**
   * Add a circular credit balance indicator to the top-right corner of the dashboard sidebar/header layout.
 * [ ] **SVG Circular Chart:**
-  * Draw a clean SVG circular progress ring indicating remaining credits as a percentage of 1000 credits (or total capacity).
+  * Draw a clean, compact SVG circular progress ring indicating remaining credits as a percentage of standard credit capacity (1000 credits).
   * Display the raw number of credits in the center of the ring.
-* [ ] **Warning State (Credits < 200):**
-  * If credits fall below **200**, dynamically change the circle stroke color to **orange/red** (`text-amber-500` or `text-red-500`).
-  * Display a clear tooltip/badge alongside it: **"please top up"** to catch the owner's attention.
-  * Make the widget clickable—clicking it redirects the user directly to the Settings page (`/dashboard/settings`) where they can top up credits.
-* [ ] **Trial Mode State:**
-  * If the trial is active (`plan === 'trial'`), show an icon representing "Unlimited" (infinity symbol `∞`) inside the circle or bypass the warning.
-
----
-
-## 4. Database Schema Upgrades
-* [ ] **SQL Migration:**
-  * Create `supabase/migrations/007_trial_state.sql` to add:
-    * `has_used_trial` (boolean, default false)
-    * `trial_ends_at` (timestamp with time zone)
-    * `trial_activated_at` (timestamp with time zone)
-  * Set default value of `credits` for new registrations to `0`.
+  * Clicking the circular indicator redirects the user directly to the Settings page (`/dashboard/settings`).
+* [ ] **Threshold States & Warnings:**
+  * **Safe State ($\ge$ 200 credits):** Stroke is green or warm saffron (`text-[--color-accent]`). No warning shown.
+  * **Warning State ($<$ 200 credits):** Progress stroke turns red/orange (`text-red-500`), and a pulsing pill badge is rendered next to the circle with the text: **`please top up`**.
+* [ ] **Active Trial Mode State (Option 2B):**
+  * If the trial is active (`plan === 'trial'`), the header widget displays the **number of days left in the trial** (e.g., `21d`, `18d`) with a green border and no warning badge.
