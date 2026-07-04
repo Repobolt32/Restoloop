@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useState, useEffect, useTransition, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
 import { updateDiscountsAction } from './actions'
@@ -12,7 +12,7 @@ export default function SettingsPage() {
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null)
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
-  const [isPending, startTransition] = useTransition()
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
 
   // Sandbox modal state
@@ -67,121 +67,123 @@ export default function SettingsPage() {
   const handleTopUp = async (credits: number) => {
     setPaymentSuccess(null)
     setPaymentError(null)
+    setIsPaymentLoading(true)
     
-    startTransition(async () => {
-      try {
-        const amount = credits * 1 // ₹1 per credit
-        
-        const res = await fetch('/api/razorpay/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount, credits }),
-        })
-        
-        if (!res.ok) {
-          const errData = await res.json()
-          throw new Error(errData.error || 'Failed to create order')
-        }
-        
-        const { orderId } = await res.json()
-        
-        const isMock = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'mock' || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
-        
-        if (isMock) {
-          setSandboxOrder({ orderId, amount, credits })
-          setShowSandbox(true)
-        } else {
-          const options = {
-            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-            amount: amount * 100,
-            currency: 'INR',
-            name: 'Restoloop',
-            description: `${credits} credits top-up`,
-            order_id: orderId,
-            handler: async (response: any) => {
-              setPaymentSuccess(`Successfully purchased ${credits} credits!`)
-              fetchRestaurant()
-            },
-            prefill: {
-              email: restaurant?.email || '',
-            },
-            theme: {
-              color: '#A16207',
-            },
-            modal: {
-              ondismiss: function() {
-                setPaymentError('Payment cancelled by user.')
-              }
+    try {
+      const amount = credits * 1 // ₹1 per credit
+      
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, credits }),
+      })
+      
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.error || 'Failed to create order')
+      }
+      
+      const { orderId } = await res.json()
+      
+      const isMock = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'mock' || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+      
+      if (isMock) {
+        setSandboxOrder({ orderId, amount, credits })
+        setShowSandbox(true)
+      } else {
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: amount * 100,
+          currency: 'INR',
+          name: 'Restoloop',
+          description: `${credits} credits top-up`,
+          order_id: orderId,
+          handler: async (response: any) => {
+            setPaymentSuccess(`Successfully purchased ${credits} credits!`)
+            fetchRestaurant()
+          },
+          prefill: {
+            email: restaurant?.email || '',
+          },
+          theme: {
+            color: '#A16207',
+          },
+          modal: {
+            ondismiss: function() {
+              setPaymentError('Payment cancelled by user.')
             }
           }
-          
-          const rzp = new (window as any).Razorpay(options)
-          rzp.open()
         }
-      } catch (err: any) {
-        console.error('Razorpay checkout error:', err)
-        setPaymentError(err.message || 'Payment initiation failed.')
+        
+        const rzp = new (window as any).Razorpay(options)
+        rzp.open()
       }
-    })
+    } catch (err: any) {
+      console.error('Razorpay checkout error:', err)
+      setPaymentError(err.message || 'Payment initiation failed.')
+    } finally {
+      setIsPaymentLoading(false)
+    }
   }
 
   const handlePayToUnlock = async () => {
     setPaymentSuccess(null)
     setPaymentError(null)
+    setIsPaymentLoading(true)
     
-    startTransition(async () => {
-      try {
-        const res = await fetch('/api/razorpay/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ purchaseType: 'trial' }),
-        })
-        
-        if (!res.ok) {
-          const errData = await res.json()
-          throw new Error(errData.error || 'Failed to create order')
-        }
-        
-        const { orderId } = await res.json()
-        
-        const isMock = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'mock' || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
-        
-        if (isMock) {
-          setSandboxOrder({ orderId, amount: 599, credits: 0 })
-          setShowSandbox(true)
-        } else {
-          const options = {
-            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-            amount: 59900,
-            currency: 'INR',
-            name: 'Restoloop',
-            description: '21-Day Unlimited Trial Plan',
-            order_id: orderId,
-            handler: async (response: any) => {
-              setPaymentSuccess('Trial successfully activated! Please refresh.')
-              fetchRestaurant()
-            },
-            prefill: {
-              email: restaurant?.email || '',
-            },
-            theme: {
-              color: '#A16207',
-            },
-            modal: {
-              ondismiss: function() {
-                setPaymentError('Payment cancelled by user.')
-              }
+    try {
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purchaseType: 'trial' }),
+      })
+      
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.error || 'Failed to create order')
+      }
+      
+      const { orderId } = await res.json()
+      
+      const isMock = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'mock' || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+      
+      if (isMock) {
+        setSandboxOrder({ orderId, amount: 599, credits: 0 })
+        setShowSandbox(true)
+      } else {
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: 59900,
+          currency: 'INR',
+          name: 'Restoloop',
+          description: '21-Day Unlimited Trial Plan',
+          order_id: orderId,
+          handler: async (response: any) => {
+            setPaymentSuccess('Trial successfully activated! Please refresh.')
+            fetchRestaurant()
+          },
+          prefill: {
+            email: restaurant?.email || '',
+          },
+          theme: {
+            color: '#A16207',
+          },
+          modal: {
+            ondismiss: function() {
+              setPaymentError('Payment cancelled by user.')
             }
           }
-          
-          const rzp = new (window as any).Razorpay(options)
-          rzp.open()
         }
-      } catch (err: any) {
-        console.error('Razorpay checkout error:', err)
-        setPaymentError(err.message || 'Payment initiation failed.')
+        
+        const rzp = new (window as any).Razorpay(options)
+        rzp.open()
       }
-    })
+    } catch (err: any) {
+      console.error('Razorpay checkout error:', err)
+      setPaymentError(err.message || 'Payment initiation failed.')
+    } finally {
+      setIsPaymentLoading(false)
+    }
   }
 
   const handleSandboxSuccess = async () => {
@@ -346,7 +348,7 @@ export default function SettingsPage() {
               <button
                 data-testid="top-up-100"
                 onClick={() => handleTopUp(100)}
-                disabled={isPending}
+                disabled={isPaymentLoading}
                 className="bg-black hover:bg-gray-800 text-white py-3 px-2 rounded-xl font-black text-[9px] uppercase tracking-widest border-0 cursor-pointer transition-all disabled:opacity-50"
               >
                 100 cr<br />(₹100)
@@ -354,7 +356,7 @@ export default function SettingsPage() {
               <button
                 data-testid="top-up-500"
                 onClick={() => handleTopUp(500)}
-                disabled={isPending}
+                disabled={isPaymentLoading}
                 className="bg-black hover:bg-gray-800 text-white py-3 px-2 rounded-xl font-black text-[9px] uppercase tracking-widest border-0 cursor-pointer transition-all disabled:opacity-50"
               >
                 500 cr<br />(₹500)
@@ -362,7 +364,7 @@ export default function SettingsPage() {
               <button
                 data-testid="top-up-1000"
                 onClick={() => handleTopUp(1000)}
-                disabled={isPending}
+                disabled={isPaymentLoading}
                 className="bg-black hover:bg-gray-800 text-white py-3 px-2 rounded-xl font-black text-[9px] uppercase tracking-widest border-0 cursor-pointer transition-all disabled:opacity-50"
               >
                 1000 cr<br />(₹1000)
@@ -454,10 +456,10 @@ export default function SettingsPage() {
                 <button
                   data-testid="pay-to-unlock-btn"
                   onClick={handlePayToUnlock}
-                  disabled={isPending}
+                  disabled={isPaymentLoading}
                   className="bg-[--color-primary] hover:bg-[--color-primary-dark] text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer font-bold shadow-md disabled:opacity-50"
                 >
-                  {isPending ? 'Processing...' : 'Pay to Unlock'}
+                  {isPaymentLoading ? 'Processing...' : 'Pay to Unlock'}
                 </button>
               </div>
             </div>
