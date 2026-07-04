@@ -1,5 +1,5 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { addCreditsAction } from './actions'
+import { addCreditsAction, updatePlanAction } from './actions'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -153,8 +153,66 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
           </div>
         </div>
 
+        {/* Plan & Trial Override Block */}
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-md p-8 mb-6">
+          <h2 className="font-display text-lg font-black mb-4 text-[var(--color-foreground)] uppercase">
+            Plan & Trial Override
+          </h2>
+          
+          <form action={updatePlanAction} className="space-y-4">
+            <input type="hidden" name="restaurantId" value={restaurant.id} />
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)] mb-1">
+                  Pricing Plan
+                </label>
+                <select
+                  name="plan"
+                  data-testid="admin-plan-select"
+                  defaultValue={restaurant.plan}
+                  className="w-full px-4 py-3 bg-[var(--color-background)] border border-[var(--color-border)] rounded-xl font-bold text-sm outline-none focus:border-[var(--color-primary)]"
+                >
+                  <option value="free">Free</option>
+                  <option value="trial">Trial</option>
+                  <option value="starter">Starter</option>
+                  <option value="pro">Pro</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)] mb-1">
+                  Trial Expiration
+                </label>
+                <input
+                  type="datetime-local"
+                  name="trialExpiresAt"
+                  data-testid="admin-trial-expires-input"
+                  defaultValue={
+                    restaurant.trial_expires_at
+                      ? new Date(restaurant.trial_expires_at)
+                          .toISOString()
+                          .slice(0, 16)
+                      : ''
+                  }
+                  className="w-full px-4 py-3 bg-[var(--color-background)] border border-[var(--color-border)] rounded-xl font-bold text-sm outline-none focus:border-[var(--color-primary)]"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              data-testid="admin-update-plan-btn"
+              className="w-full py-3.5 bg-black hover:bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
+            >
+              Update Plan & Expiry
+            </button>
+          </form>
+        </div>
+
         {/* General Metadata Details */}
         <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-md p-8">
+
           <h2 className="font-display text-lg font-black mb-4 text-[var(--color-foreground)] uppercase">
             General Details
           </h2>

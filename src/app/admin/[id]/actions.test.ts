@@ -113,3 +113,45 @@ describe('addCreditsAction', () => {
     await expect(addCreditsAction(makeFormData({ restaurantId: 'rest-1', amount: '10' }))).rejects.toThrow('Database update failed')
   })
 })
+
+describe('updatePlanAction', () => {
+  let updatePlanAction: any
+
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    const mod = await import('./actions')
+    updatePlanAction = mod.updatePlanAction
+  })
+
+  it('throws when parameters are invalid', async () => {
+    await expect(updatePlanAction(makeFormData({}))).rejects.toThrow('Invalid action parameters')
+  })
+
+  it('throws when user is not admin', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1', email: 'user@example.com' } } })
+    await expect(updatePlanAction(makeFormData({ restaurantId: 'rest-1', plan: 'trial' }))).rejects.toThrow('Unauthorized')
+  })
+
+  it('updates plan and trial dates and redirects', async () => {
+    const eqMock = vi.fn().mockResolvedValue({ error: null })
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'admin-1', email: 'admin@restoloop.com' } } })
+    mockServiceFrom.mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: { plan: 'free', trial_activated_at: null }, error: null }),
+        }),
+      }),
+      update: vi.fn().mockReturnValue({ eq: eqMock }),
+    })
+
+    await expect(updatePlanAction(makeFormData({ restaurantId: 'rest-1', plan: 'trial', trialExpiresAt: '2026-07-25T12:00' })))
+      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true')
+
+    expect(mockServiceFrom().update).toHaveBeenCalledWith(expect.objectContaining({
+      plan: 'trial',
+      trial_expires_at: expect.any(String),
+      trial_activated_at: expect.any(String),
+    }))
+  })
+})
+
