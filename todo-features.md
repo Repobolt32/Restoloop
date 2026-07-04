@@ -60,3 +60,21 @@ This file lists the checklist and technical specifications for implementing the 
   * **Warning State ($<$ 200 credits):** Progress stroke turns red/orange (`text-red-500`), and a pulsing pill badge is rendered next to the circle with the text: **`please top up`**.
 * [ ] **Active Trial Mode State (Option 2B):**
   * If the trial is active (`plan === 'trial'`), the header widget displays the **number of days left in the trial** (e.g., `21d`, `18d`) with a green border and no warning badge.
+
+---
+
+## 4. Super-Admin Fallback & Control Center
+* [ ] **Plan & Trial Override:**
+  * Add a manual selection dropdown on the restaurant detail page (`/admin/[id]`) to switch plans (`free`, `trial`, `starter`, `pro`).
+  * Add a date-picker or relative input to set/extend the trial expiry date (`trial_ends_at`).
+* [ ] **Account Suspension Toggle:**
+  * Add an `active` / `suspended` toggle.
+  * If a restaurant is suspended, gate their public intake form at `/form/[slug]` with an administrative warning, and exclude their customers/campaigns from the daily campaign execution cron.
+* [ ] **Support Impersonation ("Login-As"):**
+  * Implement a button on the restaurant details page to securely authenticate and redirect the super-admin session to that restaurant's dashboard as a virtual owner session.
+* [ ] **Manual Cron Trigger:**
+  * Add a button on `/admin/[id]` to manually run the daily campaign generator (welcome, birthday, winback check) for that restaurant immediately.
+* [ ] **WhatsApp Session Reset:**
+  * Provide a button to clear/reset the restaurant's WhatsApp provider credentials or token metadata if their instance status is stuck.
+* [ ] **Global Coupon Override Validator:**
+  * Add a simple search field on the main admin page `/admin` to look up *any* coupon code globally and manually force-redeem or reactivate it if needed.
