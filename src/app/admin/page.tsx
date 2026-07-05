@@ -96,6 +96,18 @@ export default async function AdminPage() {
                           {restaurant.plan}
                         </span>
                       </td>
+                      <td className="p-4">
+                        <span
+                          data-testid={`restaurant-status-${restaurant.slug}`}
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                            restaurant.is_suspended
+                              ? 'border-red-200 bg-red-50 text-red-700'
+                              : 'border-green-200 bg-green-50 text-green-700'
+                          }`}
+                        >
+                          {restaurant.is_suspended ? 'Suspended' : 'Active'}
+                        </span>
+                      </td>
                       <td className="p-4 text-xs text-[var(--color-grey-500)]">
                         {new Date(restaurant.created_at).toLocaleDateString('en-IN', {
                           dateStyle: 'medium',

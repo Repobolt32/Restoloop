@@ -163,7 +163,7 @@ export async function updatePlanAction(formData: FormData) {
   revalidatePath(`/admin/${restaurantId}`)
 
   // 4. Redirect to details view with success indicator
-  redirect(`/admin/${restaurantId}?success=true`)
+  redirect(`/admin/${restaurantId}?success=true&action=update-plan`)
 }
 
 export async function toggleSuspensionAction(formData: FormData) {
@@ -193,7 +193,7 @@ export async function toggleSuspensionAction(formData: FormData) {
 
   revalidatePath('/admin')
   revalidatePath(`/admin/${restaurantId}`)
-  redirect(`/admin/${restaurantId}?success=true`)
+  redirect(`/admin/${restaurantId}?success=true&action=toggle-suspension`)
 }
 
 export async function triggerCronAction(formData: FormData) {
@@ -209,7 +209,7 @@ export async function triggerCronAction(formData: FormData) {
   await runAllCampaignsForRestaurant(restaurantId)
 
   revalidatePath(`/admin/${restaurantId}`)
-  redirect(`/admin/${restaurantId}?success=true`)
+  redirect(`/admin/${restaurantId}?success=true&action=trigger-cron`)
 }
 
 export async function resetWhatsAppSessionAction(formData: FormData) {
@@ -230,6 +230,6 @@ export async function resetWhatsAppSessionAction(formData: FormData) {
   if (error) throw new Error('Database update failed')
 
   revalidatePath(`/admin/${restaurantId}`)
-  redirect(`/admin/${restaurantId}?success=true`)
+  redirect(`/admin/${restaurantId}?success=true&action=reset-whatsapp`)
 }
 

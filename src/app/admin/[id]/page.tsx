@@ -37,7 +37,21 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
   }
 
   const showSuccess = sParams.success === 'true'
-  const addedCredits = sParams.added
+  const addedCredits = typeof sParams.added === 'string' ? sParams.added : Array.isArray(sParams.added) ? sParams.added[0] : undefined
+  const action = typeof sParams.action === 'string' ? sParams.action : Array.isArray(sParams.action) ? sParams.action[0] : undefined
+
+  let successMessage = `Successfully updated ${restaurant.name}!`
+  if (addedCredits) {
+    successMessage = `Successfully added ${addedCredits} credits to ${restaurant.name}!`
+  } else if (action === 'update-plan') {
+    successMessage = `Successfully updated plan settings for ${restaurant.name}!`
+  } else if (action === 'toggle-suspension') {
+    successMessage = `Successfully updated suspension status for ${restaurant.name}!`
+  } else if (action === 'trigger-cron') {
+    successMessage = `Successfully executed automated campaigns for ${restaurant.name}!`
+  } else if (action === 'reset-whatsapp') {
+    successMessage = `Successfully reset WhatsApp session for ${restaurant.name}!`
+  }
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] p-8 font-body text-[var(--color-foreground)]">
@@ -79,7 +93,7 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
-            Successfully added {addedCredits} credits to {restaurant.name}!
+            {successMessage}
           </div>
         )}
 

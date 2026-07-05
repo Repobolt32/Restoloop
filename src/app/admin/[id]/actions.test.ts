@@ -145,7 +145,7 @@ describe('updatePlanAction', () => {
     })
 
     await expect(updatePlanAction(makeFormData({ restaurantId: 'rest-1', plan: 'trial', trialExpiresAt: '2026-07-25T12:00' })))
-      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true')
+      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true&action=update-plan')
 
     expect(mockServiceFrom().update).toHaveBeenCalledWith(expect.objectContaining({
       plan: 'trial',
@@ -244,7 +244,7 @@ describe('toggleSuspensionAction', () => {
     })
 
     await expect(toggleSuspensionAction(makeFormData({ restaurantId: 'rest-1', suspend: 'true' })))
-      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true')
+      .rejects.toThrow('REDIRECT:/admin/rest-1?success=true&action=toggle-suspension')
   })
 })
 
