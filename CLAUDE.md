@@ -14,12 +14,15 @@ Before implementing any slice, invoke relevant tech skills from `.claude/skills/
 
 ## Source of Truth
 
+- `progress.md` — **Primary Status & Progress File**. Read at session start to verify project status. Always update it with newly completed features and next steps before finishing any task or session.
 - `docs/BUSINESS_RULES.md` — business requirements (flexible, not law)
 - `docs/superpowers/specs/2026-06-28-restoloop-design.md` — design spec
 - `docs/superpowers/plans/2026-06-28-restoloop-implementation.md` — implementation plan
 
 ## Notes
 
+- **Startup & Status**: Read `progress.md` first. Load the `using-superpowers` skill before responding or performing actions.
+- **Maintain Progress**: Update `progress.md` at the end of every feature slice or session.
 - Never refer to old PRD (`docs/Doc-Restoloop.md`)
 - Never mention old framework brand name
 - Use `ui-ux-pro-max` + `frontend-design` for dashboard (reject old coral/navy/Inter/Stitch design system)

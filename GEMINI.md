@@ -25,11 +25,13 @@ Always run `typecheck` + `lint` before claiming code works. If `build` fails, it
 
 ## Source of Truth
 
+- `progress.md` - **Primary Status & Progress File**. Must be read at startup to verify project status and updated before finishing any task or session.
 - `docs/BUSINESS_RULES.md` - business requirements (flexible, not law)
 - `docs/superpowers/specs/2026-06-28-restoloop-design.md` - design spec
 - `docs/superpowers/plans/` - directory containing individual slice implementation plans (e.g., `slice-1.md`, `2026-06-30-slice-7-credits.md`). When implementing a slice, the agent must load the required skill/sub-skill specified in the slice plan file.
 - Never refer to `docs/Doc-Restoloop.md` (old, dead)
 - `docs/DEVELOPER_GUIDE.md` has stale directory structure (references old `app/` at root, not `src/app/`)
+
 
 ## Directory Structure
 
@@ -60,6 +62,8 @@ docs/                # business rules, design spec, implementation plan
 
 ## Code Rules
 
+- **Startup & Status Rules**: Read `progress.md` immediately at session start. Load and review the `using-superpowers` skill from `.agents/skills/using-superpowers/SKILL.md` (or the equivalent registered skill) before any action or response.
+- **Progress Maintenance**: Always update `progress.md` with newly completed features, verification details, and next tasks at the end of every feature slice or session before wrapping up.
 - Follow existing patterns. Match style of neighboring files.
 - No premature abstractions. One implementation = no interface.
 - No comments unless asked.
