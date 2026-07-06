@@ -6,13 +6,6 @@ import { z } from 'zod'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
-function normalizePhone(raw: string): string {
-  const digits = raw.replace(/\D/g, '')
-  if (digits.length === 12 && digits.startsWith('91')) return digits
-  if (digits.length === 11 && digits.startsWith('0')) return '91' + digits.slice(1)
-  return digits
-}
-
 const schema = z.object({
   name: z.string().min(1),
   whatsappNumber: z.string().regex(/^91\d{10}$/),
@@ -33,21 +26,15 @@ export async function createRestaurant(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const raw = formData.get('whatsappNumber') as string
-  const parsed = schema.safeParse({
+  const parsed = schema.parse({
     name: formData.get('name'),
-    whatsappNumber: normalizePhone(raw),
+    whatsappNumber: formData.get('whatsappNumber'),
     welcomeDiscount: formData.get('welcomeDiscount'),
     birthdayDiscount: formData.get('birthdayDiscount'),
     winbackDiscount: formData.get('winbackDiscount'),
   })
 
-  if (!parsed.success) {
-    const issues = parsed.error.issues.map(i => i.message).join(', ')
-    redirect(`/dashboard/create?error=${encodeURIComponent(issues)}`)
-  }
-
-  let slug = slugify(parsed.data.name)
+  let slug = slugify(parsed.name)
 
   // Check for slug collision across all tenants using admin client to bypass RLS
   const adminClient = createSupabaseClient(
@@ -76,12 +63,12 @@ export async function createRestaurant(formData: FormData) {
 
   const { error } = await supabase.from('restaurants').insert({
     owner_id: user.id,
-    name: parsed.data.name,
+    name: parsed.name,
     slug,
-    whatsapp_number: parsed.data.whatsappNumber,
-    welcome_discount_cents: parsed.data.welcomeDiscount * 100,
-    birthday_discount_cents: parsed.data.birthdayDiscount * 100,
-    winback_discount_cents: parsed.data.winbackDiscount * 100,
+    whatsapp_number: parsed.whatsappNumber,
+    welcome_discount_cents: parsed.welcomeDiscount * 100,
+    birthday_discount_cents: parsed.birthdayDiscount * 100,
+    winback_discount_cents: parsed.winbackDiscount * 100,
   })
 
   if (error) throw new Error(error.message)

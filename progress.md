@@ -39,9 +39,7 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
     *   Account suspension (blocks intake form & daily campaign message sends).
     *   Support Impersonation ("Login-As") to access restaurant owner dashboards.
     *   Manual Cron Trigger to run automated campaigns immediately.
-    *   **Bug Fixes**: 
-        *   Resolved Vercel production environment keys mismatch where the `NEXT_PUBLIC_SUPABASE_ANON_KEY` was incorrect, restoring full production login/signup capabilities.
-        *   Context-aware success banners for detail page actions (credits, plan, suspension, campaign run, WhatsApp reset) and main table layout alignment with Status capsules (Active/Suspended).
+    *   **Bug Fixes**: Context-aware success banners for detail page actions (credits, plan, suspension, campaign run, WhatsApp reset) and main table layout alignment with Status capsules (Active/Suspended).
 
 ---
 
@@ -49,8 +47,6 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 
 *   **Unit Tests**: **128/128 passed** (`pnpm test` via Vitest).
 *   **E2E Tests**: Playwright suite (`pnpm test:e2e` / `npx playwright test`) covers full flows for authentication, intake forms, coupon validation, credits/gating, and admin controls.
-*   **Migration 009 (`user_roles`)**: Applied to remote Supabase DB via `supabase db push`. Creates `user_roles` table, `on_auth_user_created` trigger (assigns `superadmin` to `admin@restoloop.com`), and retroactive role population for existing users. Admin login E2E setup now passes — admin correctly redirects to `/admin`.
-*   **Known E2E Issue**: `admin-controls.spec.ts` tests (suspend/reactivate, custom credits) fail because no restaurants exist in the admin panel at test time (`manage-btn` testid not found). This is a test-data dependency issue, not related to migration 009.
 
 ---
 

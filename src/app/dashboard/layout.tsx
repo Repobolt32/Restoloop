@@ -8,13 +8,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: roleData } = await supabase
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single()
-
-  if (roleData?.role === 'superadmin') {
+  if (user.email === 'admin@restoloop.com') {
     redirect('/admin')
   }
 

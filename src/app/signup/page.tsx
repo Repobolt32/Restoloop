@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { signUpUser } from './actions'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -14,29 +14,12 @@ export default function SignupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
-    const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
-      },
-    })
-    if (error) {
-      if (error.status === 422) {
-        if (error.code === 'email_exists') {
-          setError('Email already registered. Try logging in instead.')
-        } else {
-          setError(error.message)
-        }
-      } else if (error.status === 429) {
-        setError('Too many attempts. Please try again later.')
-      } else {
-        setError(error.message || 'Failed to sign up')
-      }
+    const result = await signUpUser({ email, password })
+    if (result.error) {
+      setError(result.error)
       return
     }
-    router.push('/login?message=Signup successful! Please check your email to verify your account.')
+    router.push('/login')
   }
 
   return (

@@ -10,13 +10,7 @@ export default async function AdminPage() {
     redirect('/login')
   }
 
-  const { data: roleData } = await supabase
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single()
-
-  if (roleData?.role !== 'superadmin') {
+  if (user.email !== 'admin@restoloop.com') {
     redirect('/dashboard')
   }
 

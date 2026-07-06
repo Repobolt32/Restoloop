@@ -31,25 +31,14 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user) {
-    // Fetch role from user_roles
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-    
-    const userRole = roleData?.role || null
+  // Admin user trying to access merchant dashboard → redirect to /admin
+  if (user?.email === 'admin@restoloop.com' && path.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
 
-    // Admin user trying to access merchant dashboard → redirect to /admin
-    if (userRole === 'superadmin' && path.startsWith('/dashboard')) {
-      return NextResponse.redirect(new URL('/admin', request.url))
-    }
-
-    // Non-admin user trying to access /admin → redirect to /dashboard
-    if (userRole !== 'superadmin' && path.startsWith('/admin')) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
+  // Non-admin user trying to access /admin → redirect to /dashboard
+  if (user && user.email !== 'admin@restoloop.com' && path.startsWith('/admin')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return response

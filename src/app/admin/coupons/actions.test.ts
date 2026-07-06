@@ -1,18 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockGetUser = vi.fn()
-const mockFrom = vi.fn()
 const mockServiceFrom = vi.fn()
-
-const mockSingle = vi.fn()
-const mockEq = vi.fn().mockReturnValue({ single: mockSingle })
-const mockSelect = vi.fn().mockReturnValue({ eq: mockEq })
-mockFrom.mockReturnValue({ select: mockSelect })
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn().mockResolvedValue({
     auth: { getUser: mockGetUser },
-    from: mockFrom,
   }),
   createServiceClient: vi.fn().mockReturnValue({
     from: mockServiceFrom,
@@ -32,14 +25,12 @@ describe('searchCouponsAction', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    mockSingle.mockResolvedValue({ data: { role: 'superadmin' }, error: null })
     const mod = await import('./actions')
     searchCouponsAction = mod.searchCouponsAction
   })
 
   it('throws when user is not admin', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'u1', email: 'owner@test.com' } } })
-    mockSingle.mockResolvedValue({ data: { role: 'owner' }, error: null })
     await expect(searchCouponsAction('ABC')).rejects.toThrow('Unauthorized')
   })
 
@@ -64,7 +55,6 @@ describe('forceRedeemCouponAction', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    mockSingle.mockResolvedValue({ data: { role: 'superadmin' }, error: null })
     const mod = await import('./actions')
     forceRedeemCouponAction = mod.forceRedeemCouponAction
   })

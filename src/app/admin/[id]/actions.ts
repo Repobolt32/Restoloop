@@ -4,18 +4,6 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-async function requireAdmin(supabase: any, userId: string) {
-  const { data: roleData } = await supabase
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', userId)
-    .single()
-
-  if (roleData?.role !== 'superadmin') {
-    throw new Error('Unauthorized')
-  }
-}
-
 export async function addCreditsAction(formData: FormData) {
   const restaurantId = formData.get('restaurantId') as string
   const amountStr = formData.get('amount') as string
@@ -29,10 +17,9 @@ export async function addCreditsAction(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.email !== 'admin@restoloop.com') {
     throw new Error('Unauthorized')
   }
-  await requireAdmin(supabase, user.id)
 
   // 2. Add credits atomically (Fetch + Update)
   const serviceSupabase = createServiceClient()
@@ -82,10 +69,9 @@ export async function addCreditsWithLogAction(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.email !== 'admin@restoloop.com') {
     throw new Error('Unauthorized')
   }
-  await requireAdmin(supabase, user.id)
 
   const serviceSupabase = createServiceClient()
   const { data: restaurant, error: fetchError } = await serviceSupabase
@@ -134,10 +120,9 @@ export async function updatePlanAction(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.email !== 'admin@restoloop.com') {
     throw new Error('Unauthorized')
   }
-  await requireAdmin(supabase, user.id)
 
   // 2. Fetch current restaurant details
   const serviceSupabase = createServiceClient()
@@ -192,10 +177,9 @@ export async function toggleSuspensionAction(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.email !== 'admin@restoloop.com') {
     throw new Error('Unauthorized')
   }
-  await requireAdmin(supabase, user.id)
 
   const serviceSupabase = createServiceClient()
   const { error } = await serviceSupabase
@@ -219,8 +203,7 @@ export async function triggerCronAction(formData: FormData) {
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
-  await requireAdmin(supabase, user.id)
+  if (!user || user.email !== 'admin@restoloop.com') throw new Error('Unauthorized')
 
   const { runAllCampaignsForRestaurant } = await import('@/lib/campaigns')
   await runAllCampaignsForRestaurant(restaurantId)
@@ -236,8 +219,7 @@ export async function resetWhatsAppSessionAction(formData: FormData) {
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
-  await requireAdmin(supabase, user.id)
+  if (!user || user.email !== 'admin@restoloop.com') throw new Error('Unauthorized')
 
   const serviceSupabase = createServiceClient()
   const { error } = await serviceSupabase

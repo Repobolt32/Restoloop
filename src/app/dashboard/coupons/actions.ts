@@ -26,7 +26,7 @@ export async function createCouponAction(formData: FormData) {
     .limit(1)
     .maybeSingle()
 
-    if (!restaurant) redirect('/dashboard/create')
+  if (!restaurant) redirect('/dashboard/create')
 
   const customerId = formData.get('customer_id') as string
   const discountPercent = Number(formData.get('discount_percent'))
@@ -66,7 +66,7 @@ export async function disableCouponAction(couponId: string) {
     .limit(1)
     .maybeSingle()
 
-    if (!restaurant) redirect('/dashboard/create')
+  if (!restaurant) redirect('/dashboard/create')
 
   await supabase
     .from('coupons')
@@ -90,7 +90,7 @@ export async function deleteCouponAction(couponId: string) {
     .limit(1)
     .maybeSingle()
 
-    if (!restaurant) redirect('/dashboard/create')
+  if (!restaurant) redirect('/dashboard/create')
 
   await supabase
     .from('coupons')
