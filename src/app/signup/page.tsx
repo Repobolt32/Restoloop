@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { signUpUser } from './actions'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -14,10 +14,9 @@ export default function SignupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
-    const supabase = createClient()
-    const { error } = await supabase.auth.signUp({ email, password })
-    if (error) {
-      setError(error.message)
+    const result = await signUpUser({ email, password })
+    if (result.error) {
+      setError(result.error)
       return
     }
     router.push('/login')
