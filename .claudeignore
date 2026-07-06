@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Next.js Build & Cache
+.next/
+*.tsbuildinfo
+.vercel/
+
+# Browser Profiles & Test Reports
+.chrome-profile/
+.chrome-profile-new/
+playwright-report/
+test-results/
+screenshots/
+graphify-out/
+
+# Version Control & Local Harnesses
+.git/
+.kimchi/
+.superpowers/
+.opencode/
+
+# Large log files
+*.log
+*.err
