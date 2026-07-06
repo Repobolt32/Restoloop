@@ -17,7 +17,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setError(error.message)
+      setError('Invalid email or password')
       return
     }
     if (data.user?.email === 'admin@restoloop.com') {
