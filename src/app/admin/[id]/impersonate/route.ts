@@ -1,5 +1,6 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function GET(
   _request: Request,
@@ -10,7 +11,13 @@ export async function GET(
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== 'admin@restoloop.com') {
+  const { data: roleData } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user?.id || '')
+    .single()
+
+  if (!user || roleData?.role !== 'superadmin') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
@@ -40,6 +47,15 @@ export async function GET(
   if (linkError || !linkData) {
     return NextResponse.json({ error: linkError?.message || 'Failed to generate link' }, { status: 500 })
   }
+
+  const cookieStore = await cookies()
+  cookieStore.set('rl_admin_return', user.email || '', {
+    path: '/',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60, // 1 hour
+  })
 
   const confirmUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/verify?token=${linkData.properties.hashed_token}&type=magiclink&redirect_to=${encodeURIComponent(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard`)}`
 

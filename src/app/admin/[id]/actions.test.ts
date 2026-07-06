@@ -4,6 +4,11 @@ const mockGetUser = vi.fn()
 const mockFrom = vi.fn()
 const mockServiceFrom = vi.fn()
 
+const mockSingle = vi.fn()
+const mockEq = vi.fn().mockReturnValue({ single: mockSingle })
+const mockSelect = vi.fn().mockReturnValue({ eq: mockEq })
+mockFrom.mockReturnValue({ select: mockSelect })
+
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn().mockResolvedValue({
     auth: { getUser: mockGetUser },
@@ -38,6 +43,7 @@ function makeFormData(entries: Record<string, string>): FormData {
 describe('addCreditsAction', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSingle.mockResolvedValue({ data: { role: 'superadmin' }, error: null })
   })
 
   it('throws when restaurantId or amount is missing', async () => {
@@ -61,6 +67,7 @@ describe('addCreditsAction', () => {
 
   it('throws when user is not admin', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1', email: 'user@example.com' } } })
+    mockSingle.mockResolvedValue({ data: { role: 'owner' }, error: null })
     await loadModule()
 
     await expect(addCreditsAction(makeFormData({ restaurantId: 'rest-1', amount: '10' }))).rejects.toThrow('Unauthorized')
@@ -119,6 +126,7 @@ describe('updatePlanAction', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
+    mockSingle.mockResolvedValue({ data: { role: 'superadmin' }, error: null })
     const mod = await import('./actions')
     updatePlanAction = mod.updatePlanAction
   })
@@ -129,6 +137,7 @@ describe('updatePlanAction', () => {
 
   it('throws when user is not admin', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1', email: 'user@example.com' } } })
+    mockSingle.mockResolvedValue({ data: { role: 'owner' }, error: null })
     await expect(updatePlanAction(makeFormData({ restaurantId: 'rest-1', plan: 'trial' }))).rejects.toThrow('Unauthorized')
   })
 
@@ -160,6 +169,7 @@ describe('addCreditsWithLogAction', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
+    mockSingle.mockResolvedValue({ data: { role: 'superadmin' }, error: null })
     const mod = await import('./actions')
     addCreditsWithLogAction = mod.addCreditsWithLogAction
   })
@@ -227,12 +237,14 @@ describe('toggleSuspensionAction', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
+    mockSingle.mockResolvedValue({ data: { role: 'superadmin' }, error: null })
     const mod = await import('./actions')
     toggleSuspensionAction = mod.toggleSuspensionAction
   })
 
   it('throws when user is not admin', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1', email: 'user@example.com' } } })
+    mockSingle.mockResolvedValue({ data: { role: 'owner' }, error: null })
     await expect(toggleSuspensionAction(makeFormData({ restaurantId: 'rest-1', suspend: 'true' }))).rejects.toThrow('Unauthorized')
   })
 

@@ -1,42 +1,33 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
-export default function SignupPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const router = useRouter()
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setMessage('')
+    setLoading(true)
+    
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
-      },
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     })
+
+    setLoading(false)
     if (error) {
-      if (error.status === 422) {
-        if (error.code === 'email_exists') {
-          setError('Email already registered. Try logging in instead.')
-        } else {
-          setError(error.message)
-        }
-      } else if (error.status === 429) {
-        setError('Too many attempts. Please try again later.')
-      } else {
-        setError(error.message || 'Failed to sign up')
-      }
+      setError(error.message || 'Failed to send password reset email')
       return
     }
-    router.push('/login?message=Signup successful! Please check your email to verify your account.')
+
+    setMessage('Password reset email sent! Please check your inbox.')
   }
 
   return (
@@ -44,10 +35,10 @@ export default function SignupPage() {
       <form onSubmit={handleSubmit} className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md w-full max-w-md flex flex-col gap-6">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-1">
-            Sign Up
+            Reset Password
           </h1>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent]">
-            Get started with Restoloop
+            Send recovery link
           </p>
         </div>
 
@@ -57,8 +48,14 @@ export default function SignupPage() {
           </div>
         )}
 
+        {message && (
+          <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-emerald-800 text-xs font-bold">
+            {message}
+          </div>
+        )}
+
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">Email</label>
+          <label htmlFor="email" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">Email Address</label>
           <input
             id="email"
             type="email"
@@ -69,28 +66,16 @@ export default function SignupPage() {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">Password</label>
-          <input
-            id="password"
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="border border-[--color-border] rounded-lg px-4 py-3 text-sm focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 w-full font-bold text-[--color-foreground]"
-          />
-        </div>
-
         <button
           type="submit"
-          className="bg-black hover:bg-gray-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3.5 w-full transition-colors cursor-pointer"
+          disabled={loading}
+          className="bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3.5 w-full transition-colors cursor-pointer"
         >
-          Sign Up
+          {loading ? 'Sending...' : 'Send Reset Link'}
         </button>
 
         <p className="text-center text-xs font-bold text-[--color-grey-500] mt-2">
-          Already have an account?{' '}
+          Back to{' '}
           <Link href="/login" className="text-[--color-primary] hover:text-[--color-primary-dark] transition-colors underline uppercase tracking-wider text-[10px] font-black ml-1">
             Log in
           </Link>

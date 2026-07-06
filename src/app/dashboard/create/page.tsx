@@ -1,9 +1,15 @@
 import { createRestaurant } from './actions'
 
-export default function CreateRestaurantPage() {
+export default async function CreateRestaurantPage(props: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await props.searchParams
   return (
     <div className="min-h-screen bg-[--color-background] flex items-center justify-center p-4">
       <form action={createRestaurant} className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md w-full max-w-md flex flex-col gap-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-red-800 text-xs font-bold">
+            {error.replace(/\(|\)/g, '')}
+          </div>
+        )}
         <div>
           <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-1">
             Create Your Restaurant
