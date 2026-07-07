@@ -18,6 +18,7 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 *   **Guest & Coupon Management (S4, S5, S6)**: Interactive guest list table, coupon generation, and a dedicated Counter Coupon Validation screen at `/dashboard/validate` for cashier validation.
 *   **Coupon Settings (S14)**: Configurable discount parameters (percentage/flat, minimum order value, validity days) in settings.
 *   **Customer Segments (S16)**: Dynamic guest list filtering by segments: *All, New, Birthday, Win-back,* and *Opt-out*.
+*   **Sidebar Styling**: Restored premium mockup styling for navigation buttons (rounded rectangle 12px corners, title case typography, solid active dark orange `#E65C00` state with white text/icons and right-aligned small white dot indicator).
 
 ### 2. Marketing & Automation Campaign Engine
 *   **Campaign Engine (S15)**: Background message queues for Welcome, Birthday, Winback, and Expiry campaigns.
