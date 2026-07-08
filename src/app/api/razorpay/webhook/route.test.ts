@@ -3,8 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockMaybeSingle = vi.fn()
 const mockUpdate = vi.fn()
 
-vi.mock('@/lib/supabase/server', () => ({
-  createServiceClient: vi.fn().mockReturnValue({
+vi.mock('@/lib/supabase/server', () => {
+  const mockClient = {
     from: vi.fn().mockImplementation((table: string) => {
       if (table === 'restaurants') {
         return {
@@ -22,8 +22,12 @@ vi.mock('@/lib/supabase/server', () => ({
       }
       return {}
     }),
-  }),
-}))
+  }
+  return {
+    createServiceClient: vi.fn().mockReturnValue(mockClient),
+    createClient: vi.fn().mockResolvedValue(mockClient),
+  }
+})
 
 vi.mock('razorpay', () => ({
   default: {

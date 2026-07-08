@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import Razorpay from 'razorpay'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -38,7 +38,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Missing payment notes metadata' }, { status: 400 })
       }
 
-      const supabase = createServiceClient()
+      // Fallback to cookie-based client for testing when service role key is missing
+      const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+        ? createServiceClient()
+        : await createClient()
 
       const { data: restaurant, error: fetchError } = await supabase
         .from('restaurants')

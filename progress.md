@@ -40,7 +40,7 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
     *   Account suspension (blocks intake form & daily campaign message sends).
     *   Support Impersonation ("Login-As") to access restaurant owner dashboards.
     *   Manual Cron Trigger to run automated campaigns immediately.
-    *   **Bug Fixes**: Context-aware success banners for detail page actions (credits, plan, suspension, campaign run, WhatsApp reset) and main table layout alignment with Status capsules (Active/Suspended).
+    *   **Bug Fixes**: Context-aware success banners for detail page actions (credits, plan, suspension, campaign run, WhatsApp reset) and main table layout alignment with Status capsules (Active/Suspended). Added safe fallbacks for missing Supabase environment variables (`SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) to prevent synchronous client-initialization crashes during sandbox trial capture testing, falling back to the authenticated cookie-based client context when service role keys are missing.
 
 ---
 

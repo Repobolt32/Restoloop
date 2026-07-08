@@ -1,7 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
@@ -37,10 +36,7 @@ export async function createRestaurant(formData: FormData) {
   let slug = slugify(parsed.name)
 
   // Check for slug collision across all tenants using admin client to bypass RLS
-  const adminClient = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const adminClient = createServiceClient()
 
   let isUnique = false
   let attempts = 0
@@ -66,8 +62,11 @@ export async function createRestaurant(formData: FormData) {
     name: parsed.name,
     slug,
     whatsapp_number: parsed.whatsappNumber,
+    welcome_discount_percent: parsed.welcomeDiscount,
     welcome_discount_cents: parsed.welcomeDiscount * 100,
+    birthday_discount_percent: parsed.birthdayDiscount,
     birthday_discount_cents: parsed.birthdayDiscount * 100,
+    winback_discount_percent: parsed.winbackDiscount,
     winback_discount_cents: parsed.winbackDiscount * 100,
   })
 
