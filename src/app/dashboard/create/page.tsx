@@ -1,7 +1,12 @@
 import { createRestaurant } from './actions'
 
-export default async function CreateRestaurantPage(props: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await props.searchParams
+export default async function CreateRestaurantPage(props: { searchParams?: Promise<{ error?: string }> | { error?: string } }) {
+  const resolvedParams = props?.searchParams
+    ? (props.searchParams instanceof Promise || typeof (props.searchParams as any).then === 'function'
+      ? await props.searchParams
+      : props.searchParams)
+    : {}
+  const error = (resolvedParams as { error?: string })?.error
   return (
     <div className="min-h-screen bg-[--color-background] flex items-center justify-center p-4">
       <form action={createRestaurant} className="bg-white border border-[--color-border] rounded-2xl p-8 shadow-md w-full max-w-md flex flex-col gap-6">
