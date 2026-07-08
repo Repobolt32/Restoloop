@@ -47,16 +47,44 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 
 ## 🚦 Verification Status
 
-*   **Unit Tests**: **133/133 passed** (`pnpm test` via Vitest).
+*   **Unit Tests**: **139/139 passed** (`pnpm test` via Vitest).
 *   **E2E Tests**: Playwright suite (`pnpm test:e2e` / `npx playwright test`) covers full flows for authentication, intake forms, coupon validation, credits/gating, and admin controls.
 
 ---
 
-## 📅 Active Task: Manual Campaign Testing & Seeding Verification
-*   **Goal**: Provide the database seeding scripts, SQL triggers, and instructions to help manually test the Welcome, Birthday, Winback, and Expiry automated campaigns locally using the mock OpenWA provider.
-*   **Completed (Ngrok Configuration)**: Exposed the local server using ngrok to test webhook flows (WhatsApp / Razorpay) and public customer intake forms on external/mobile devices, updating `next.config.ts` to support dynamic `allowedOrigins` for Server Actions.
-*   **Next Steps**:
-    1.  Document precise SQL updates for customer records (e.g. altering birthdates or sign-up dates) to simulate campaign trigger conditions.
-    2.  Provide the cURL or route execution command to trigger the daily cron campaign run locally.
-    3.  Verify outbound messages are correctly logged to the terminal window running `pnpm dev`.
+## ✅ Completed Task: WhatsApp Delivery Fix (2026-07-08)
+
+### Root Cause Fixed
+`rock-testing` was missing commit `2138724` ("fix: handle LID JIDs and coupon-code join fallback in WhatsApp webhook"). Modern WhatsApp delivers inbound messages with LID JIDs (`xxx@lid`), not phone JIDs. Without this commit, the webhook was resolving LIDs to garbage phone numbers → messages sent to non-existent chats → silently dropped.
+
+### What Was Done
+1. **Stashed** the wrong uncommitted fix (`sendText` in `actions.ts` — wrong layer, wrong approach).
+2. **Fast-forward merged** `origin/main` into `rock-testing` (brought in `2138724` cleanly, no conflicts).
+3. **Dropped** the stash permanently — the webhook is the sender, never the form.
+4. **Auth-gated** `src/app/api/debug/whatsapp-status/route.ts` behind `CRON_SECRET` bearer token (was unauthenticated).
+
+### Architecture: Welcome Coupon is WEBHOOK-triggered (not form-triggered)
+1. **Form** (`src/app/form/[slug]/actions.ts`): creates `opted_in` customer + welcome coupon → returns a `wa.me` link with coupon code embedded in prefilled message.
+2. **Customer** taps link → sends prefilled message to restaurant WhatsApp.
+3. **OpenWA** forwards inbound to `POST /api/whatsapp`.
+4. **Webhook** (`src/app/api/whatsapp/route.ts`): correlates LID → customer → sends welcome coupon message.
+
+### Verification Evidence
+- `pnpm typecheck` → ✅ 0 errors
+- `pnpm lint` → ✅ 0 errors (3 pre-existing warnings)
+- `pnpm test` → ✅ **139/139 passed**
+- `pnpm build` → ✅ clean production build
+
+### Ops Triage (recurring-symptom checklist)
+1. `GET /api/debug/whatsapp-status` with `Authorization: Bearer $CRON_SECRET` → is session `ready`? If not → recreate session (scan QR, update `OPENWA_SESSION_ID`).
+2. Is OpenWA's webhook URL pointing at the **stable Vercel deploy URL** (not ephemeral ngrok)? ngrok URLs rotate on restart.
+3. In Supabase: is there an **inbound** `message_logs` row for the customer message? If no → inbound never reached webhook (OpenWA config/session). If yes but no outbound `opt_in_confirm` → LID correlation failed (verify `2138724` is in HEAD: `git log --oneline | head`).
+4. **Never** add `sendText` to the intake form. The webhook sends.
+
+---
+
+## 📅 Next Steps
+*   Live end-to-end test (Task 6): submit intake form → tap wa.me link → confirm welcome message arrives.
+*   Verify OpenWA webhook URL in OpenWA admin points to stable Vercel production URL (not ngrok).
+*   Optional: store outbound `messageId` in `message_logs.provider_message_id` for delivery-receipt correlation (Task 5C).
 

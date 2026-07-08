@@ -179,6 +179,7 @@ export async function POST(request: NextRequest) {
       type: 'opt_in_prompt',
       status: result.success ? 'sent' : 'failed',
       error: result.error || null,
+      provider_message_id: result.messageId || null,
     })
   } else {
     // Existing customer: handle opt-in/out
@@ -216,6 +217,7 @@ export async function POST(request: NextRequest) {
             type: 'opt_in_confirm',
             status: result.success ? 'sent' : 'failed',
             error: result.error || null,
+            provider_message_id: result.messageId || null,
           })
 
           return NextResponse.json({ status: 'ok' })
@@ -264,6 +266,7 @@ export async function POST(request: NextRequest) {
         type: 'opt_in_confirm',
         status: result.success ? 'sent' : 'failed',
         error: result.error || null,
+        provider_message_id: result.messageId || null,
       })
     } else if (body === 'STOP') {
       await supabase
@@ -290,6 +293,7 @@ export async function POST(request: NextRequest) {
         type: 'opt_in_prompt',
         status: result.success ? 'sent' : 'failed',
         error: result.error || null,
+        provider_message_id: result.messageId || null,
       })
     }
   }

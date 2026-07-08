@@ -78,6 +78,7 @@ export async function runWelcomeReminders() {
         type: 'welcome_reminder',
         status: result.success ? 'sent' : 'failed',
         error: result.error ?? null,
+        provider_message_id: result.messageId ?? null,
       })
 
       if (result.success) {
@@ -159,6 +160,7 @@ export async function runBirthdayCampaigns() {
         type: 'birthday_campaign',
         status: result.success ? 'sent' : 'failed',
         error: result.error ?? null,
+        provider_message_id: result.messageId ?? null,
       })
 
       if (result.success) {
@@ -237,6 +239,7 @@ export async function runWinbackCampaigns() {
         type: 'winback_campaign',
         status: result.success ? 'sent' : 'failed',
         error: result.error ?? null,
+        provider_message_id: result.messageId ?? null,
       })
 
       if (result.success) {
@@ -299,6 +302,7 @@ export async function runExpiryReminders() {
         status: result.success ? 'sent' : 'failed',
         error: result.error ?? null,
         coupon_id: coupon.id,
+        provider_message_id: result.messageId ?? null,
       })
 
       if (result.success) {
