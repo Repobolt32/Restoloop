@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       allowedOrigins: allowedOrigin ? [allowedOrigin] : [],
     },
   },
+  allowedDevOrigins: allowedOrigin ? [allowedOrigin] : [],
 };
 
 export default nextConfig;
