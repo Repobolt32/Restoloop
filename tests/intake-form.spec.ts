@@ -58,7 +58,7 @@ test.describe('Public intake form flow', () => {
 
     expect(coupon).not.toBeNull()
     expect(coupon?.status).toBe('sent')
-    expect(coupon?.discount_cents).toBe(1000)
+    expect(coupon?.discount_percent).toBe(10)
   })
 
   test('invalid phone shows client-side error', async ({ page }) => {
