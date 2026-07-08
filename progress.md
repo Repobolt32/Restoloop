@@ -54,7 +54,9 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 
 ## 📅 Active Task: Manual Campaign Testing & Seeding Verification
 *   **Goal**: Provide the database seeding scripts, SQL triggers, and instructions to help manually test the Welcome, Birthday, Winback, and Expiry automated campaigns locally using the mock OpenWA provider.
+*   **Completed (Ngrok Configuration)**: Exposed the local server using ngrok to test webhook flows (WhatsApp / Razorpay) and public customer intake forms on external/mobile devices, updating `next.config.ts` to support dynamic `allowedOrigins` for Server Actions.
 *   **Next Steps**:
     1.  Document precise SQL updates for customer records (e.g. altering birthdates or sign-up dates) to simulate campaign trigger conditions.
     2.  Provide the cURL or route execution command to trigger the daily cron campaign run locally.
     3.  Verify outbound messages are correctly logged to the terminal window running `pnpm dev`.
+
