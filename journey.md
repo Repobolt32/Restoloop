@@ -21,3 +21,23 @@ This file contains a chronological journal of all technical tasks, code adjustme
 *   **Verification**:
     *   Ran `pnpm typecheck` successfully.
     *   Ran `pnpm test` (all 128 tests passing).
+
+### 🛠️ Bug Fix: Create Restaurant Validation Server Error (Next.js Server Crash)
+
+*   **Issue**: When creating a restaurant, if the user input an invalid phone number or invalid discount percents, the server action would crash due to uncaught Zod schema parsing exceptions, leading to a raw Next.js server crash page ("This page couldn't load. A server error occurred.").
+*   **Resolution**:
+    1.  Moved the phone normalization function `normalizePhone` into `src/lib/utils.ts` to allow it to be exported as a standard helper without Next.js interpreting it as an invalid (non-async) Server Action.
+    2.  Implemented phone number normalization for inputs starting with `+91`, `0`, and 10-digit formats (standardizing to `91xxxxxxxxxx`).
+    3.  Switched `schema.parse` to `schema.safeParse` in `createRestaurant` server action.
+    4.  Redirected validation failures and database insertion errors back to `/dashboard/create?error=...` to display them gracefully.
+    5.  Modified `CreateRestaurantPage` to accept search parameters and render a clean, styled red validation error banner.
+*   **Modified Files**:
+    *   [utils.ts](file:///e:/desktop/Restoloop/src/lib/utils.ts) — Added and exported `normalizePhone`.
+    *   [actions.ts](file:///e:/desktop/Restoloop/src/app/dashboard/create/actions.ts) — Removed local `normalizePhone` helper, imported from `@/lib/utils`, used `schema.safeParse`, and redirected on error.
+    *   [page.tsx](file:///e:/desktop/Restoloop/src/app/dashboard/create/page.tsx) — Added `searchParams` prop and rendered the error banner.
+    *   [actions.test.ts](file:///e:/desktop/Restoloop/src/app/dashboard/create/actions.test.ts) — Added 5 new unit tests covering various phone number format normalization scenarios.
+*   **Verification**:
+    *   Ran `pnpm typecheck` successfully.
+    *   Ran `pnpm lint` successfully (0 errors, 3 warnings).
+    *   Ran `pnpm test` (all 133 tests passing).
+    *   Ran `pnpm build` successfully.

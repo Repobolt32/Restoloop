@@ -70,3 +70,30 @@ describe('Create Restaurant Zod Schema', () => {
     expect(schema.safeParse({ name: '' }).success).toBe(false)
   })
 })
+
+describe('normalizePhone', () => {
+  it('handles standard 10 digit number', async () => {
+    const { normalizePhone } = await import('@/lib/utils')
+    expect(normalizePhone('9876543210')).toBe('919876543210')
+  })
+
+  it('handles 10 digit number with spaces or hyphens', async () => {
+    const { normalizePhone } = await import('@/lib/utils')
+    expect(normalizePhone('98765-43210')).toBe('919876543210')
+  })
+
+  it('handles number starting with +91', async () => {
+    const { normalizePhone } = await import('@/lib/utils')
+    expect(normalizePhone('+919876543210')).toBe('919876543210')
+  })
+
+  it('handles number starting with 0', async () => {
+    const { normalizePhone } = await import('@/lib/utils')
+    expect(normalizePhone('09876543210')).toBe('919876543210')
+  })
+
+  it('handles already normalized number', async () => {
+    const { normalizePhone } = await import('@/lib/utils')
+    expect(normalizePhone('919876543210')).toBe('919876543210')
+  })
+})

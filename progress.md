@@ -14,6 +14,7 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 ### 1. Core Platform & Multi-Tenant Dashboard
 *   **Authentication (S1, S10)**: Secure signup/login with email, password, and fast onboarding redirect to the dashboard.
 *   **Multi-Tenancy (S2)**: Automatic restaurant registration, dynamic URL slug generation (e.g., `/form/[slug]`), and owner-restricted table rows (using Postgres RLS).
+*   **Create Restaurant Validation**: Resolved Next.js server crash during restaurant creation by adding phone normalization (handling `+91`, `0`, and 10-digit formats), using Zod `safeParse`, and implementing a clean validation error banner on the `/dashboard/create` page.
 *   **Guest Intake Form (S3)**: Public-facing guest intake page for restaurant tables collecting names, phone numbers (E.164 verification), and birthdates.
 *   **Guest & Coupon Management (S4, S5, S6)**: Interactive guest list table, coupon generation, and a dedicated Counter Coupon Validation screen at `/dashboard/validate` for cashier validation.
 *   **Coupon Settings (S14)**: Configurable discount parameters (percentage/flat, minimum order value, validity days) in settings.
@@ -46,7 +47,7 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 
 ## 🚦 Verification Status
 
-*   **Unit Tests**: **128/128 passed** (`pnpm test` via Vitest).
+*   **Unit Tests**: **133/133 passed** (`pnpm test` via Vitest).
 *   **E2E Tests**: Playwright suite (`pnpm test:e2e` / `npx playwright test`) covers full flows for authentication, intake forms, coupon validation, credits/gating, and admin controls.
 
 ---

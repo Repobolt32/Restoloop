@@ -4,13 +4,14 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { normalizePhone } from '@/lib/utils'
 
 const schema = z.object({
-  name: z.string().min(1),
-  whatsappNumber: z.string().regex(/^91\d{10}$/),
-  welcomeDiscount: z.coerce.number().int().positive(),
-  birthdayDiscount: z.coerce.number().int().positive(),
-  winbackDiscount: z.coerce.number().int().positive(),
+  name: z.string().min(1, { message: 'Restaurant name is required' }),
+  whatsappNumber: z.string().regex(/^91\d{10}$/, { message: 'WhatsApp number must be 91 followed by a 10-digit number' }),
+  welcomeDiscount: z.coerce.number().int().positive({ message: 'Welcome discount must be a positive integer' }),
+  birthdayDiscount: z.coerce.number().int().positive({ message: 'Birthday discount must be a positive integer' }),
+  winbackDiscount: z.coerce.number().int().positive({ message: 'Winback discount must be a positive integer' }),
 })
 
 function slugify(name: string): string {
@@ -25,15 +26,21 @@ export async function createRestaurant(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const parsed = schema.parse({
+  const rawPhone = (formData.get('whatsappNumber') as string) || ''
+  const parsed = schema.safeParse({
     name: formData.get('name'),
-    whatsappNumber: formData.get('whatsappNumber'),
+    whatsappNumber: normalizePhone(rawPhone),
     welcomeDiscount: formData.get('welcomeDiscount'),
     birthdayDiscount: formData.get('birthdayDiscount'),
     winbackDiscount: formData.get('winbackDiscount'),
   })
 
-  let slug = slugify(parsed.name)
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues.map(e => e.message).join(', ')
+    redirect(`/dashboard/create?error=${encodeURIComponent(errorMsg)}`)
+  }
+
+  let slug = slugify(parsed.data.name)
 
   // Check for slug collision across all tenants using admin client to bypass RLS
   const adminClient = createServiceClient()
@@ -59,18 +66,20 @@ export async function createRestaurant(formData: FormData) {
 
   const { error } = await supabase.from('restaurants').insert({
     owner_id: user.id,
-    name: parsed.name,
+    name: parsed.data.name,
     slug,
-    whatsapp_number: parsed.whatsappNumber,
-    welcome_discount_percent: parsed.welcomeDiscount,
-    welcome_discount_cents: parsed.welcomeDiscount * 100,
-    birthday_discount_percent: parsed.birthdayDiscount,
-    birthday_discount_cents: parsed.birthdayDiscount * 100,
-    winback_discount_percent: parsed.winbackDiscount,
-    winback_discount_cents: parsed.winbackDiscount * 100,
+    whatsapp_number: parsed.data.whatsappNumber,
+    welcome_discount_percent: parsed.data.welcomeDiscount,
+    welcome_discount_cents: parsed.data.welcomeDiscount * 100,
+    birthday_discount_percent: parsed.data.birthdayDiscount,
+    birthday_discount_cents: parsed.data.birthdayDiscount * 100,
+    winback_discount_percent: parsed.data.winbackDiscount,
+    winback_discount_cents: parsed.data.winbackDiscount * 100,
   })
 
-  if (error) throw new Error(error.message)
+  if (error) {
+    redirect(`/dashboard/create?error=${encodeURIComponent(error.message)}`)
+  }
 
   revalidatePath('/dashboard')
   redirect('/dashboard')
