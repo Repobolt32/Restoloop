@@ -10,6 +10,7 @@ export interface WebhookEvent {
   body: string
   messageId: string
   timestamp: number
+  senderPhone?: string
 }
 
 export interface InboundMessage {
@@ -23,4 +24,6 @@ export interface WhatsAppAdapter {
   sendTemplate(phone: string, template: string, vars: string[]): Promise<SendResult>
   validateWebhook(rawBody: string, signature: string): WebhookEvent | null
   parseInbound(rawBody: string): InboundMessage | null
+  getStatus(): Promise<string>
+  resolveLidPhone?(lidJid: string): Promise<string | null>
 }

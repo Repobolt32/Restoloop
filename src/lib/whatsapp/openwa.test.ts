@@ -102,14 +102,33 @@ describe('OpenWAAdapter.sendText', () => {
   })
 
   it('returns success with messageId on HTTP 200', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+    const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ messageId: 'msg-abc' }),
-    }))
+    })
+    vi.stubGlobal('fetch', mockFetch)
 
     const result = await adapter.sendText('919900000000', 'hello')
 
-    expect(result).toEqual({ success: true, messageId: 'msg-abc' })
+    expect(result.success).toBe(true)
+    expect(result.messageId).toBe('msg-abc')
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body)
+    expect(body.chatId).toBe('919900000000@c.us')
+  })
+
+  it('sends to a raw LID JID without appending @c.us', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ messageId: 'msg-lid' }),
+    })
+    vi.stubGlobal('fetch', mockFetch)
+
+    const lid = '48816900317433@lid'
+    const result = await adapter.sendText(lid, 'coupon reply')
+
+    expect(result.success).toBe(true)
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body)
+    expect(body.chatId).toBe('48816900317433@lid')
   })
 
   it('returns failure on HTTP 500', async () => {
@@ -133,5 +152,55 @@ describe('OpenWAAdapter.sendText', () => {
 
     expect(result.success).toBe(false)
     expect(result.error).toContain('fetch failed')
+  })
+})
+
+describe('OpenWAAdapter.resolveLidPhone', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('resolves LID to phone on HTTP 200', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ phone: '919876543210' }),
+    }))
+
+    const result = await adapter.resolveLidPhone('48816900317433@lid')
+
+    expect(result).toBe('919876543210')
+  })
+
+  it('returns null and logs on HTTP 404 (contact not found)', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+    }))
+
+    const result = await adapter.resolveLidPhone('99999999999999@lid')
+
+    expect(result).toBeNull()
+    expect(consoleSpy).toHaveBeenCalled()
+    const logged = String(consoleSpy.mock.calls[0][0])
+    expect(logged).toContain('resolveLidPhone')
+    expect(logged).toContain('404')
+    consoleSpy.mockRestore()
+  })
+
+  it('returns null and logs on network error', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('fetch failed')))
+
+    const result = await adapter.resolveLidPhone('99999999999999@lid')
+
+    expect(result).toBeNull()
+    expect(consoleSpy).toHaveBeenCalled()
+    consoleSpy.mockRestore()
   })
 })

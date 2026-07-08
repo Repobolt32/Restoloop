@@ -48,13 +48,31 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 ## 🚦 Verification Status
 
 *   **Unit Tests**: **133/133 passed** (`pnpm test` via Vitest).
-*   **E2E Tests**: Playwright suite (`pnpm test:e2e` / `npx playwright test`) covers full flows for authentication, intake forms, coupon validation, credits/gating, and admin controls.
+*   **E2E & Webhook Integration**: Fully verified with a live OpenWA session. Handled nested `payload.data` parsing bug to resolve HTTP 500 crashes. Verified end-to-end: public customer intake -> prefilled chat send -> webhook callback -> coupon transmission.
 
 ---
 
 ## 📅 Active Task: Manual Campaign Testing & Seeding Verification
-*   **Goal**: Provide the database seeding scripts, SQL triggers, and instructions to help manually test the Welcome, Birthday, Winback, and Expiry automated campaigns locally using the mock OpenWA provider.
+*   **Goal**: Provide the database seeding scripts, SQL triggers, and instructions to help manually test the Welcome, Birthday, Winback, and Expiry automated campaigns locally using the real OpenWA provider on ngrok.
+*   **Completed (Ngrok & OpenWA Configuration)**:
+    *   Exposed the local server using ngrok to test webhook flows (WhatsApp / Razorpay) and public customer intake forms on external/mobile devices.
+    *   Flipped `WHATSAPP_PROVIDER` to `openwa`.
+    *   Added `getStatus()` capability to all WhatsApp adapters.
+    *   Built `/api/debug/whatsapp-status` debug helper endpoint.
+    *   Linked WhatsApp device successfully via local OpenWA server UI.
+    *   Fixed webhook payload parser for `message.received` event payload wrapping.
+    *   Verified end-to-end flow with a real device (coupon sent/received successfully).
+    *   Verified all unit tests (133/133) and lints pass clean.
 *   **Next Steps**:
-    1.  Document precise SQL updates for customer records (e.g. altering birthdates or sign-up dates) to simulate campaign trigger conditions.
-    2.  Provide the cURL or route execution command to trigger the daily cron campaign run locally.
-    3.  Verify outbound messages are correctly logged to the terminal window running `pnpm dev`.
+    1.  ~~Test cron/automated campaign triggers (Welcome, Birthday, Winback) under the real OpenWA gateway setup.~~
+  2.  **[DONE] WhatsApp LID Fix**: Added early guard in `/api/whatsapp/route.ts` — when `event.from` ends with `@lid` (Click-to-Chat LID format), the handler logs the event and returns `{ status: 'lid_skipped' }` instead of doing a broken phone lookup. 134/134 tests pass, 0 lint errors, typecheck clean.
+  3.  **[DONE] WhatsApp LID Coupon Delivery Fix (TDD)**: Replaced the silent `lid_skipped` bail with a robust 3-strategy LID resolution + coupon-code join fallback:
+      - `sendText` now accepts raw JIDs (`@lid` passed through, bare phone still gets `@c.us` appended) — replies route over the channel the message arrived on.
+      - `resolveLidPhone` logs failures (URL, HTTP status, error) instead of silent `null` — observability so failures are debuggable, not guessed.
+      - `route.ts` LID branch: resolve via `senderPhone` → live API → if both fail or phone-lookup misses, **scan message body for a welcome coupon code** (`W\d+-[A-Z0-9]{6}`) and join through the coupon to the customer. Never silently bails.
+      - `actions.ts` form action now embeds the generated coupon code in the prefilled `wa.me` message body — the coupon code becomes the form↔webhook join key that survives LID (phone number is no longer the only identity link).
+      - TDD: 4 RED tests written first (sendText raw JID, resolveLidPhone 404 logging, resolveLidPhone network logging, LID + coupon-code join), watched fail, then GREEN. 139/139 tests pass, typecheck clean, 0 lint errors.
+  4.  Test cron/automated campaign triggers (Welcome, Birthday, Winback) under the real OpenWA gateway setup.
+
+
+

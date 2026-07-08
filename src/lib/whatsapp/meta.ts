@@ -16,4 +16,8 @@ export class MetaAdapter implements WhatsAppAdapter {
   parseInbound(rawBody: string): InboundMessage | null {
     return null
   }
+
+  async getStatus(): Promise<string> {
+    return 'ready'
+  }
 }

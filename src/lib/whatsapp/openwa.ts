@@ -22,7 +22,7 @@ export class OpenWAAdapter implements WhatsAppAdapter {
             'X-API-Key': this.apiKey,
           },
           body: JSON.stringify({
-            chatId: `${phone}@c.us`,
+            chatId: phone.includes('@') ? phone : `${phone}@c.us`,
             text,
           }),
         }
@@ -48,12 +48,15 @@ export class OpenWAAdapter implements WhatsAppAdapter {
   validateWebhook(rawBody: string, signature: string): WebhookEvent | null {
     try {
       const payload = JSON.parse(rawBody)
+      const data = payload.data || payload
+      if (!data || !data.from) return null
       return {
-        from: payload.from,
-        to: payload.to,
-        body: payload.body,
-        messageId: payload.id,
-        timestamp: payload.timestamp,
+        from: data.from,
+        to: data.to,
+        body: data.body,
+        messageId: data.id || data.messageId,
+        timestamp: data.timestamp,
+        senderPhone: data.senderPhone,
       }
     } catch {
       return null
@@ -63,13 +66,52 @@ export class OpenWAAdapter implements WhatsAppAdapter {
   parseInbound(rawBody: string): InboundMessage | null {
     try {
       const payload = JSON.parse(rawBody)
+      const data = payload.data || payload
+      if (!data || !data.from) return null
       return {
-        from: payload.from,
-        body: payload.body,
-        messageId: payload.id,
+        from: data.from,
+        body: data.body,
+        messageId: data.id || data.messageId,
       }
     } catch {
       return null
+    }
+  }
+
+  async resolveLidPhone(lidJid: string): Promise<string | null> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/sessions/${this.sessionId}/contacts/${encodeURIComponent(lidJid)}/phone`,
+        { headers: { 'X-API-Key': this.apiKey } }
+      )
+      if (!response.ok) {
+        console.error(`[resolveLidPhone] ${lidJid} -> HTTP ${response.status} ${response.statusText}`)
+        return null
+      }
+      const data = await response.json()
+      return data.phone ? String(data.phone).replace(/\D/g, '') : null
+    } catch (error) {
+      console.error(`[resolveLidPhone] ${lidJid} -> ${String(error)}`)
+      return null
+    }
+  }
+
+  async getStatus(): Promise<string> {
+    try {
+      const response = await fetch(`${this.baseUrl}/sessions/${this.sessionId}`, {
+        method: 'GET',
+        headers: {
+          'X-API-Key': this.apiKey,
+        },
+      })
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}))
+        return errBody.message || `HTTP ${response.status}`
+      }
+      const data = await response.json()
+      return data.status || 'unknown'
+    } catch (error) {
+      return `Error: ${String(error)}`
     }
   }
 }

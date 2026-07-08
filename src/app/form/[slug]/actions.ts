@@ -92,7 +92,7 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
       return { success: false, error: couponError.message }
     }
 
-    const prefilledMessage = encodeURIComponent('Hi! I just signed up for your loyalty club.')
+    const prefilledMessage = encodeURIComponent(`Hi! I just signed up for your loyalty club. My coupon code is ${couponCode}`)
     const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=${prefilledMessage}`
     return { success: true, waUrl }
   } catch (error) {

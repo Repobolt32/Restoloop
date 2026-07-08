@@ -39,6 +39,10 @@ class MockAdapter implements WhatsAppAdapter {
       return null
     }
   }
+
+  async getStatus(): Promise<string> {
+    return 'ready'
+  }
 }
 
 export function createWhatsAppAdapter(): WhatsAppAdapter {

@@ -1,14 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock whatsapp adapter
 const mockSendText = vi.fn().mockResolvedValue({ success: true, messageId: 'msg-1' })
 const mockValidateWebhook = vi.fn()
+const mockResolveLidPhone = vi.fn()
 vi.mock('@/lib/whatsapp/adapter', () => ({
   createWhatsAppAdapter: () => ({
     sendText: mockSendText,
     sendTemplate: vi.fn(),
     validateWebhook: mockValidateWebhook,
     parseInbound: vi.fn(),
+    resolveLidPhone: mockResolveLidPhone,
   }),
 }))
 
@@ -27,7 +28,6 @@ vi.mock('next/server', () => ({
   },
 }))
 
-// Supabase chain mock
 function chain(data: any = null, error: any = null) {
   const c: any = {
     select: vi.fn().mockReturnThis(),
@@ -69,11 +69,12 @@ describe('WhatsApp Webhook Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSendText.mockResolvedValue({ success: true, messageId: 'msg-1' })
+    mockResolveLidPhone.mockResolvedValue(null)
     mockValidateWebhook.mockReturnValue({
       from: '919900000000@c.us',
       to: '918800000000@c.us',
       body: 'hello',
-      id: 'msg-123',
+      messageId: 'msg-123',
       timestamp: 1700000000,
     })
   })
@@ -83,13 +84,13 @@ describe('WhatsApp Webhook Route', () => {
       from: '919900000000@c.us',
       to: '918800000000@c.us',
       body: 'hello',
-      id: 'msg-123',
+      messageId: 'msg-123',
       timestamp: 1700000000,
     })
 
     tableHandler = (table: string) => {
       if (table === 'message_logs') {
-        return chain({ id: 'existing-log' }) // duplicate found
+        return chain({ id: 'existing-log' })
       }
       return chain(null)
     }
@@ -112,7 +113,7 @@ describe('WhatsApp Webhook Route', () => {
         c.insert = vi.fn().mockReturnValue(c)
         return c
       }
-      return chain(null) // no restaurant found
+      return chain(null)
     }
 
     const res = await POST(makeRequest({
@@ -137,7 +138,6 @@ describe('WhatsApp Webhook Route', () => {
         return chain({ id: 'rest-1', name: 'Spice Garden' })
       }
       if (table === 'customers') {
-        // First call: lookup (null = new customer), second: insert
         const c = chain(null)
         c.insert = vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
@@ -166,7 +166,7 @@ describe('WhatsApp Webhook Route', () => {
       from: '919900000000@c.us',
       to: '918800000000@c.us',
       body: 'YES',
-      id: 'msg-yes-1',
+      messageId: 'msg-yes-1',
       timestamp: 1700000000,
     })
 
@@ -183,7 +183,7 @@ describe('WhatsApp Webhook Route', () => {
         return chain({ id: 'cust-1', opt_in_status: 'pending' })
       }
       if (table === 'coupons') {
-        return chain(null) // no existing welcome coupon
+        return chain(null)
       }
       return chain(null)
     }
@@ -206,7 +206,7 @@ describe('WhatsApp Webhook Route', () => {
       from: '919900000000@c.us',
       to: '918800000000@c.us',
       body: 'STOP',
-      id: 'msg-stop-1',
+      messageId: 'msg-stop-1',
       timestamp: 1700000000,
     })
 
@@ -242,7 +242,7 @@ describe('WhatsApp Webhook Route', () => {
       from: '919900000000@c.us',
       to: '918800000000@c.us',
       body: 'hello',
-      id: 'msg-pending-1',
+      messageId: 'msg-pending-1',
       timestamp: 1700000000,
     })
 
@@ -278,7 +278,7 @@ describe('WhatsApp Webhook Route', () => {
       from: '919900000000@c.us',
       to: '918800000000@c.us',
       body: 'YES',
-      id: 'msg-yes-2',
+      messageId: 'msg-yes-2',
       timestamp: 1700000000,
     })
 
@@ -295,7 +295,7 @@ describe('WhatsApp Webhook Route', () => {
         return chain({ id: 'cust-1', opt_in_status: 'pending' })
       }
       if (table === 'coupons') {
-        return chain({ code: 'W50-EXISTING' }) // existing coupon
+        return chain({ code: 'W50-EXISTING' })
       }
       return chain(null)
     }
@@ -317,7 +317,7 @@ describe('WhatsApp Webhook Route', () => {
       from: '919900000000@c.us',
       to: '918800000000@c.us',
       body: 'hello',
-      id: 'msg-silent-1',
+      messageId: 'msg-silent-1',
       timestamp: 1700000000,
     })
 
@@ -345,7 +345,116 @@ describe('WhatsApp Webhook Route', () => {
     }))
 
     expect(res.body).toEqual({ status: 'ok' })
-    // opted_in + non-YES/STOP = no outbound message
     expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('LID + coupon code in body: finds customer via coupon join, sends coupon, replies to raw LID JID', async () => {
+    mockResolveLidPhone.mockResolvedValue(null)
+    mockValidateWebhook.mockReturnValue({
+      from: '48816900317433@lid',
+      to: '917542011085@c.us',
+      body: 'Hi! I just signed up. My coupon code is W2-9O06V8',
+      messageId: 'false_48816900317433@lid_ACED50DB',
+      timestamp: 1700000000,
+    })
+
+    tableHandler = (table: string) => {
+      if (table === 'message_logs') {
+        const c = chain(null)
+        c.insert = vi.fn().mockReturnValue(c)
+        return c
+      }
+      if (table === 'restaurants') {
+        return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_percent: 2 })
+      }
+      if (table === 'coupons') {
+        const c = chain({
+          id: 'cpn-1',
+          code: 'W2-9O06V8',
+          customer_id: 'cust-1',
+          restaurant_id: 'rest-1',
+          type: 'welcome',
+          discount_percent: 2,
+          expires_at: '2026-08-08T09:50:13.000Z',
+        })
+        return c
+      }
+      if (table === 'customers') {
+        return chain({
+          id: 'cust-1',
+          restaurant_id: 'rest-1',
+          phone: '919876543210',
+          name: 'Tester',
+          opt_in_status: 'opted_in',
+        })
+      }
+      return chain(null)
+    }
+
+    const res = await POST(makeRequest({
+      from: '48816900317433@lid',
+      to: '917542011085@c.us',
+      body: 'Hi! I just signed up. My coupon code is W2-9O06V8',
+      id: 'false_48816900317433@lid_ACED50DB',
+      timestamp: 1700000000,
+    }))
+
+    expect(res.body).toEqual({ status: 'ok' })
+    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('W2-9O06V8'))
+  })
+
+  it('LID + senderPhone resolved: looks up customer by resolved phone, replies to resolved phone', async () => {
+    mockResolveLidPhone.mockResolvedValue('919876543210')
+    mockValidateWebhook.mockReturnValue({
+      from: '48816900317433@lid',
+      to: '917542011085@c.us',
+      body: 'Hi! I just signed up for your loyalty club.',
+      messageId: 'msg-lid-resolved-2',
+      timestamp: 1700000000,
+      senderPhone: '919876543210',
+    })
+
+    tableHandler = (table: string) => {
+      if (table === 'message_logs') {
+        const c = chain(null)
+        c.insert = vi.fn().mockReturnValue(c)
+        return c
+      }
+      if (table === 'restaurants') {
+        return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_percent: 2 })
+      }
+      if (table === 'customers') {
+        return chain({
+          id: 'cust-1',
+          restaurant_id: 'rest-1',
+          phone: '919876543210',
+          name: 'Tester',
+          opt_in_status: 'opted_in',
+        })
+      }
+      if (table === 'coupons') {
+        return chain({
+          id: 'cpn-1',
+          code: 'W2-9O06V8',
+          customer_id: 'cust-1',
+          type: 'welcome',
+          discount_percent: 2,
+          expires_at: '2026-08-08T09:50:13.000Z',
+        })
+      }
+      return chain(null)
+    }
+
+    const res = await POST(makeRequest({
+      from: '48816900317433@lid',
+      to: '917542011085@c.us',
+      body: 'Hi! I just signed up for your loyalty club.',
+      id: 'msg-lid-resolved-2',
+      timestamp: 1700000000,
+      senderPhone: '919876543210',
+    }))
+
+    expect(res.body).toEqual({ status: 'ok' })
+    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('W2-9O06V8'))
   })
 })

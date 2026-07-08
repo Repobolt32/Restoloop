@@ -26,7 +26,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'duplicate' })
   }
 
-  const fromPhone = event.from.replace('@c.us', '').replace(/\D/g, '')
+  let fromPhone = event.from.replace('@c.us', '').replace(/\D/g, '')
+  const replyTo = event.from.includes('@lid') ? event.from : fromPhone
+
+  let lidResolved = false
+  if (event.from.endsWith('@lid') || event.from.includes('@lid')) {
+    if (event.senderPhone) {
+      fromPhone = event.senderPhone.replace(/\D/g, '')
+      lidResolved = true
+    } else {
+      const resolved = adapter.resolveLidPhone
+        ? await adapter.resolveLidPhone(event.from)
+        : null
+      if (resolved) {
+        fromPhone = resolved
+        lidResolved = true
+      }
+    }
+  }
+
   const toPhone = (event.to || '').replace('@c.us', '').replace(/\D/g, '')
 
   let restaurant = null
@@ -91,6 +109,38 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // 4. Coupon-code join fallback (LID unresolved or phone lookup missed)
+  //    Form embeds the welcome coupon code in the prefilled wa.me message body.
+  //    Scan for it and join through the coupon to find the customer.
+  const isLid = event.from.endsWith('@lid') || event.from.includes('@lid')
+  if (isLid && !customer && event.body) {
+    const codeMatch = event.body.match(/W\d+-[A-Z0-9]{6}/i)
+    if (codeMatch) {
+      const code = codeMatch[0].toUpperCase()
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select('*, customers(*)')
+        .eq('code', code)
+        .eq('type', 'welcome')
+        .maybeSingle()
+
+      if (coupon) {
+        const couponCustomer = (coupon as any).customers
+        if (couponCustomer) {
+          customer = couponCustomer
+          if (!restaurant) {
+            const { data: restData } = await supabase
+              .from('restaurants')
+              .select('*')
+              .eq('id', couponCustomer.restaurant_id)
+              .maybeSingle()
+            if (restData) restaurant = restData
+          }
+        }
+      }
+    }
+  }
+
   // Log inbound message
   await supabase.from('message_logs').insert({
     restaurant_id: restaurant?.id || null,
@@ -108,7 +158,7 @@ export async function POST(request: NextRequest) {
   if (!customer) {
     // New customer: send opt-in prompt
     const optInMessage = `Reply YES to receive exclusive coupons from ${restaurant.name}. Reply STOP to opt out.`
-    const result = await adapter.sendText(fromPhone, optInMessage)
+    const result = await adapter.sendText(replyTo, optInMessage)
 
     // Create pending customer
     const { data: newCustomer } = await supabase
@@ -157,7 +207,7 @@ export async function POST(request: NextRequest) {
         if (welcomeCoupon) {
           const discountPercent = welcomeCoupon.discount_percent || restaurant.welcome_discount_percent
           const welcomeMessage = `Hey ${customer.name || 'there'}! Welcome to ${restaurant.name}. Your coupon: ${welcomeCoupon.code} for ${discountPercent}% OFF. Valid till ${new Date(welcomeCoupon.expires_at).toLocaleDateString('en-IN')}. Reply STOP to opt out.`
-          const result = await adapter.sendText(fromPhone, welcomeMessage)
+          const result = await adapter.sendText(replyTo, welcomeMessage)
 
           await supabase.from('message_logs').insert({
             restaurant_id: restaurant.id,
@@ -205,7 +255,7 @@ export async function POST(request: NextRequest) {
       }
 
       const welcomeMessage = `Welcome! Your coupon code is ${couponCode} for ${restaurant.welcome_discount_percent}% OFF. Reply STOP to opt out.`
-      const result = await adapter.sendText(fromPhone, welcomeMessage)
+      const result = await adapter.sendText(replyTo, welcomeMessage)
 
       await supabase.from('message_logs').insert({
         restaurant_id: restaurant.id,
@@ -231,7 +281,7 @@ export async function POST(request: NextRequest) {
     } else if (customer.opt_in_status === 'pending') {
       // Re-send opt-in prompt if they reply anything else while pending
       const optInMessage = `Reply YES to receive exclusive coupons from ${restaurant.name}. Reply STOP to opt out.`
-      const result = await adapter.sendText(fromPhone, optInMessage)
+      const result = await adapter.sendText(replyTo, optInMessage)
 
       await supabase.from('message_logs').insert({
         restaurant_id: restaurant.id,
