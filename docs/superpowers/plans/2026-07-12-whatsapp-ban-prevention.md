@@ -8,6 +8,16 @@
 
 **Tech Stack:** Next.js 16 App Router, `after()` from `next/server`, Vitest, Supabase Postgres, Vercel Cron.
 
+## Required Skills
+
+Before writing or editing any code, the agent MUST load and review the following instructions and skills:
+1. **superpowers:using-superpowers**: For starting the agent's work, finding, and loading other relevant skills.
+2. **ponytail**: For keeping implementation minimal, YAGNI-first, avoiding unnecessary heavy dependencies/queues, and adding `// ponytail:` comments.
+3. **route-handlers**: For building the Next.js API webhook endpoint POST handler.
+4. **vercel-functions**: For configuring Next.js runtime, Vercel Serverless Function behavior, `maxDuration` limits, and Vercel Cron jobs.
+5. **openwa-skill**: For interacting with the OpenWA (WhatsApp API) REST API.
+6. **context7 MCP Server**: Call `resolve-library-id` followed by `query-docs` to fetch up-to-date documentation for any Next.js (e.g., `after()` callback), React, or Supabase library APIs.
+
 ## Global Constraints
 
 - Ponytail (YAGNI, minimal): no new DB tables, no new npm packages, no external queues.
