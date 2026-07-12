@@ -83,8 +83,130 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 
 ---
 
-## 📅 Next Steps
-*   Live end-to-end test (Task 6): submit intake form → tap wa.me link → confirm welcome message arrives.
-*   Verify OpenWA webhook URL in OpenWA admin points to stable Vercel production URL (not ngrok).
-*   Optional: store outbound `messageId` in `message_logs.provider_message_id` for delivery-receipt correlation (Task 5C).
+## ✅ Completed Task: WhatsApp LID-JID Code Review Fixes (2026-07-09)
 
+### Issues Found & Fixed
+Review of commits `2138724` + `63558f6` found 2 HIGH, 5 MEDIUM, 4 LOW issues. Fixed 7; skipped 4 (cosmetic or pre-existing/out-of-scope).
+
+**Fixed:**
+1. **[HIGH]** `actions.ts` duplicate-customer path now embeds existing welcome coupon code in `wa.me` prefilled message (was generic, broke LID fallback for returning customers).
+2. **[HIGH]** `route.test.ts` coupon-fallback test mock fixed — `customers` now returns null for initial phone lookup so the coupon-code join fallback is actually exercised (was false-positive: customer found via normal path, fallback never reached).
+3. **[MEDIUM]** `openwa.ts` `resolveLidPhone` — defensive multi-field parse (`data.phone || data.phoneNumber || data.number`) + logs unexpected response shape for runtime diagnosis.
+4. **[MEDIUM]** `openwa.ts` `getStatus()` — checks `data.session?.status || data.status` to handle both wrapped and unwrapped OpenWA response shapes.
+5. **[MEDIUM]** `route.ts` — removed dead `lidResolved` variable (set but never read).
+6. **[MEDIUM]** `route.ts` — new LID customers now store raw `@lid` JID as phone (was LID digits → campaigns sent to invalid `@c.us` address).
+7. **[LOW]** `route.ts` — simplified redundant `endsWith('@lid') || includes('@lid')` to `includes('@lid')`.
+
+**Skipped (not needed):**
+- `(coupon as any)` type bypass — cosmetic, works fine.
+- Debug route dead catch block — harmless.
+- `encodeURIComponent` on LID JID — Express decodes path params, works in practice.
+- `validateWebhook` ignores signature — pre-existing, requires OpenWA webhook secret infra config, out of scope.
+
+### Verification Evidence
+- `pnpm exec tsc --noEmit --skipLibCheck` → ✅ 0 source errors
+- `pnpm lint` → ✅ 0 errors (3 pre-existing warnings)
+- `pnpm test` → ✅ **139/139 passed**
+
+---
+
+## ✅ E2E Testing Results (2026-07-09) — Phases A, B, E, F
+
+All phases that don't require OpenWA gateway verified.
+
+### Phase A — Static & Unit ✅
+- `tsc --noEmit --skipLibCheck` → ✅ 0 source errors (only pre-existing `.next/dev/types/` auto-gen errors)
+- `pnpm lint` → ✅ 0 errors, 3 pre-existing warnings
+- `pnpm test` → ✅ **139/139 passed** (16 files)
+- Key tests confirmed passing: LID+coupon fallback, resolveLidPhone suite, duplicate-phone path
+
+### Phase B — Database Seed ✅
+- Created restaurant `test-spice` in cloud Supabase (`oggwcgygkwxywmjdnaef`)
+- ID: `0c100ea9-15f2-4d7a-998f-66667e0090a6`, `plan: trial`, `credits: 1000`, `is_suspended: false`
+- whatsapp_number placeholder: `919999999999` (needs real OpenWA phone number)
+
+### Phase E — Duplicate-Customer Form Path ✅
+- Submitted form via browser with phone `+919876543211` → new customer + coupon `W10-DHYNIH` created
+- Submitted same phone again → success page with wa.me link containing `W10-DHYNIH` (existing coupon)
+- **Code verified at `actions.ts:68-78`**: duplicate 23505 branch queries existing coupon and embeds it in prefilled message
+- DB confirms: 1 customer row, 1 coupon row (no duplicate)
+
+### Phase F — Debug Status Route Auth Gate ✅
+- **F1** — GET `/api/debug/whatsapp-status` without auth → **HTTP 401** `{"error":"unauthorized"}`
+- **F2** — GET with `Bearer test-cron-secret-123` → **HTTP 200** with provider/session info (OpenWA reports fetch error because gateway is down, but route works correctly)
+
+## ✅ OpenWA Gateway Running (2026-07-09)
+
+OpenWA v0.8.8 is running at `http://localhost:2785/api` with session `restoloop` authenticated and `ready`.
+
+### Running Services
+```
+OpenWA Gateway   -> http://localhost:2785/api   (status: ready, phone: 917542011085)
+Next.js Dev      -> http://localhost:3000
+ngrok Tunnel     -> https://selenious-adenophyllous-velva.ngrok-free.dev -> localhost:3000
+```
+
+### OpenWA API Key
+```
+X-API-Key: owa_k1_restoloop_real_2026
+```
+
+### Webhook Configured
+- URL: `https://selenious-adenophyllous-velva.ngrok-free.dev/api/whatsapp`
+- Events: `message.received`
+- Retry: 3 attempts
+
+### Test Restaurant Updated
+- Slug: `test-spice`
+- whatsapp_number: `917542011085` (OpenWA session's phone)
+
+### Verified
+- Text send via OpenWA API → ✅ `messageId: true_161258842124526@lid_3EB0F4D4EE001F780E7AAF_out`
+- Debug route via ngrok → ✅ `status: "ready"`
+
+### Ready for Phases C/D/G/H
+The gateway, ngrok tunnel, webhook, and seed data are all set. Test flow:
+1. Customer submits form at `/form/test-spice`
+2. Taps wa.me link to `917542011085`
+3. OpenWA forwards inbound to ngrok → webhook → sends welcome coupon back
+
+---
+
+## ✅ Completed Task: VPS OpenWA Gateway Deployment (2026-07-12)
+
+### What Was Done
+1. **Started Stack on VPS**: Logged into the AWS EC2 instance (`13.207.182.132`) and started the Docker Compose stack (`openwa-docker-proxy`, `openwa-api`, `openwa-caddy`).
+2. **Resolved Caddy SSL Challenge Timeout**: Diagnosed a connection timeout in Caddy logs. Identified that ports 80 and 443 were blocked at the AWS Security Group level. Instructed the user to open these ports to `0.0.0.0/0` in the AWS console. Connection test succeeded, and Caddy successfully generated the SSL certificate for `https://wa.bluetideorg.com`.
+3. **Resolved Chromium ARM64 Launch Failure**:
+   - The `openwa-api` container was failing to launch the Puppeteer Chromium browser on the ARM64 Neoverse-N1 instance, returning `Failed to launch the browser process: Code: null`.
+   - Permissions on `/root/.cache/puppeteer` were restricted (`drwx------` on `/root`).
+   - We updated the local `docker-compose.yml` to set `read_only: false`, uploaded it to the VPS, recreated the containers, and ran `chmod 755 /root` inside the container.
+   - To completely bypass any future Chromium stability issues on ARM64, we switched the OpenWA engine to `baileys` (a lightweight, native Node.js engine for WhatsApp) in `docker-compose.yml`.
+4. **Created and Started Session**: Successfully created and initialized session `0b328bcd-5e4f-4110-9094-ea742bccc393` over HTTPS. The session generated its QR code and transitioned to status `qr_ready`.
+5. **Wired Local Next.js**: Updated `.env.local` with:
+   - `OPENWA_BASE_URL=https://wa.bluetideorg.com/api`
+   - `OPENWA_SESSION_ID=49888e49-9620-48d2-96f8-aade09c6d302` (the DB UUID required by NestJS endpoints)
+   - `OPENWA_API_KEY=owa_k1_bluetide_a7d8c6b4e9f02b3c`
+6. **Verified Build & Tests**: Ran `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 3 warnings), and `pnpm test` (139/139 unit tests passed).
+
+---
+
+## ✅ Completed Task: WhatsApp Ban Prevention (2026-07-12)
+
+### What Was Done
+Implemented five layered defense mechanisms to prevent WhatsApp phone number bans:
+1. **Double-Opt-In Hook**: restoran intake form now returns a `wa.me` link. When a customer messages the webhook, they receive a warm greeting + YES/Y prompt first. The actual coupon is only delivered after the customer replies YES or Y, removing the "Block/Report" banner from their screen.
+2. **Opt-Out Gate**: If a customer's state in the database is `opted_out`, the intake form rejects their submission, preventing spam complaints.
+3. **Dynamic Spintax Variation**: Created a pure `resolveSpintax` utility to inject randomized phrase variations (e.g. `{Hi|Hey|Hello}`) on all outbound messages (welcome, birthday, winback, expiry).
+4. **Human-like Jitter via after()**: Restructured webhook handling to return `200 OK` instantly and schedule message sending inside Next.js `after()` with a 5-8 second randomized delay.
+5. **Prior-Interaction Campaign Check**: All automated campaign jobs now verify that a customer has sent at least one inbound message to the restaurant WhatsApp (`direction = 'inbound'`) before triggering campaign sends.
+6. **Hourly Batch Cron Schedule**: Spreads outbound campaigns by running Vercel Cron hourly instead of daily, processing a maximum batch size of 5 customers per restaurant per run, and deduping campaign sends daily.
+7. **Verified Build & Tests**: Ran `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 3 warnings), and `pnpm test` (148/148 unit tests passed).
+
+---
+
+## 📅 Next Steps
+
+1. **Scan QR Code**: User to open `https://wa.bluetideorg.com` in a browser, log in with the API key (`owa_k1_bluetide_a7d8c6b4e9f02b3c`), find the session, and scan the QR code to authenticate the WhatsApp device.
+2. **Update Vercel Env Vars**: Update Vercel project environment variables to match the new VPS keys, base URL, and ensure cron is hourly.
+3. **E2E Integration Verification**: Submit the guest intake form at `/form/test-spice`, tap `wa.me` to send the prefilled code, receive the opt-in prompt, reply YES, and verify the coupon delivery successfully with spintax variations.
