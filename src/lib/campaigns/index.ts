@@ -1,5 +1,11 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { createWhatsAppAdapter } from '@/lib/whatsapp/adapter'
+import { resolveSpintax } from '@/lib/whatsapp/spintax'
+
+// ponytail: UTC date string for today-dedup check
+function todayUTC(): string {
+  return new Date().toISOString().slice(0, 10) // "YYYY-MM-DD"
+}
 
 function generateCampaignCouponCode(): string {
   const allowed = '23456789ABCDEFGHJKLMNPQRSTUVWXYZZ'
@@ -50,12 +56,44 @@ export async function runWelcomeReminders() {
       .eq('opt_in_status', 'opted_in')
       .filter('created_at', 'gte', gteDate)
       .filter('created_at', 'lte', lteDate)
+      .limit(5)  // ponytail: hourly batch cap, spreads load across the day
 
     for (const customer of customers ?? []) {
       const welcomeCoupon = customer.coupons?.find(
         (c: any) => c.type === 'welcome' && c.status === 'sent'
       )
       if (!welcomeCoupon) continue
+
+      // Prior-interaction check
+      const { data: inbound } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('direction', 'inbound')
+        .limit(1)
+        .maybeSingle()
+      if (!inbound) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'welcome_reminder',
+          status: 'blocked_no_prior_interaction',
+        })
+        continue
+      }
+
+      // Today dedup check
+      const todayStart = `${todayUTC()}T00:00:00.000Z`
+      const { data: sentToday } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('type', 'welcome_reminder')
+        .gte('created_at', todayStart)
+        .limit(1)
+        .maybeSingle()
+      if (sentToday) continue
 
       if (restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
@@ -68,7 +106,9 @@ export async function runWelcomeReminders() {
         continue
       }
 
-      const msg = `Hey ${customer.name || 'there'}! Your coupon ${welcomeCoupon.code} for ${restaurant.name} is still active! Reply STOP to opt out.`
+      const msg = resolveSpintax(
+        `{Hey|Hi|Hello} ${customer.name || 'there'}! {Your coupon|Reminder: your coupon} ${welcomeCoupon.code} for ${restaurant.name} is {still active|waiting for you}! Reply STOP to opt out.`
+      )
       const result = await adapter.sendText(customer.phone, msg)
 
       await supabase.from('message_logs').insert({
@@ -112,6 +152,7 @@ export async function runBirthdayCampaigns() {
       .eq('opt_in_status', 'opted_in')
       .eq('birthday_month', month)
       .eq('birthday_day', day)
+      .limit(5)  // ponytail: hourly batch cap, spreads load across the day
 
     for (const customer of customers ?? []) {
       const { data: existing } = await supabase
@@ -123,6 +164,37 @@ export async function runBirthdayCampaigns() {
         .maybeSingle()
 
       if (existing) continue
+
+      // Prior-interaction check
+      const { data: inbound } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('direction', 'inbound')
+        .limit(1)
+        .maybeSingle()
+      if (!inbound) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'birthday_campaign',
+          status: 'blocked_no_prior_interaction',
+        })
+        continue
+      }
+
+      // Today dedup check
+      const todayStart = `${todayUTC()}T00:00:00.000Z`
+      const { data: sentToday } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('type', 'birthday_campaign')
+        .gte('created_at', todayStart)
+        .limit(1)
+        .maybeSingle()
+      if (sentToday) continue
 
       if (restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
@@ -150,7 +222,9 @@ export async function runBirthdayCampaigns() {
 
       if (couponError) continue
 
-      const msg = `Happy Birthday ${customer.name || 'there'}! Enjoy ${restaurant.birthday_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
+      const msg = resolveSpintax(
+        `{Happy Birthday|Happy Birthday 🎂|Wishing you a great birthday}, ${customer.name || 'there'}! {Enjoy|Celebrate with} ${restaurant.birthday_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
+      )
       const result = await adapter.sendText(customer.phone, msg)
 
       await supabase.from('message_logs').insert({
@@ -190,6 +264,7 @@ export async function runWinbackCampaigns() {
       .eq('restaurant_id', restaurant.id)
       .eq('opt_in_status', 'opted_in')
       .lte('last_visit_at', cutoff.toISOString())
+      .limit(5)  // ponytail: hourly batch cap, spreads load across the day
 
     for (const customer of customers ?? []) {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
@@ -202,6 +277,37 @@ export async function runWinbackCampaigns() {
         .maybeSingle()
 
       if (recent) continue
+
+      // Prior-interaction check
+      const { data: inbound } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('direction', 'inbound')
+        .limit(1)
+        .maybeSingle()
+      if (!inbound) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'winback_campaign',
+          status: 'blocked_no_prior_interaction',
+        })
+        continue
+      }
+
+      // Today dedup check
+      const todayStart = `${todayUTC()}T00:00:00.000Z`
+      const { data: sentToday } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('type', 'winback_campaign')
+        .gte('created_at', todayStart)
+        .limit(1)
+        .maybeSingle()
+      if (sentToday) continue
 
       if (restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
@@ -229,7 +335,9 @@ export async function runWinbackCampaigns() {
 
       if (couponError) continue
 
-      const msg = `We miss you ${customer.name || 'there'}! Come back for ${restaurant.winback_discount_percent}% OFF. Code: ${couponCode}. Reply STOP to opt out.`
+      const msg = resolveSpintax(
+        `{We miss you|It's been a while}, ${customer.name || 'there'}! {Come back for|Enjoy} ${restaurant.winback_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
+      )
       const result = await adapter.sendText(customer.phone, msg)
 
       await supabase.from('message_logs').insert({
@@ -272,12 +380,45 @@ export async function runExpiryReminders() {
       .eq('enabled', true)
       .gte('expires_at', expiryStart.toISOString())
       .lt('expires_at', expiryEnd.toISOString())
+      .limit(5)  // ponytail: hourly batch cap, spreads load across the day
 
     for (const coupon of coupons ?? []) {
       const customer = coupon.customers as unknown as {
         id: string; phone: string; name: string | null; opt_in_status: string
       }
       if (!customer || customer.opt_in_status !== 'opted_in') continue
+
+      // Prior-interaction check
+      const { data: inbound } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('direction', 'inbound')
+        .limit(1)
+        .maybeSingle()
+      if (!inbound) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'expiry_reminder',
+          status: 'blocked_no_prior_interaction',
+          coupon_id: coupon.id,
+        })
+        continue
+      }
+
+      // Today dedup check
+      const todayStart = `${todayUTC()}T00:00:00.000Z`
+      const { data: sentToday } = await supabase
+        .from('message_logs')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('type', 'expiry_reminder')
+        .gte('created_at', todayStart)
+        .limit(1)
+        .maybeSingle()
+      if (sentToday) continue
 
       if (restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
@@ -291,7 +432,9 @@ export async function runExpiryReminders() {
         continue
       }
 
-      const msg = `Hey ${customer.name || 'there'}! Your coupon ${coupon.code} at ${restaurant.name} expires in ${days} day(s)! Don't miss out. Reply STOP to opt out.`
+      const msg = resolveSpintax(
+        `{Hey|Hi} ${customer.name || 'there'}! {Don't miss out|Heads up} — your coupon ${coupon.code} at ${restaurant.name} {expires in|is expiring in} ${days} day(s). Reply STOP to opt out.`
+      )
       const result = await adapter.sendText(customer.phone, msg)
 
       await supabase.from('message_logs').insert({

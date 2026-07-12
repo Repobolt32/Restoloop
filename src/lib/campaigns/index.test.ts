@@ -14,6 +14,7 @@ vi.mock('@/lib/whatsapp/adapter', () => ({
 // Supabase chain mock helper
 function chain(data: any = null, error: any = null) {
   const c: any = {
+    _isDefaultChain: data === null && error === null,
     select: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
@@ -32,12 +33,45 @@ function chain(data: any = null, error: any = null) {
 }
 
 // We'll configure this per test
-let tableHandler: (table: string) => any = () => chain(null)
+const defaultChain = chain(null)
+defaultChain._isDefaultChain = true
+let tableHandler: (table: string) => any = () => defaultChain
 const rpcMock = vi.fn().mockResolvedValue({ error: null })
 
 vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: () => ({
-    from: (table: string) => tableHandler(table),
+    from: (table: string) => {
+      const res = tableHandler(table)
+      if (table === 'message_logs' && res && res._isDefaultChain) {
+        let direction = ''
+        const c: any = {
+          select: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
+          gte: vi.fn().mockReturnThis(),
+          eq: vi.fn((key, value) => {
+            if (key === 'direction') direction = value
+            return c
+          }),
+          maybeSingle: vi.fn(async () => {
+            if (direction === 'inbound') {
+              return { data: { id: 'default-inbound-log' }, error: null }
+            }
+            return { data: null, error: null }
+          }),
+          single: vi.fn(async () => {
+            if (direction === 'inbound') {
+              return { data: { id: 'default-inbound-log' }, error: null }
+            }
+            return { data: null, error: null }
+          }),
+          then: (resolve: any) => resolve({ data: null, error: null }),
+        }
+        return c
+      }
+      return res
+    },
     rpc: rpcMock,
   }),
 }))
@@ -250,7 +284,7 @@ describe('runBirthdayCampaigns', () => {
 
     await runBirthdayCampaigns()
 
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('Birthday'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringMatching(/birthday/i))
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('15'))
   })
 
@@ -350,7 +384,7 @@ describe('runWinbackCampaigns', () => {
 
     await runWinbackCampaigns()
 
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('miss'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringMatching(/miss|while/i))
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('20'))
   })
 
@@ -447,7 +481,7 @@ describe('runExpiryReminders', () => {
     await runExpiryReminders()
 
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('EXP-ABC'))
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('expires'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringMatching(/expir/i))
   })
 
   it('skips coupon for customer who is not opted_in', async () => {
@@ -533,3 +567,111 @@ describe('runExpiryReminders', () => {
     expect(rpcMock).toHaveBeenCalledWith('deduct_credit', { restaurant_id: 'rest-1' })
   })
 })
+
+describe('campaign prior-interaction check', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSendText.mockResolvedValue({ success: true, messageId: 'msg-1' })
+  })
+
+  it('skips customer with no inbound message log', async () => {
+    // Explicit override for message_logs returning chain(null) with _isDefaultChain = false
+    const messageLogsMock = chain(null)
+    messageLogsMock._isDefaultChain = false
+
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Alice',
+            opt_in_status: 'opted_in',
+            coupons: [{ id: 'c-1', type: 'welcome', status: 'sent', code: 'W50-ABC123' }],
+          },
+        ])
+      }
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
+      }
+      if (table === 'message_logs') {
+        return messageLogsMock
+      }
+      return chain(null)
+    }
+
+    await runWelcomeReminders()
+
+    expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('skips customer who already received campaign today', async () => {
+    const messageLogsMock = chain(null)
+    messageLogsMock._isDefaultChain = false
+    messageLogsMock.maybeSingle = vi.fn()
+      .mockResolvedValueOnce({ data: { id: 'inbound-log-1' } }) // inbound check: found
+      .mockResolvedValueOnce({ data: { id: 'sent-today-log' } }) // today check: found
+
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Alice',
+            opt_in_status: 'opted_in',
+            coupons: [{ id: 'c-1', type: 'welcome', status: 'sent', code: 'W50-ABC123' }],
+          },
+        ])
+      }
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
+      }
+      if (table === 'message_logs') {
+        return messageLogsMock
+      }
+      return chain(null)
+    }
+
+    await runWelcomeReminders()
+
+    expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('sends to customer with inbound log and no send today', async () => {
+    const messageLogsMock = chain(null)
+    messageLogsMock._isDefaultChain = false
+    messageLogsMock.maybeSingle = vi.fn()
+      .mockResolvedValueOnce({ data: { id: 'inbound-log-1' } }) // inbound check: found
+      .mockResolvedValueOnce({ data: null }) // today check: none found
+
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Alice',
+            opt_in_status: 'opted_in',
+            coupons: [{ id: 'c-1', type: 'welcome', status: 'sent', code: 'W50-ABC123' }],
+          },
+        ])
+      }
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
+      }
+      if (table === 'message_logs') {
+        return messageLogsMock
+      }
+      return chain(null)
+    }
+
+    await runWelcomeReminders()
+
+    expect(mockSendText).toHaveBeenCalled()
+  })
+})
+
