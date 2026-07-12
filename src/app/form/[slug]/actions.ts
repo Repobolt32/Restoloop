@@ -66,7 +66,22 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
           .maybeSingle()
 
         if (existingCustomer) {
-          const prefilledMessage = encodeURIComponent('Hi! I just signed up for your loyalty club.')
+          if (existingCustomer.opt_in_status === 'opted_out') {
+            return {
+              success: false,
+              error: 'You have opted out of this loyalty club. Please contact the restaurant to re-enable your membership.',
+            }
+          }
+          const { data: existingCoupon } = await supabase
+            .from('coupons')
+            .select('code')
+            .eq('customer_id', existingCustomer.id)
+            .eq('type', 'welcome')
+            .maybeSingle()
+          const code = existingCoupon?.code || ''
+          const prefilledMessage = encodeURIComponent(
+            `Hi! I just signed up for your loyalty club.${code ? ` My coupon code is ${code}` : ''}`
+          )
           const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=${prefilledMessage}`
           return { success: true, waUrl }
         }

@@ -180,6 +180,20 @@ describe('submitIntakeForm', () => {
           }),
         }
       }
+      if (table === 'coupons') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { code: 'W10-ABC123' },
+                  error: null,
+                }),
+              }),
+            }),
+          }),
+        }
+      }
       return { select: vi.fn().mockReturnThis() }
     })
 
@@ -222,5 +236,56 @@ describe('submitIntakeForm', () => {
 
     expect(result.success).toBe(false)
     expect(result.error).toContain('+91')
+  })
+
+  it('rejects submission when customer is opted out', async () => {
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'restaurants') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              maybeSingle: vi.fn().mockResolvedValue({
+                data: { id: 'rest-1', whatsapp_number: '918800000000', welcome_discount_percent: 10 },
+                error: null,
+              }),
+            }),
+          }),
+        }
+      }
+      if (table === 'customers') {
+        return {
+          insert: vi.fn().mockReturnValue({
+            select: vi.fn().mockReturnValue({
+              maybeSingle: vi.fn().mockResolvedValue({
+                data: null,
+                error: { code: '23505', message: 'duplicate key' },
+              }),
+            }),
+          }),
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { id: 'c1', opt_in_status: 'opted_out' },
+                  error: null,
+                }),
+              }),
+            }),
+          }),
+        }
+      }
+      return { select: vi.fn().mockReturnThis() }
+    })
+
+    await loadModule()
+
+    const formData = new FormData()
+    formData.set('name', 'Alice')
+    formData.set('phone', '+919900000000')
+
+    const result = await submitIntakeForm('spice-garden', formData)
+
+    expect(result.success).toBe(false)
+    expect(result.error).toContain('opted out')
   })
 })
