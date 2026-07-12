@@ -13,6 +13,8 @@ vi.mock('@/lib/whatsapp/adapter', () => ({
   }),
 }))
 
+export let afterPromises: Promise<any>[] = []
+
 vi.mock('next/server', () => ({
   NextRequest: class {
     constructor(public url: string, public init?: any) {}
@@ -25,6 +27,12 @@ vi.mock('next/server', () => ({
       body,
       json: () => Promise.resolve(body),
     }),
+  },
+  after: (cb: () => any) => {
+    const p = cb()
+    if (p && typeof p.then === 'function') {
+      afterPromises.push(p)
+    }
   },
 }))
 
@@ -68,6 +76,11 @@ function makeRequest(body: any, headers: Record<string, string> = {}) {
 describe('WhatsApp Webhook Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    afterPromises.length = 0
+    vi.spyOn(global, 'setTimeout').mockImplementation((cb: any) => {
+      if (typeof cb === 'function') cb()
+      return 0 as any
+    })
     mockSendText.mockResolvedValue({ success: true, messageId: 'msg-1' })
     mockResolveLidPhone.mockResolvedValue(null)
     mockValidateWebhook.mockReturnValue({
@@ -157,6 +170,8 @@ describe('WhatsApp Webhook Route', () => {
       timestamp: 1700000000,
     }))
 
+    await Promise.all(afterPromises)
+
     expect(res.body).toEqual({ status: 'ok' })
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('Reply YES'))
   })
@@ -196,8 +211,10 @@ describe('WhatsApp Webhook Route', () => {
       timestamp: 1700000000,
     }))
 
+    await Promise.all(afterPromises)
+
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('Welcome'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('coupon'))
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('10'))
   })
 
@@ -232,6 +249,8 @@ describe('WhatsApp Webhook Route', () => {
       id: 'msg-stop-1',
       timestamp: 1700000000,
     }))
+
+    await Promise.all(afterPromises)
 
     expect(res.body).toEqual({ status: 'ok' })
     expect(mockSendText).not.toHaveBeenCalled()
@@ -269,8 +288,10 @@ describe('WhatsApp Webhook Route', () => {
       timestamp: 1700000000,
     }))
 
+    await Promise.all(afterPromises)
+
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('Reply YES'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('reply YES'))
   })
 
   it('reuses existing welcome coupon on YES when one already exists', async () => {
@@ -308,6 +329,8 @@ describe('WhatsApp Webhook Route', () => {
       timestamp: 1700000000,
     }))
 
+    await Promise.all(afterPromises)
+
     expect(res.body).toEqual({ status: 'ok' })
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('W50-EXISTING'))
   })
@@ -321,11 +344,14 @@ describe('WhatsApp Webhook Route', () => {
       timestamp: 1700000000,
     })
 
+    const messageLogsChain = chain(null)
+    messageLogsChain.maybeSingle = vi.fn()
+      .mockResolvedValueOnce({ data: null, error: null }) // 1st call (dedupe)
+      .mockResolvedValueOnce({ data: { id: 'confirm-log' }, error: null }) // 2nd call (confirmLog check)
+
     tableHandler = (table: string) => {
       if (table === 'message_logs') {
-        const c = chain(null)
-        c.insert = vi.fn().mockReturnValue(c)
-        return c
+        return messageLogsChain
       }
       if (table === 'restaurants') {
         return chain({ id: 'rest-1', name: 'Spice Garden' })
@@ -343,6 +369,8 @@ describe('WhatsApp Webhook Route', () => {
       id: 'msg-silent-1',
       timestamp: 1700000000,
     }))
+
+    await Promise.all(afterPromises)
 
     expect(res.body).toEqual({ status: 'ok' })
     expect(mockSendText).not.toHaveBeenCalled()
@@ -376,17 +404,18 @@ describe('WhatsApp Webhook Route', () => {
           type: 'welcome',
           discount_percent: 2,
           expires_at: '2026-08-08T09:50:13.000Z',
+          customers: {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919876543210',
+            name: 'Tester',
+            opt_in_status: 'opted_in',
+          },
         })
         return c
       }
       if (table === 'customers') {
-        return chain({
-          id: 'cust-1',
-          restaurant_id: 'rest-1',
-          phone: '919876543210',
-          name: 'Tester',
-          opt_in_status: 'opted_in',
-        })
+        return chain(null)
       }
       return chain(null)
     }
@@ -399,8 +428,10 @@ describe('WhatsApp Webhook Route', () => {
       timestamp: 1700000000,
     }))
 
+    await Promise.all(afterPromises)
+
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('W2-9O06V8'))
+    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('Welcome to Spice Garden'))
   })
 
   it('LID + senderPhone resolved: looks up customer by resolved phone, replies to resolved phone', async () => {
@@ -454,7 +485,9 @@ describe('WhatsApp Webhook Route', () => {
       senderPhone: '919876543210',
     }))
 
+    await Promise.all(afterPromises)
+
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('W2-9O06V8'))
+    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('Welcome to Spice Garden'))
   })
 })

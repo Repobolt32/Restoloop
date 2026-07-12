@@ -1,6 +1,14 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { createWhatsAppAdapter } from '@/lib/whatsapp/adapter'
+import { resolveSpintax } from '@/lib/whatsapp/spintax'
+import { after } from 'next/server'
 import { NextRequest, NextResponse } from 'next/server'
+
+function jitter(minMs: number, maxMs: number): Promise<void> {
+  return new Promise(resolve =>
+    setTimeout(resolve, Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs)
+  )
+}
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text()
@@ -29,19 +37,14 @@ export async function POST(request: NextRequest) {
   let fromPhone = event.from.replace('@c.us', '').replace(/\D/g, '')
   const replyTo = event.from.includes('@lid') ? event.from : fromPhone
 
-  let lidResolved = false
-  if (event.from.endsWith('@lid') || event.from.includes('@lid')) {
+  if (event.from.includes('@lid')) {
     if (event.senderPhone) {
       fromPhone = event.senderPhone.replace(/\D/g, '')
-      lidResolved = true
     } else {
       const resolved = adapter.resolveLidPhone
         ? await adapter.resolveLidPhone(event.from)
         : null
-      if (resolved) {
-        fromPhone = resolved
-        lidResolved = true
-      }
+      if (resolved) fromPhone = resolved
     }
   }
 
@@ -49,7 +52,6 @@ export async function POST(request: NextRequest) {
 
   let restaurant = null
 
-  // 1. Try lookup by recipient number (to)
   if (toPhone) {
     const { data } = await supabase
       .from('restaurants')
@@ -59,7 +61,6 @@ export async function POST(request: NextRequest) {
     restaurant = data
   }
 
-  // 2. Try lookup by sender number (from) - fallback/compatibility with implementation plan's code
   if (!restaurant) {
     const { data } = await supabase
       .from('restaurants')
@@ -69,7 +70,6 @@ export async function POST(request: NextRequest) {
     restaurant = data
   }
 
-  // Lookup customer
   let { data: customer } = restaurant
     ? await supabase
         .from('customers')
@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
         .maybeSingle()
     : { data: null }
 
-  // 3. Try lookup by existing customer's restaurant if not found yet
   if (!restaurant && fromPhone) {
     const { data: existingCustomer } = await supabase
       .from('customers')
@@ -94,10 +93,9 @@ export async function POST(request: NextRequest) {
         .select('*')
         .eq('id', existingCustomer.restaurant_id)
         .maybeSingle()
-      
+
       if (restData) {
         restaurant = restData
-        // Re-query customer with restaurant context
         const { data: custData } = await supabase
           .from('customers')
           .select('*')
@@ -109,10 +107,8 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 4. Coupon-code join fallback (LID unresolved or phone lookup missed)
-  //    Form embeds the welcome coupon code in the prefilled wa.me message body.
-  //    Scan for it and join through the coupon to find the customer.
-  const isLid = event.from.endsWith('@lid') || event.from.includes('@lid')
+  // Coupon-code join fallback (LID unresolved)
+  const isLid = event.from.includes('@lid')
   if (isLid && !customer && event.body) {
     const codeMatch = event.body.match(/W\d+-[A-Z0-9]{6}/i)
     if (codeMatch) {
@@ -155,148 +151,162 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'unknown_restaurant' })
   }
 
-  if (!customer) {
-    // New customer: send opt-in prompt
-    const optInMessage = `Reply YES to receive exclusive coupons from ${restaurant.name}. Reply STOP to opt out.`
-    const result = await adapter.sendText(replyTo, optInMessage)
+  // Capture locals for after() closure
+  const capturedRestaurant = restaurant
+  const capturedCustomer = customer
 
-    // Create pending customer
-    const { data: newCustomer } = await supabase
-      .from('customers')
-      .insert({
-        restaurant_id: restaurant.id,
-        phone: fromPhone,
-        opt_in_status: 'pending',
-      })
-      .select()
-      .single()
+  // Return 200 immediately — outbound logic runs in after()
+  after(async () => {
+    try {
+      if (!capturedCustomer) {
+        // Unknown customer: send opt-in prompt
+        await jitter(5000, 8000)
+        const optInMsg = resolveSpintax(
+          `{Hi|Hey|Hello}! Welcome to ${capturedRestaurant.name}. Reply {YES|YES 👍} to join our loyalty club and receive exclusive coupons. Reply STOP to cancel.`
+        )
+        const result = await adapter.sendText(replyTo, optInMsg)
 
-    // Log outbound message
-    await supabase.from('message_logs').insert({
-      restaurant_id: restaurant.id,
-      customer_id: newCustomer?.id,
-      direction: 'outbound',
-      type: 'opt_in_prompt',
-      status: result.success ? 'sent' : 'failed',
-      error: result.error || null,
-      provider_message_id: result.messageId || null,
-    })
-  } else {
-    // Existing customer: handle opt-in/out
-    const body = event.body.trim().toUpperCase()
+        const { data: newCustomer } = await supabase
+          .from('customers')
+          .insert({
+            restaurant_id: capturedRestaurant.id,
+            phone: event.from.includes('@lid') ? event.from : fromPhone,
+            opt_in_status: 'pending',
+          })
+          .select()
+          .single()
 
-    // Form-originated customers (opted_in) — send coupon if not yet confirmed
-    if (customer.opt_in_status === 'opted_in') {
-      const { data: confirmLog } = await supabase
-        .from('message_logs')
-        .select('id')
-        .eq('customer_id', customer.id)
-        .eq('direction', 'outbound')
-        .eq('type', 'opt_in_confirm')
-        .limit(1)
-        .maybeSingle()
+        await supabase.from('message_logs').insert({
+          restaurant_id: capturedRestaurant.id,
+          customer_id: newCustomer?.id,
+          direction: 'outbound',
+          type: 'opt_in_prompt',
+          status: result.success ? 'sent' : 'failed',
+          error: result.error || null,
+          provider_message_id: result.messageId || null,
+        })
+        return
+      }
 
-      if (!confirmLog) {
-        // Find the welcome coupon
-        const { data: welcomeCoupon } = await supabase
+      const body = event.body.trim().toUpperCase()
+
+      if (body === 'STOP') {
+        await supabase
+          .from('customers')
+          .update({ opt_in_status: 'opted_out' })
+          .eq('id', capturedCustomer.id)
+        await supabase.from('message_logs').insert({
+          restaurant_id: capturedRestaurant.id,
+          customer_id: capturedCustomer.id,
+          direction: 'inbound',
+          type: 'opt_out',
+          status: 'sent',
+        })
+        return
+      }
+
+      if (body === 'YES' || body === 'Y') {
+        await supabase
+          .from('customers')
+          .update({ opt_in_status: 'opted_in' })
+          .eq('id', capturedCustomer.id)
+
+        let couponCode = ''
+        const { data: existingCoupon } = await supabase
           .from('coupons')
           .select('*')
-          .eq('customer_id', customer.id)
+          .eq('customer_id', capturedCustomer.id)
           .eq('type', 'welcome')
           .maybeSingle()
 
-        if (welcomeCoupon) {
-          const discountPercent = welcomeCoupon.discount_percent || restaurant.welcome_discount_percent
-          const welcomeMessage = `Hey ${customer.name || 'there'}! Welcome to ${restaurant.name}. Your coupon: ${welcomeCoupon.code} for ${discountPercent}% OFF. Valid till ${new Date(welcomeCoupon.expires_at).toLocaleDateString('en-IN')}. Reply STOP to opt out.`
-          const result = await adapter.sendText(replyTo, welcomeMessage)
+        if (existingCoupon) {
+          couponCode = existingCoupon.code
+        } else {
+          couponCode = `W${capturedRestaurant.welcome_discount_percent}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+          await supabase.from('coupons').insert({
+            restaurant_id: capturedRestaurant.id,
+            customer_id: capturedCustomer.id,
+            type: 'welcome',
+            code: couponCode,
+            discount_percent: capturedRestaurant.welcome_discount_percent,
+            discount_cents: 0,
+            status: 'sent',
+            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          })
+        }
 
+        await jitter(5000, 8000)
+        const welcomeMsg = resolveSpintax(
+          `{Great|Wonderful|Awesome}! {Here is|Here's} your coupon for ${capturedRestaurant.name}: ${couponCode} — ${capturedRestaurant.welcome_discount_percent}% OFF. Valid till ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN')}. {Enjoy|Use it on your next visit}! Reply STOP to opt out.`
+        )
+        const result = await adapter.sendText(replyTo, welcomeMsg)
+
+        await supabase.from('message_logs').insert({
+          restaurant_id: capturedRestaurant.id,
+          customer_id: capturedCustomer.id,
+          direction: 'outbound',
+          type: 'opt_in_confirm',
+          status: result.success ? 'sent' : 'failed',
+          error: result.error || null,
+          provider_message_id: result.messageId || null,
+        })
+        return
+      }
+
+      if (capturedCustomer.opt_in_status === 'opted_in') {
+        // Check if coupon has already been delivered (opt_in_confirm log exists)
+        const { data: confirmLog } = await supabase
+          .from('message_logs')
+          .select('id')
+          .eq('customer_id', capturedCustomer.id)
+          .eq('direction', 'outbound')
+          .eq('type', 'opt_in_confirm')
+          .limit(1)
+          .maybeSingle()
+
+        if (!confirmLog) {
+          // First contact: send warm greeting + YES prompt instead of coupon
+          await jitter(5000, 8000)
+          const greetMsg = resolveSpintax(
+            `{Hi|Hey|Hello} ${capturedCustomer.name || 'there'}! 🎁 Welcome to ${capturedRestaurant.name}. {Reply YES to confirm and|To receive} your ${capturedRestaurant.welcome_discount_percent}% discount coupon, {just reply YES|reply YES below}. Reply STOP to cancel.`
+          )
+          const result = await adapter.sendText(replyTo, greetMsg)
           await supabase.from('message_logs').insert({
-            restaurant_id: restaurant.id,
-            customer_id: customer.id,
+            restaurant_id: capturedRestaurant.id,
+            customer_id: capturedCustomer.id,
             direction: 'outbound',
-            type: 'opt_in_confirm',
+            type: 'opt_in_prompt',
             status: result.success ? 'sent' : 'failed',
             error: result.error || null,
             provider_message_id: result.messageId || null,
           })
-
-          return NextResponse.json({ status: 'ok' })
+          return
         }
+        // Coupon already sent — no further action for this message
+        return
       }
-    }
 
-    if (body === 'YES') {
-      await supabase
-        .from('customers')
-        .update({ opt_in_status: 'opted_in' })
-        .eq('id', customer.id)
-
-      // Retrieve existing welcome coupon or create new one
-      let couponCode = ''
-      const { data: existingCoupon } = await supabase
-        .from('coupons')
-        .select('*')
-        .eq('customer_id', customer.id)
-        .eq('type', 'welcome')
-        .maybeSingle()
-
-      if (existingCoupon) {
-        couponCode = existingCoupon.code
-      } else {
-        couponCode = `W${restaurant.welcome_discount_percent}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
-        await supabase.from('coupons').insert({
-          restaurant_id: restaurant.id,
-          customer_id: customer.id,
-          type: 'welcome',
-          code: couponCode,
-          discount_percent: restaurant.welcome_discount_percent,
-          discount_cents: 0,
-          status: 'sent',
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      if (capturedCustomer.opt_in_status === 'pending') {
+        // Re-send prompt for unrecognised reply while pending
+        await jitter(5000, 8000)
+        const optInMsg = resolveSpintax(
+          `{Hi|Hey|Hello} ${capturedCustomer.name || 'there'}! {Please reply YES|Just reply YES} to join the loyalty club at ${capturedRestaurant.name} and receive your coupon. Reply STOP to cancel.`
+        )
+        const result = await adapter.sendText(replyTo, optInMsg)
+        await supabase.from('message_logs').insert({
+          restaurant_id: capturedRestaurant.id,
+          customer_id: capturedCustomer.id,
+          direction: 'outbound',
+          type: 'opt_in_prompt',
+          status: result.success ? 'sent' : 'failed',
+          error: result.error || null,
+          provider_message_id: result.messageId || null,
         })
       }
-
-      const welcomeMessage = `Welcome! Your coupon code is ${couponCode} for ${restaurant.welcome_discount_percent}% OFF. Reply STOP to opt out.`
-      const result = await adapter.sendText(replyTo, welcomeMessage)
-
-      await supabase.from('message_logs').insert({
-        restaurant_id: restaurant.id,
-        customer_id: customer.id,
-        direction: 'outbound',
-        type: 'opt_in_confirm',
-        status: result.success ? 'sent' : 'failed',
-        error: result.error || null,
-        provider_message_id: result.messageId || null,
-      })
-    } else if (body === 'STOP') {
-      await supabase
-        .from('customers')
-        .update({ opt_in_status: 'opted_out' })
-        .eq('id', customer.id)
-
-      await supabase.from('message_logs').insert({
-        restaurant_id: restaurant.id,
-        customer_id: customer.id,
-        direction: 'inbound',
-        type: 'opt_out',
-        status: 'sent',
-      })
-    } else if (customer.opt_in_status === 'pending') {
-      // Re-send opt-in prompt if they reply anything else while pending
-      const optInMessage = `Reply YES to receive exclusive coupons from ${restaurant.name}. Reply STOP to opt out.`
-      const result = await adapter.sendText(replyTo, optInMessage)
-
-      await supabase.from('message_logs').insert({
-        restaurant_id: restaurant.id,
-        customer_id: customer.id,
-        direction: 'outbound',
-        type: 'opt_in_prompt',
-        status: result.success ? 'sent' : 'failed',
-        error: result.error || null,
-        provider_message_id: result.messageId || null,
-      })
+    } catch (e) {
+      console.error('ERROR IN AFTER CALLBACK:', e);
     }
-  }
+  })
 
   return NextResponse.json({ status: 'ok' })
 }
