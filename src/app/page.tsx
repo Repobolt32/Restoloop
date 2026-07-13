@@ -591,10 +591,6 @@ const Footer = () => {
                                 <Mail className="w-4 h-4 text-lp-accent" />
                                 <a href="mailto:ankit@bluetideapp.com" className="text-sm">ankit@bluetideapp.com</a>
                             </div>
-                            <div className="flex items-center gap-3 text-white/40 hover:text-white transition-colors">
-                                <Phone className="w-4 h-4 text-lp-accent" />
-                                <a href="tel:+917542011085" className="text-sm">+91 7542011085</a>
-                            </div>
                             <div className="flex items-center gap-3 text-white/40">
                                 <MapPin className="w-4 h-4 text-lp-accent" />
                                 <span className="text-sm">Bihar, India</span>

@@ -4,7 +4,7 @@ import { MetaAdapter } from './meta'
 
 class MockAdapter implements WhatsAppAdapter {
   async sendText(phone: string, text: string): Promise<SendResult> {
-    return { success: true, messageId: `mock-msg-${Math.random().toString(36).substring(2, 9)}` }
+    return { success: true, messageId: `mock-msg:${text}:${Math.random().toString(36).substring(2, 9)}` }
   }
 
   async sendTemplate(phone: string, template: string, vars: string[]): Promise<SendResult> {

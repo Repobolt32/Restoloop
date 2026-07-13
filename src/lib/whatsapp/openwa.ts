@@ -89,7 +89,11 @@ export class OpenWAAdapter implements WhatsAppAdapter {
         return null
       }
       const data = await response.json()
-      return data.phone ? String(data.phone).replace(/\D/g, '') : null
+      const phone = data.phone || data.phoneNumber || data.number
+      if (!phone) {
+        console.error(`[resolveLidPhone] ${lidJid} -> no phone field in response:`, JSON.stringify(data).slice(0, 200))
+      }
+      return phone ? String(phone).replace(/\D/g, '') : null
     } catch (error) {
       console.error(`[resolveLidPhone] ${lidJid} -> ${String(error)}`)
       return null
@@ -109,7 +113,7 @@ export class OpenWAAdapter implements WhatsAppAdapter {
         return errBody.message || `HTTP ${response.status}`
       }
       const data = await response.json()
-      return data.status || 'unknown'
+      return data.session?.status || data.status || 'unknown'
     } catch (error) {
       return `Error: ${String(error)}`
     }
