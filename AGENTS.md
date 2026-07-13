@@ -1,8 +1,14 @@
 # AGENTS.md
 
+> **GRAPHIFY FIRST. ALWAYS. NO EXCEPTIONS.**
+> Before any file read, grep, code edit, bug fix, architecture question, or search — run `graphify query` first.
+> Never guess. Never rely on memory. Never read files cold. Query the graph.
+
+Multi-tenant SaaS for restaurant customer retention. Owner signs up, creates restaurant, manages customers/coupons via dashboard. Customers fill public intake form, get WhatsApp messages.
+
 ## Stack
 
-- Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
+- Next.js (App Router) + TypeScript + Tailwind CSS v4
 - Supabase (Postgres + Auth + RLS) via `@supabase/ssr`
 - Vercel deploy
 - pnpm package manager
@@ -19,53 +25,75 @@ pnpm test:watch   # vitest watch
 pnpm test:e2e     # playwright test (auto-starts dev server)
 ```
 
-Run `typecheck` + `lint` before claiming code works.
+Always run `typecheck` + `lint` before claiming code works. If `build` fails, it's not done.
 
 ## Path Alias
 
-`@/*` maps to `./src/*`. Use it: `import { createClient } from '@/lib/supabase/server'`
-
-## Skills
-
-Before implementing any slice, invoke relevant skills:
-
-- **Server-side:** `server-actions`, `route-handlers`, `vercel-functions`
-- **Database:** `supabase-postgres-best-practices`, `zod`
-- **UI:** `frontend-design`, `tailwind-design-system`, `web-design-guidelines`
-- **Testing:** `playwright-best-practices`, `playwright-visual-testing`
-- **Billing:** `razorpay`
-- **Guidelines:** `karpathy-guidelines`
-- **Coding:** `ponytail` (lazy, minimal, YAGNI-first)
-- **Deploy:** `deploy-to-vercel`
+`@/*` maps to `./src/*`. Example: `import { createClient } from '@/lib/supabase/server'`
 
 ## Source of Truth
 
+- `progress.md` — **Primary status file**. Read at session start. Update before finishing any task.
 - `docs/BUSINESS_RULES.md` — business requirements (flexible, not law)
 - `docs/superpowers/specs/2026-06-28-restoloop-design.md` — design spec
 - `docs/superpowers/plans/` — slice implementation plans
+- `docs/TESTING.md` — full test file list (read only when writing tests)
 - Never refer to `docs/Doc-Restoloop.md` (old, dead)
-- Never mention old framework brand name
+- `docs/DEVELOPER_GUIDE.md` has stale directory structure (references old `app/` at root, not `src/app/`)
 
-## Search & Navigation
+## Directory Structure
 
-**Default: graphify MCP.** Before `grep`/`glob`/`read`, query graphify:
+```
+src/
+├── app/
+│   ├── signup/     # auth: signup form
+│   ├── login/      # auth: login form
+│   ├── auth/       # auth callback
+│   ├── dashboard/  # owner dashboard (customers, coupons, validate, settings)
+│   ├── admin/      # super admin panel
+│   ├── form/       # public customer intake form
+│   └── api/        # route handlers (whatsapp webhook, cron, razorpay)
+├── lib/
+│   ├── supabase/   # client.ts (browser) + server.ts (server)
+│   └── whatsapp/   # WhatsApp adapter (OpenWA + Meta)
+├── middleware.ts    # auth guard: redirects unauthenticated to /login
+supabase/migrations/ # SQL migrations
+tests/               # Playwright E2E specs
+docs/                # business rules, design spec, plans
+```
 
-| Task | Tool |
-|------|------|
-| Find where a concept/function lives | `query_graph` |
-| Understand connections between modules | `get_neighbors` / `shortest_path` |
-| Find files by glob pattern | `glob` |
-| Search exact string/regex | `grep` |
-| Read a known file | `read` |
+## Search & Navigation — MANDATORY
 
-Dispatch explorer agents when searching 5+ files, exploring unfamiliar areas, or finding everything related to X.
+**graphify is the ONLY way to start any task.** No exceptions.
+
+| Situation | What to do |
+|-----------|------------|
+| Any bug fix | `graphify query "<symptom>"` before touching any file |
+| Any feature | `graphify query "<feature area>"` to find related files |
+| Any file edit | `graphify query "<file or concept>"` to understand connections first |
+| Any grep/glob | Run `graphify query` first — only use grep if graph doesn't have the answer |
+| Two related things | `graphify path "<A>" "<B>"` to trace the connection |
+| Unknown area | `graphify explain "<concept>"` before reading any file |
+| Broad architecture | Read `graphify-out/wiki/index.md` if it exists, else `GRAPH_REPORT.md` |
+
+**NEVER:**
+- Read a file cold without querying graphify first
+- Grep before trying graphify
+- Assume you know where something lives
+- Fix a bug without tracing its full call path in the graph
+
+After modifying any code: run `graphify update .` to keep graph current.
 
 ## Code Rules
 
+- **Startup order**: (1) read `progress.md`, (2) check relevant skills, (3) `graphify query` before any code work, (4) answer.
+- **Progress**: Update `progress.md` at end of every feature slice or session.
 - Follow existing patterns. Match style of neighboring files.
-- No premature abstractions. No comments unless asked.
-- **Theme:** Crimson & Warm Saffron light mode from `design-system/restoloop/MASTER.md`. No dark mode.
-- Fetch current API docs via Context7 MCP before relying on memory.
+- No premature abstractions. One implementation = no interface.
+- No comments unless asked.
+- **Theme**: Crimson & Warm Saffron light mode from `design-system/restoloop/MASTER.md`. No dark mode. Typography: Playfair Display SC / Karla.
+- Load `ponytail` skill for all coding tasks — lazy, minimal, YAGNI-first.
+- Fetch current API docs via Context7 MCP before relying on memory for signatures.
 - Before making an implementation plan from a slice plan, read all tech skill `.md` files specified in that plan.
 
 ## Domain Conventions
@@ -80,7 +108,7 @@ Dispatch explorer agents when searching 5+ files, exploring unfamiliar areas, or
 - **Unit tests:** Vitest, files at `src/**/*.test.{ts,tsx}`.
 - **E2E tests:** Playwright, files at `tests/slice-N.spec.ts`.
 
-## WhatsApp (Current State)
+## WhatsApp
 
 Two separate code paths needing unification:
 - **Meta Cloud API:** Template sends (welcome, birthday, winback) via `graph.facebook.com/v20.0`
@@ -94,55 +122,23 @@ Two separate code paths needing unification:
 - Input validation with Zod at trust boundaries.
 - Cron endpoint uses `Authorization: Bearer <CRON_SECRET>` header.
 
-## Testing
+## Skills
 
-### Vitest Unit Tests (Mocked)
-Run: `pnpm test`
-Config: `vitest` (built into package.json scripts)
+Before implementing any slice, invoke relevant skills:
 
-| File | Tests |
-|------|-------|
-| `src/app/auth/callback/route.test.ts` | 4 |
-| `src/app/dashboard/coupons/actions.test.ts` | 9 |
-| `src/app/dashboard/settings/actions.test.ts` | 9 |
-| `src/app/dashboard/validate/actions.test.ts` | 8 |
-| `src/app/dashboard/create/actions.test.ts` | 9 |
-| `src/app/form/[slug]/actions.test.ts` | 8 |
-| `src/app/admin/[id]/actions.test.ts` | 7 |
-| `src/app/api/whatsapp/route.test.ts` | 8 |
-| `src/app/api/razorpay/create-order/route.test.ts` | 5 |
-| `src/app/api/razorpay/webhook/route.test.ts` | 6 |
-| `src/app/api/cron/welcome-reminder/route.test.ts` | 6 |
-| `src/lib/campaigns/index.test.ts` | 16 |
-| `src/lib/whatsapp/openwa.test.ts` | 10 |
-| `src/lib/whatsapp/adapter.test.ts` | 3 |
-| `src/lib/utils.test.ts` | 6 |
-| **Total** | **114** |
-
-### Playwright E2E Tests (Real-World)
-Run: `npx playwright test`
-Config: `playwright.config.ts`
-Setup: `npx playwright test --project=setup` (auto-creates test users in Supabase)
-
-| File | Tests |
-|------|-------|
-| `tests/auth.setup.ts` | 2 (setup) |
-| `tests/auth.spec.ts` | 3 |
-| `tests/restaurant.spec.ts` | 1 |
-| `tests/coupons.spec.ts` | 1 |
-| `tests/validate.spec.ts` | 3 |
-| `tests/admin.spec.ts` | 1 |
-| `tests/intake-form.spec.ts` | 3 |
-| **Total** | **14** |
-
-Helpers: `tests/helpers/supabase.ts`
-Auth state: `tests/.auth/` (gitignored)
+- **Server-side:** `server-actions`, `route-handlers`, `vercel-functions`
+- **Database:** `supabase-postgres-best-practices`, `zod`
+- **UI:** `frontend-design`, `tailwind-design-system`, `web-design-guidelines`
+- **Testing:** `playwright-best-practices`, `playwright-visual-testing`
+- **Billing:** `razorpay`
+- **Coding:** `ponytail` (lazy, minimal, YAGNI-first)
+- **Deploy:** `deploy-to-vercel`
 
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 
-When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
 
 Rules:
 - For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.

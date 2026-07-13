@@ -205,6 +205,27 @@ Implemented five layered defense mechanisms to prevent WhatsApp phone number ban
 
 ---
 
+## ✅ Completed Task: Campaign Cron Fan-Out Dispatcher (2026-07-12)
+
+### What Was Done
+Converted the cron route handler at `src/app/api/cron/welcome-reminder/route.ts` from a single monolithic invocation to a self-invoking fan-out pattern:
+
+- **Dispatcher mode** (no `restaurant_id`): Fetches all non-suspended restaurant IDs from Supabase, fires parallel `fetch()` self-invocations with each ID, returns immediately after `Promise.allSettled` (ensuring HTTP requests leave the process before Vercel terminates the function).
+- **Worker mode** (`?restaurant_id=<id>`): Runs all four campaigns (welcome, birthday, winback, expiry) for that single restaurant — same logic as before, now isolated in its own serverless invocation with its own 300s timeout.
+- Added `getBaseUrl()` helper (prefers `VERCEL_URL`, falls back to `NEXT_PUBLIC_SITE_URL`).
+- Added `export const maxDuration = 300` to the route module.
+- Updated `vercel.json` with `functions` config to grant explicit 300s timeout.
+- Rewrote `route.test.ts` with 8 tests covering both modes (auth, worker success/error/order, dispatcher fan-out/empty/db-error).
+
+### Verification Evidence
+- `pnpm typecheck` → ✅ 0 errors
+- `pnpm lint` → ✅ 0 errors (3 pre-existing warnings)
+- `pnpm test` → ✅ **150/150 passed** (17 files)
+- `pnpm build` → ✅ clean production build (24 routes)
+- Committed: `rock-testing 1d802e5` — _feat: fan-out cron dispatcher — each restaurant gets its own serverless invocation_
+
+---
+
 ## 📅 Next Steps
 
 1. **Scan QR Code**: User to open `https://wa.bluetideorg.com` in a browser, log in with the API key (`owa_k1_bluetide_a7d8c6b4e9f02b3c`), find the session, and scan the QR code to authenticate the WhatsApp device.
