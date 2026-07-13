@@ -226,8 +226,33 @@ Converted the cron route handler at `src/app/api/cron/welcome-reminder/route.ts`
 
 ---
 
+## ✅ Completed Task: WhatsApp Delivery & LID JID Routing Fix (2026-07-13)
+
+### What Was Done
+Fixed silent message delivery failures caused by Baileys/WhatsApp API gateway dropping outbound messages sent to raw `@lid` JIDs:
+- **Webhook Reply Routing (`src/app/api/whatsapp/route.ts`)**: Modified `replyTo` resolution to reply directly to the resolved standard `@c.us` phone JID (`fromPhone`) instead of the raw `@lid` JID whenever the sender's phone number can be successfully resolved. Falls back to raw LID JID only when the phone number cannot be resolved.
+- **Unit Tests (`src/app/api/whatsapp/route.test.ts`)**: Updated the webhook route tests to assert that it correctly replies to the resolved phone number (`919876543210`) when the LID JID is successfully resolved via `senderPhone` or `resolveLidPhone`.
+
+---
+
+## ✅ Completed Task: Phone Normalization Across Forms (2026-07-13)
+
+### What Was Done
+Standardized phone input across all tenant and guest forms to accept raw 10-digit inputs (e.g. `9876543210`) as well as formats with `+91`, `91`, etc., and automatically normalize them to the `91` + 10-digit database format:
+1. **Customer Intake Form (`src/app/form/[slug]/IntakeForm.tsx` & `actions.ts`)**:
+   - Updated client-side validation regex to `/^(?:\+91|91)?\d{10}$/` and updated label/placeholder to `9876543210`.
+   - Updated server-side Zod schema to validate `91\d{10}` format and run `normalizePhone()` on the input prior to parsing.
+2. **Dashboard Add Guest Form (`src/app/dashboard/customers/page.tsx` & `actions.ts`)**:
+   - Changed label to `WhatsApp Number *` and placeholder to `9876543210`. Increased input `maxLength` to `15` to support code prefixes.
+   - Updated server-side action to run `normalizePhone()` before schema parsing.
+3. **Create Restaurant Form (`src/app/dashboard/create/page.tsx`)**:
+   - Updated number placeholder from `919876543210` to `9876543210` (server action already normalized phone inputs).
+4. **Unit Tests**:
+   - Updated `src/app/form/[slug]/actions.test.ts` to assert against the new 10-digit input format and test normalization correctly.
+
+---
+
 ## 📅 Next Steps
 
-1. **Scan QR Code**: User to open `https://wa.bluetideorg.com` in a browser, log in with the API key (`owa_k1_bluetide_a7d8c6b4e9f02b3c`), find the session, and scan the QR code to authenticate the WhatsApp device.
-2. **Update Vercel Env Vars**: Update Vercel project environment variables to match the new VPS keys, base URL, and ensure cron is hourly.
-3. **E2E Integration Verification**: Submit the guest intake form at `/form/test-spice`, tap `wa.me` to send the prefilled code, receive the opt-in prompt, reply YES, and verify the coupon delivery successfully with spintax variations.
+1. **Verify Live Webhook Flows**: Submit the customer intake form at `https://selenious-adenophyllous-velva.ngrok-free.dev/form/test-spice`, send the prefilled WhatsApp message to the restaurant, and verify that the welcome coupon successfully delivers.
+2. **Vercel Deployment**: Ensure that the latest `main` branch with the dispatcher cron and delivery/normalization fixes is deployed to Vercel production.

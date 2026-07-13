@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   let fromPhone = event.from.replace('@c.us', '').replace(/\D/g, '')
-  const replyTo = event.from.includes('@lid') ? event.from : fromPhone
+  const rawLidDigits = fromPhone
 
   if (event.from.includes('@lid')) {
     if (event.senderPhone) {
@@ -47,6 +47,10 @@ export async function POST(request: NextRequest) {
       if (resolved) fromPhone = resolved
     }
   }
+
+  const replyTo = (event.from.includes('@lid') && fromPhone === rawLidDigits)
+    ? event.from
+    : fromPhone
 
   const toPhone = (event.to || '').replace('@c.us', '').replace(/\D/g, '')
 

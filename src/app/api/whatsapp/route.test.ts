@@ -488,6 +488,6 @@ describe('WhatsApp Webhook Route', () => {
     await Promise.all(afterPromises)
 
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('Welcome to Spice Garden'))
+    expect(mockSendText).toHaveBeenCalledWith('919876543210', expect.stringContaining('Welcome to Spice Garden'))
   })
 })

@@ -42,7 +42,7 @@ export default async function CreateRestaurantPage(props: { searchParams?: Promi
             name="whatsappNumber"
             type="text"
             required
-            placeholder="919876543210"
+            placeholder="9876543210"
             className="border border-[--color-border] rounded-lg px-4 py-3 text-sm focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 w-full font-mono font-bold text-[--color-foreground]"
           />
         </div>

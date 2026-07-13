@@ -20,10 +20,10 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
 
     const formData = new FormData(e.currentTarget)
     
-    // Client-side phone format validation check (+91XXXXXXXXXX)
+    // Client-side phone format validation check (10 digits with optional +91 or 91)
     const phone = formData.get('phone') as string
-    if (!/^\+91\d{10}$/.test(phone)) {
-      setError('WhatsApp number must start with +91 followed by 10 digits.')
+    if (!/^(?:\+91|91)?\d{10}$/.test(phone)) {
+      setError('Please enter a valid 10-digit WhatsApp number (e.g. 9876543210).')
       setLoading(false)
       return
     }
@@ -50,20 +50,21 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-2">You&apos;re Registered!</h1>
-        <p className="text-[--color-grey-600] text-sm mb-8 font-bold leading-relaxed">
-          Tap the button below to open WhatsApp and claim your welcome discount code at <strong className="text-[--color-foreground]">{restaurantName}</strong>.
+        <h2 className="font-display text-2xl font-black text-[--color-foreground] uppercase mb-2">Almost Done!</h2>
+        <p className="text-[--color-grey-500] text-sm font-bold leading-relaxed mb-6">
+          Click the button below to send your confirmation message on WhatsApp and receive your coupon.
         </p>
         <a
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest py-3.5 px-6 rounded-xl transition duration-200 inline-flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-900/10 cursor-pointer"
+          onClick={() => {
+            // Reset form status so they can sign up again later if needed
+            setWaUrl('')
+          }}
+          className="inline-block w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-widest py-4 transition-colors shadow-md text-center"
         >
-          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.57 2.015 14.1 1.01 11.479 1.01c-5.442 0-9.866 4.372-9.87 9.802 0 1.934.507 3.826 1.47 5.514L2.094 20l3.963-1.039c1.6.877 3.325 1.34 5.093 1.343zm12.19-7.065c-.328-.164-1.945-.96-2.247-1.07-.302-.109-.522-.164-.74.164-.219.329-.85 1.07-1.041 1.29-.192.219-.384.246-.712.082-1.194-.597-1.974-1.055-2.756-2.396-.206-.353-.021-.544.153-.718.156-.156.328-.384.493-.575.164-.192.219-.329.328-.549.11-.22.055-.411-.027-.575-.082-.164-.74-1.78-.988-2.382-.24-.58-.51-.502-.7-.512-.178-.01-.384-.01-.59-.01-.205 0-.54.077-.822.384-.282.308-1.078 1.054-1.078 2.57s1.103 2.983 1.257 3.189c.154.205 2.17 3.313 5.258 4.646.734.317 1.309.507 1.758.65.74.235 1.414.202 1.947.122.593-.089 1.945-.794 2.219-1.56.275-.767.275-1.424.192-1.56-.083-.137-.302-.219-.63-.383z" />
-          </svg>
-          Open WhatsApp
+          Send WhatsApp Confirmation
         </a>
       </div>
     )
@@ -71,14 +72,18 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
 
   return (
     <div className="w-full max-w-md bg-white border border-[--color-border] rounded-2xl p-8 shadow-md">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-1">Join the Club</h1>
-        <p className="text-xs font-bold text-[--color-grey-500] leading-relaxed">
-          Sign up to receive exclusive offers and a welcome coupon from <span className="text-[--color-foreground] font-extrabold">{restaurantName}</span>.
-        </p>
+      <div className="mb-8">
+        <h1 className="text-2xl font-black tracking-tight text-[--color-foreground] font-display uppercase mb-1">{restaurantName}</h1>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-accent]">Join Our Loyalty Club</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 text-sm font-bold px-4 py-3 rounded-xl mb-6">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="name" className="text-xs font-black uppercase tracking-wider text-[--color-grey-600]">
             Name
@@ -101,11 +106,11 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
             type="tel"
             id="phone"
             name="phone"
-            placeholder="+919876543210"
+            placeholder="9876543210"
             required
             className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] placeholder-[--color-grey-300] font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150"
           />
-          <p className="text-[--color-grey-400] text-[10px] font-bold">Must include country code, e.g. +91XXXXXXXXXX</p>
+          <p className="text-[--color-grey-400] text-[10px] font-bold">Enter your 10-digit WhatsApp number (e.g. 9876543210)</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

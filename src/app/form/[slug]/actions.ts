@@ -2,10 +2,11 @@
 
 import { createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { normalizePhone } from '@/lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
-  phone: z.string().regex(/^\+91\d{10}$/, 'Phone number must match format +91XXXXXXXXXX'),
+  phone: z.string().regex(/^91\d{10}$/, 'Phone number must be a valid 10-digit number (e.g. 9876543210)'),
   birthdayMonth: z.number().int().min(1).max(12).optional(),
   birthdayDay: z.number().int().min(1).max(31).optional(),
   foodPreference: z.string().optional(),
@@ -26,20 +27,20 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
     }
 
     const name = formData.get('name')
-    const phoneInput = formData.get('phone')
+    const phoneInput = (formData.get('phone') as string) || ''
     const rawBirthdayMonth = formData.get('birthdayMonth')
     const rawBirthdayDay = formData.get('birthdayDay')
     const foodPreference = formData.get('foodPreference')
 
     const validated = schema.parse({
       name,
-      phone: phoneInput,
+      phone: normalizePhone(phoneInput),
       birthdayMonth: rawBirthdayMonth ? Number(rawBirthdayMonth) : undefined,
       birthdayDay: rawBirthdayDay ? Number(rawBirthdayDay) : undefined,
       foodPreference: foodPreference || undefined,
     })
 
-    const phone = validated.phone.replace('+', '')
+    const phone = validated.phone
 
     // Create opted_in customer
     const { data: customer, error: customerError } = await supabase

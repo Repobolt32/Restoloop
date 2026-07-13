@@ -4,10 +4,11 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
+import { normalizePhone } from '@/lib/utils'
 
 const customerSchema = z.object({
-  name: z.string().min(1),
-  phone: z.string().regex(/^91\d{10}$/, 'Must be E.164 without + (e.g. 919876543210)'),
+  name: z.string().min(1, 'Name is required'),
+  phone: z.string().regex(/^91\d{10}$/, 'Phone number must be a valid 10-digit number (e.g. 9876543210)'),
   birthday_month: z.number().int().min(1).max(12).optional(),
   birthday_day: z.number().int().min(1).max(31).optional(),
 })
@@ -27,10 +28,11 @@ export async function addCustomerAction(formData: FormData) {
 
   const rawMonth = formData.get('birthday_month')
   const rawDay = formData.get('birthday_day')
+  const rawPhone = (formData.get('phone') as string) || ''
 
   const result = customerSchema.safeParse({
     name: formData.get('name'),
-    phone: formData.get('phone'),
+    phone: normalizePhone(rawPhone),
     birthday_month: rawMonth ? Number(rawMonth) : undefined,
     birthday_day: rawDay ? Number(rawDay) : undefined,
   })

@@ -303,8 +303,8 @@ export default function CustomersPage() {
                 <input id="add-name" name="name" type="text" required placeholder="Customer name" className="w-full border border-[--color-border] rounded-xl px-4 py-3 text-sm font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20" />
               </div>
               <div>
-                <label htmlFor="add-phone" className="section-label mb-1 block">Phone (E.164, no +) *</label>
-                <input id="add-phone" name="phone" type="text" required placeholder="919876543210" maxLength={12} className="w-full border border-[--color-border] rounded-xl px-4 py-3 text-sm font-mono font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20" />
+                <label htmlFor="add-phone" className="section-label mb-1 block">WhatsApp Number *</label>
+                <input id="add-phone" name="phone" type="text" required placeholder="9876543210" maxLength={15} className="w-full border border-[--color-border] rounded-xl px-4 py-3 text-sm font-mono font-bold focus:border-[--color-primary] focus:outline-none focus:ring-2 focus:ring-[--color-primary]/20" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

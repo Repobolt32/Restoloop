@@ -24,17 +24,17 @@ async function loadModule() {
 describe('Intake Form Zod Schema', () => {
   // We test the schema indirectly through submitIntakeForm
   // But we can also import z and test directly
-  it('validates phone format: must start with +91 and have 10 digits', async () => {
+  it('validates phone format: must be exactly 91 followed by 10 digits after normalization', async () => {
     const { z } = await import('zod')
     const schema = z.object({
-      phone: z.string().regex(/^\+91\d{10}$/, 'Phone number must match format +91XXXXXXXXXX'),
+      phone: z.string().regex(/^91\d{10}$/, 'Phone number must be a valid 10-digit number (e.g. 9876543210)'),
     })
 
-    expect(schema.safeParse({ phone: '+919900000000' }).success).toBe(true)
-    expect(schema.safeParse({ phone: '919900000000' }).success).toBe(false) // no +
-    expect(schema.safeParse({ phone: '+9199000000' }).success).toBe(false)   // 8 digits
-    expect(schema.safeParse({ phone: '+9199000000000' }).success).toBe(false) // 11 digits
-    expect(schema.safeParse({ phone: '+91abc0000000' }).success).toBe(false)  // letters
+    expect(schema.safeParse({ phone: '919900000000' }).success).toBe(true)
+    expect(schema.safeParse({ phone: '+919900000000' }).success).toBe(false) // Schema expects already normalized input (91...)
+    expect(schema.safeParse({ phone: '9199000000' }).success).toBe(false)   // 8 digits
+    expect(schema.safeParse({ phone: '9199000000000' }).success).toBe(false) // 11 digits
+    expect(schema.safeParse({ phone: '91abc0000000' }).success).toBe(false)  // letters
   })
 
   it('validates birthday month range 1-12', async () => {
@@ -230,12 +230,12 @@ describe('submitIntakeForm', () => {
 
     const formData = new FormData()
     formData.set('name', 'Alice')
-    formData.set('phone', '9900000000') // missing +91
+    formData.set('phone', '9900') // truly invalid length
 
     const result = await submitIntakeForm('spice-garden', formData)
 
     expect(result.success).toBe(false)
-    expect(result.error).toContain('+91')
+    expect(result.error).toContain('10-digit number')
   })
 
   it('rejects submission when customer is opted out', async () => {
