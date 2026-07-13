@@ -174,7 +174,7 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[--color-primary] hover:bg-[--color-primary-dark] active:bg-[--color-primary] text-white font-black text-[10px] uppercase tracking-widest py-3.5 rounded-xl transition duration-200 flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-50"
+          className="w-full bg-[#E65C00] hover:bg-[#C84B00] active:bg-[#E65C00] disabled:bg-[#E65C00] text-white font-black text-[10px] uppercase tracking-widest py-3.5 rounded-xl transition duration-200 flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-50"
         >
           {loading ? (
             <>
