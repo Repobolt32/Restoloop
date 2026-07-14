@@ -47,7 +47,7 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
 
 ## 🚦 Verification Status
 
-*   **Unit Tests**: **139/139 passed** (`pnpm test` via Vitest).
+*   **Unit Tests**: **159/159 passed** (`pnpm test` via Vitest).
 *   **E2E Tests**: Playwright suite (`pnpm test:e2e` / `npx playwright test`) covers full flows for authentication, intake forms, coupon validation, credits/gating, and admin controls.
 
 ---
@@ -247,12 +247,111 @@ Standardized phone input across all tenant and guest forms to accept raw 10-digi
    - Updated server-side action to run `normalizePhone()` before schema parsing.
 3. **Create Restaurant Form (`src/app/dashboard/create/page.tsx`)**:
    - Updated number placeholder from `919876543210` to `9876543210` (server action already normalized phone inputs).
+## ✅ Completed Task: WhatsApp Delivery & LID JID Routing Fix (2026-07-13)
+
+### What Was Done
+Fixed silent message delivery failures caused by Baileys/WhatsApp API gateway dropping outbound messages sent to raw `@lid` JIDs:
+- **Webhook Reply Routing (`src/app/api/whatsapp/route.ts`)**: Modified `replyTo` resolution to reply directly to the resolved standard `@c.us` phone JID (`fromPhone`) instead of the raw `@lid` JID whenever the sender's phone number can be successfully resolved. Falls back to raw LID JID only when the phone number cannot be resolved.
+- **Unit Tests (`src/app/api/whatsapp/route.test.ts`)**: Updated the webhook route tests to assert that it correctly replies to the resolved phone number (`919876543210`) when the LID JID is successfully resolved via `senderPhone` or `resolveLidPhone`.
+
+---
+
+## ✅ Completed Task: Phone Normalization Across Forms (2026-07-13)
+
+### What Was Done
+Standardized phone input across all tenant and guest forms to accept raw 10-digit inputs (e.g. `9876543210`) as well as formats with `+91`, `91`, etc., and automatically normalize them to the `91` + 10-digit database format:
+1. **Customer Intake Form (`src/app/form/[slug]/IntakeForm.tsx` & `actions.ts`)**:
+   - Updated client-side validation regex to `/^(?:\+91|91)?\d{10}$/` and updated label/placeholder to `9876543210`.
+   - Updated server-side Zod schema to validate `91\d{10}` format and run `normalizePhone()` on the input prior to parsing.
+2. **Dashboard Add Guest Form (`src/app/dashboard/customers/page.tsx` & `actions.ts`)**:
+   - Changed label to `WhatsApp Number *` and placeholder to `9876543210`. Increased input `maxLength` to `15` to support code prefixes.
+   - Updated server-side action to run `normalizePhone()` before schema parsing.
+3. **Create Restaurant Form (`src/app/dashboard/create/page.tsx`)**:
+   - Updated number placeholder from `919876543210` to `9876543210` (server action already normalized phone inputs).
 4. **Unit Tests**:
    - Updated `src/app/form/[slug]/actions.test.ts` to assert against the new 10-digit input format and test normalization correctly.
 
 ---
 
+## ✅ Completed Task: Webhook Resilience + Session Diagnostics (2026-07-13)
+
+### Root Cause Found
+Live debugging revealed the OpenWA Baileys session on VPS transitioned from `ready` → `qr_ready` (session expired/kicked) between 11:21 and 17:00 IST. During this window:
+- The webhook URL was correct ✅
+- The DB restaurant phone `919472673183` matched VPS session ✅  
+- But the session lost auth → Baileys stopped forwarding inbound messages → zero webhook hits
+
+### What Was Fixed
+1. **`route.ts` — Webhook Diagnostic Logging**: Added `console.log('[WA-WEBHOOK]')` on every incoming event showing `from/to/fromPhone/toPhone/body` so the exact Baileys payload shape is visible in the Next.js dev terminal.
+2. **`route.ts` — `OPENWA_SESSION_PHONE` fallback**: Added a 3rd restaurant lookup using `process.env.OPENWA_SESSION_PHONE` for cases where Baileys omits `event.to` (seen in group/broadcast contexts). DB lookup chain: `toPhone` → `fromPhone` → `OPENWA_SESSION_PHONE`.
+3. **`.env.local`**: Added `OPENWA_SESSION_PHONE=919472673183`.
+4. **`openwa-qr.html`**: Rebuilt as a live polling dashboard — auto-fetches VPS session status + QR every 5s, shows green "Connected" state with phone number when session is ready.
+
+### Verification
+- Local webhook test with `to: "919472673183@c.us"` → DB shows `inbound` + `outbound opt_in_prompt` logs ✅
+- `pnpm typecheck` → 0 errors ✅
+
+### Ops Runbook — Session Expired Recovery
+1. Open `openwa-qr.html` in browser
+2. Scan QR with WhatsApp (the phone holding `919472673183`)
+3. Page turns green → session `ready` → messages flow again
+
+---
+
+## ✅ Completed Task: OpenWA → Meta Cloud API Migration (2026-07-13)
+
+### What Was Done
+Full eradication of OpenWA/Baileys and migration to the official **Meta WhatsApp Cloud API**:
+
+1. **Deleted** `openwa.ts`, `openwa.test.ts`, `openwa-mock/` directory, `openwa-qr.html`
+2. **Implemented** `meta.ts` — full `MetaAdapter`:
+   - `sendText` → `POST graph.facebook.com/v20.0/{phoneNumberId}/messages` with `type: "text"`
+   - `sendTemplate` → sends proper Meta template with `components` params
+   - `validateWebhook` → HMAC-SHA256 via `x-hub-signature-256` header + parses nested Meta payload shape
+   - `parseInbound` → extracts `from/body/messageId` from Meta's `entry[].changes[].value.messages[]`
+   - `getStatus` → `GET /v20.0/{phoneNumberId}?fields=...` phone status check
+   - `verifyWebhookChallenge` → GET verification handshake for Meta webhook setup
+3. **Created** `meta.test.ts` — 19 tests covering all methods
+4. **Updated** `adapter.ts` — default now `MetaAdapter`, no OpenWA fallback
+5. **Updated** `types.ts` — removed `resolveLidPhone?` (LID is an OpenWA/Baileys concept, Meta gives real E.164 phones)
+6. **Rewrote** `/api/whatsapp/route.ts`:
+   - Stripped all `@lid` JID branching (40+ lines removed)
+   - Removed `OPENWA_SESSION_PHONE` env fallback
+   - Added `GET` handler for Meta webhook verification challenge
+   - Updated signature header to `x-hub-signature-256`
+7. **Updated** `/api/debug/whatsapp-status/route.ts` — reads `META_PHONE_NUMBER_ID` now
+8. **Updated** `.env.local` — `OPENWA_*` → `META_*` env vars
+
+### Env vars to fill in
+Add to Vercel + `.env.local`:
+- `META_PHONE_NUMBER_ID` — from Meta App > WhatsApp > API Setup
+- `META_ACCESS_TOKEN` — permanent system user token
+- `META_APP_SECRET` — from Meta App > Settings > Basic
+- `META_VERIFY_TOKEN` — any random string, set same in Meta webhook config
+
+### Verification Evidence
+- `pnpm typecheck` → ✅ 0 errors
+- `pnpm lint` → ✅ 0 errors (3 pre-existing warnings)
+- `pnpm test` → ✅ **155/155 passed** (17 files)
+
+---
+
+## ✅ Completed Task: WhatsApp Meta Campaign Templates Setup (2026-07-14)
+
+### What Was Done
+1. **Configured template-based messaging** for campaigns in `src/lib/campaigns/index.ts`. Since Meta blocks free-text messages sent outside the 24-hour window from the user's last inbound message, campaigns initiated by cron (Birthday, Winback, Expiry, and Welcome Reminder) are updated to dynamically call `adapter.sendTemplate` instead of `adapter.sendText` when `WHATSAPP_PROVIDER === 'meta'`.
+2. **Added comprehensive tests** in `src/lib/campaigns/index.test.ts` to assert that when in Meta mode, templates are successfully sent with their respective parameters, while other modes still use free-text `sendText`.
+3. **Documented setup steps** for creating a Meta Developer App, retrieving the credentials, configuring webhooks, and registering templates (`welcome_reminder`, `birthday_campaign`, `winback_campaign`, `expiry_reminder`) in `docs/superpowers/plans/2026-07-14-whatsapp-meta-setup.md`.
+
+### Verification Evidence
+- `pnpm typecheck` → ✅ 0 errors
+- `pnpm lint` → ✅ 0 errors (3 warnings)
+- `pnpm test` → ✅ **159/159 passed**
+
+---
+
 ## 📅 Next Steps
 
-1. **Verify Live Webhook Flows**: Submit the customer intake form at `https://selenious-adenophyllous-velva.ngrok-free.dev/form/test-spice`, send the prefilled WhatsApp message to the restaurant, and verify that the welcome coupon successfully delivers.
-2. **Vercel Deployment**: Ensure that the latest `main` branch with the dispatcher cron and delivery/normalization fixes is deployed to Vercel production.
+1. **Add Meta Credentials**: Fill in `META_PHONE_NUMBER_ID`, `META_ACCESS_TOKEN`, `META_APP_SECRET`, `META_VERIFY_TOKEN` in Vercel env vars and `.env.local`.
+2. **Configure Meta Webhook**: In Meta App > WhatsApp > Configuration, set webhook URL to `https://<your-domain>/api/whatsapp` and verify token to `META_VERIFY_TOKEN`. Subscribe to `messages` events.
+3. **Vercel Deployment**: Deploy latest branch with Meta migration to Vercel production.
