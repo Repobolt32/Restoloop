@@ -341,7 +341,7 @@ Add to Vercel + `.env.local`:
 ### What Was Done
 1. **Configured template-based messaging** for campaigns in `src/lib/campaigns/index.ts`. Since Meta blocks free-text messages sent outside the 24-hour window from the user's last inbound message, campaigns initiated by cron (Birthday, Winback, Expiry, and Welcome Reminder) are updated to dynamically call `adapter.sendTemplate` instead of `adapter.sendText` when `WHATSAPP_PROVIDER === 'meta'`.
 2. **Added comprehensive tests** in `src/lib/campaigns/index.test.ts` to assert that when in Meta mode, templates are successfully sent with their respective parameters, while other modes still use free-text `sendText`.
-3. **Documented setup steps** for creating a Meta Developer App, retrieving the credentials, configuring webhooks, and registering templates (`welcome_reminder`, `birthday_campaign`, `winback_campaign`, `expiry_reminder`) in `docs/superpowers/plans/2026-07-14-whatsapp-meta-setup.md`.
+3. **Documented setup steps** and final copy variations for templates (`welcome_coupon`, `welcome_reminder`, `birthday_campaign`, `winback_campaign`, `expiry_reminder`) in [2026-07-14-whatsapp-meta-setup.md](file:///e:/desktop/Restoloop/docs/superpowers/plans/2026-07-14-whatsapp-meta-setup.md) and [campaign_Template.md](file:///e:/desktop/Restoloop/docs/campaign_Template.md).
 
 ### Verification Evidence
 - `pnpm typecheck` → ✅ 0 errors
