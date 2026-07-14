@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 // Mock whatsapp adapter at top level
 const mockSendText = vi.fn().mockResolvedValue({ success: true, messageId: 'msg-1' })
+const mockSendTemplate = vi.fn().mockResolvedValue({ success: true, messageId: 'tpl-1' })
 vi.mock('@/lib/whatsapp/adapter', () => ({
   createWhatsAppAdapter: () => ({
     sendText: mockSendText,
-    sendTemplate: vi.fn(),
+    sendTemplate: mockSendTemplate,
     validateWebhook: vi.fn(),
     parseInbound: vi.fn(),
   }),
@@ -672,6 +673,151 @@ describe('campaign prior-interaction check', () => {
     await runWelcomeReminders()
 
     expect(mockSendText).toHaveBeenCalled()
+  })
+})
+
+describe('Campaigns in Meta Mode (Template Sends)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    process.env.WHATSAPP_PROVIDER = 'meta'
+  })
+
+  afterEach(() => {
+    delete process.env.WHATSAPP_PROVIDER
+  })
+
+  it('runWelcomeReminders sends template welcome_reminder', async () => {
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Alice',
+            opt_in_status: 'opted_in',
+            coupons: [{ id: 'c-1', type: 'welcome', status: 'sent', code: 'W50-ABC123' }],
+          },
+        ])
+      }
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, welcome_reminder_days: 25 }])
+      }
+      return chain(null)
+    }
+
+    await runWelcomeReminders()
+
+    expect(mockSendTemplate).toHaveBeenCalledWith(
+      '919900000000',
+      'welcome_reminder',
+      ['Alice', 'W50-ABC123', 'Spice Garden']
+    )
+    expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('runBirthdayCampaigns sends template birthday_campaign', async () => {
+    const today = new Date()
+    const month = today.getMonth() + 1
+    const day = today.getDate()
+
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Bob',
+            opt_in_status: 'opted_in',
+            birthday_month: month,
+            birthday_day: day,
+          },
+        ])
+      }
+      if (table === 'coupons') {
+        return chain(null)
+      }
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, birthday_discount_percent: 15 }])
+      }
+      return chain(null)
+    }
+
+    await runBirthdayCampaigns()
+
+    expect(mockSendTemplate).toHaveBeenCalledWith(
+      '919900000000',
+      'birthday_campaign',
+      ['Bob', '15', 'Spice Garden', expect.any(String)]
+    )
+    expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('runWinbackCampaigns sends template winback_campaign', async () => {
+    const lastVisit = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString()
+
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Charlie',
+            opt_in_status: 'opted_in',
+            last_visit_at: lastVisit,
+          },
+        ])
+      }
+      if (table === 'coupons') {
+        return chain(null)
+      }
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, winback_discount_percent: 20, winback_days: 40 }])
+      }
+      return chain(null)
+    }
+
+    await runWinbackCampaigns()
+
+    expect(mockSendTemplate).toHaveBeenCalledWith(
+      '919900000000',
+      'winback_campaign',
+      ['Charlie', '20', 'Spice Garden', expect.any(String)]
+    )
+    expect(mockSendText).not.toHaveBeenCalled()
+  })
+
+  it('runExpiryReminders sends template expiry_reminder', async () => {
+    const tomorrow = new Date(Date.now() + 1.5 * 24 * 60 * 60 * 1000).toISOString()
+
+    tableHandler = (table: string) => {
+      if (table === 'restaurants') {
+        return chain([{ id: 'rest-1', name: 'Spice Garden', credits: 10, expiry_reminder_days: 1 }])
+      }
+      if (table === 'coupons') {
+        return chain([{
+          id: 'coupon-1',
+          code: 'EXP-ABC',
+          restaurant_id: 'rest-1',
+          status: 'sent',
+          enabled: true,
+          expires_at: tomorrow,
+          customers: { id: 'cust-1', phone: '919900000000', name: 'Diana', opt_in_status: 'opted_in' },
+        }])
+      }
+      return chain(null)
+    }
+
+    await runExpiryReminders()
+
+    expect(mockSendTemplate).toHaveBeenCalledWith(
+      '919900000000',
+      'expiry_reminder',
+      ['Diana', 'EXP-ABC', 'Spice Garden', '1']
+    )
+    expect(mockSendText).not.toHaveBeenCalled()
   })
 })
 

@@ -112,10 +112,19 @@ export async function runWelcomeReminders(restaurantId?: string) {
         continue
       }
 
-      const msg = resolveSpintax(
-        `{Hey|Hi|Hello} ${customer.name || 'there'}! {Your coupon|Reminder: your coupon} ${welcomeCoupon.code} for ${restaurant.name} is {still active|waiting for you}! Reply STOP to opt out.`
-      )
-      const result = await adapter.sendText(customer.phone, msg)
+      let result
+      if (process.env.WHATSAPP_PROVIDER === 'meta') {
+        result = await adapter.sendTemplate(
+          customer.phone,
+          'welcome_reminder',
+          [customer.name || 'there', welcomeCoupon.code, restaurant.name]
+        )
+      } else {
+        const msg = resolveSpintax(
+          `{Hey|Hi|Hello} ${customer.name || 'there'}! {Your coupon|Reminder: your coupon} ${welcomeCoupon.code} for ${restaurant.name} is {still active|waiting for you}! Reply STOP to opt out.`
+        )
+        result = await adapter.sendText(customer.phone, msg)
+      }
 
       await supabase.from('message_logs').insert({
         restaurant_id: restaurant.id,
@@ -234,10 +243,19 @@ export async function runBirthdayCampaigns(restaurantId?: string) {
 
       if (couponError) continue
 
-      const msg = resolveSpintax(
-        `{Happy Birthday|Happy Birthday 🎂|Wishing you a great birthday}, ${customer.name || 'there'}! {Enjoy|Celebrate with} ${restaurant.birthday_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
-      )
-      const result = await adapter.sendText(customer.phone, msg)
+      let result
+      if (process.env.WHATSAPP_PROVIDER === 'meta') {
+        result = await adapter.sendTemplate(
+          customer.phone,
+          'birthday_campaign',
+          [customer.name || 'there', String(restaurant.birthday_discount_percent), restaurant.name, couponCode]
+        )
+      } else {
+        const msg = resolveSpintax(
+          `{Happy Birthday|Happy Birthday 🎂|Wishing you a great birthday}, ${customer.name || 'there'}! {Enjoy|Celebrate with} ${restaurant.birthday_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
+        )
+        result = await adapter.sendText(customer.phone, msg)
+      }
 
       await supabase.from('message_logs').insert({
         restaurant_id: restaurant.id,
@@ -353,10 +371,19 @@ export async function runWinbackCampaigns(restaurantId?: string) {
 
       if (couponError) continue
 
-      const msg = resolveSpintax(
-        `{We miss you|It's been a while}, ${customer.name || 'there'}! {Come back for|Enjoy} ${restaurant.winback_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
-      )
-      const result = await adapter.sendText(customer.phone, msg)
+      let result
+      if (process.env.WHATSAPP_PROVIDER === 'meta') {
+        result = await adapter.sendTemplate(
+          customer.phone,
+          'winback_campaign',
+          [customer.name || 'there', String(restaurant.winback_discount_percent), restaurant.name, couponCode]
+        )
+      } else {
+        const msg = resolveSpintax(
+          `{We miss you|It's been a while}, ${customer.name || 'there'}! {Come back for|Enjoy} ${restaurant.winback_discount_percent}% OFF at ${restaurant.name}. Code: ${couponCode}. Reply STOP to opt out.`
+        )
+        result = await adapter.sendText(customer.phone, msg)
+      }
 
       await supabase.from('message_logs').insert({
         restaurant_id: restaurant.id,
@@ -456,10 +483,19 @@ export async function runExpiryReminders(restaurantId?: string) {
         continue
       }
 
-      const msg = resolveSpintax(
-        `{Hey|Hi} ${customer.name || 'there'}! {Don't miss out|Heads up} — your coupon ${coupon.code} at ${restaurant.name} {expires in|is expiring in} ${days} day(s). Reply STOP to opt out.`
-      )
-      const result = await adapter.sendText(customer.phone, msg)
+      let result
+      if (process.env.WHATSAPP_PROVIDER === 'meta') {
+        result = await adapter.sendTemplate(
+          customer.phone,
+          'expiry_reminder',
+          [customer.name || 'there', coupon.code, restaurant.name, String(days)]
+        )
+      } else {
+        const msg = resolveSpintax(
+          `{Hey|Hi} ${customer.name || 'there'}! {Don't miss out|Heads up} — your coupon ${coupon.code} at ${restaurant.name} {expires in|is expiring in} ${days} day(s). Reply STOP to opt out.`
+        )
+        result = await adapter.sendText(customer.phone, msg)
+      }
 
       await supabase.from('message_logs').insert({
         restaurant_id: restaurant.id,
