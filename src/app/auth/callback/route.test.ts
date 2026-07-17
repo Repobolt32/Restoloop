@@ -69,4 +69,13 @@ describe('Auth Callback Route', () => {
 
     expect(res.headers.get('location')).toContain('/admin')
   })
+
+  it('redirects to /login with error query param when exchange fails', async () => {
+    mockExchangeCode.mockResolvedValue({ error: new Error('Auth failed') })
+
+    const req = { url: 'http://localhost:3000/auth/callback?code=abc123' }
+    const res = await GET(req as any)
+
+    expect(res.headers.get('location')).toContain('/login?error=auth_failed')
+  })
 })
