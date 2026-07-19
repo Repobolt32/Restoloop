@@ -1,6 +1,21 @@
 import { createRestaurant } from './actions'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 
 export default async function CreateRestaurantPage(props: { searchParams?: Promise<{ error?: string }> | { error?: string } }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: existing } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .limit(1)
+    .maybeSingle()
+
+  if (existing) redirect('/dashboard')
+
   const resolvedParams = props?.searchParams
     ? (props.searchParams instanceof Promise || typeof (props.searchParams as any).then === 'function'
       ? await props.searchParams

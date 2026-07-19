@@ -26,6 +26,17 @@ export async function createRestaurant(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: existingRestaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .limit(1)
+    .maybeSingle()
+
+  if (existingRestaurant) {
+    redirect('/dashboard')
+  }
+
   const rawPhone = (formData.get('whatsappNumber') as string) || ''
   const parsed = schema.safeParse({
     name: formData.get('name'),
