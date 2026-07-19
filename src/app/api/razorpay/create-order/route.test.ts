@@ -45,33 +45,22 @@ describe('POST /api/razorpay/create-order', () => {
     mockGetUser.mockResolvedValue({ data: { user: null } })
     await loadModule()
 
-    const res = await POST(makeRequest({ amount: 100, credits: 10 }))
+    const res = await POST(makeRequest({ purchaseType: 'trial' }))
     const data = await res.json()
 
     expect(res.status).toBe(401)
     expect(data.error).toBe('Unauthorized')
   })
 
-  it('returns 400 when amount or credits missing', async () => {
+  it('returns 400 when purchaseType is invalid', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
     await loadModule()
 
-    const res = await POST(makeRequest({ amount: 0, credits: 10 }))
+    const res = await POST(makeRequest({ purchaseType: 'invalid' }))
     const data = await res.json()
 
     expect(res.status).toBe(400)
-    expect(data.error).toBe('Invalid order parameters')
-  })
-
-  it('returns 400 when credits is negative', async () => {
-    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
-    await loadModule()
-
-    const res = await POST(makeRequest({ amount: 100, credits: -5 }))
-    const data = await res.json()
-
-    expect(res.status).toBe(400)
-    expect(data.error).toBe('Invalid order parameters')
+    expect(data.error).toBe('Invalid purchase type')
   })
 
   it('returns 404 when restaurant not found', async () => {
@@ -79,23 +68,11 @@ describe('POST /api/razorpay/create-order', () => {
     mockMaybeSingle.mockResolvedValue({ data: null, error: null })
     await loadModule()
 
-    const res = await POST(makeRequest({ amount: 100, credits: 10 }))
+    const res = await POST(makeRequest({ purchaseType: 'trial' }))
     const data = await res.json()
 
     expect(res.status).toBe(404)
     expect(data.error).toBe('Restaurant not found')
-  })
-
-  it('returns mock order id when razorpay is null', async () => {
-    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
-    mockMaybeSingle.mockResolvedValue({ data: { id: 'rest-1' }, error: null })
-    await loadModule()
-
-    const res = await POST(makeRequest({ amount: 100, credits: 10 }))
-    const data = await res.json()
-
-    expect(res.status).toBe(200)
-    expect(data.orderId).toMatch(/^order_mock_/)
   })
 
   it('returns 400 when trial is already activated', async () => {
@@ -121,5 +98,53 @@ describe('POST /api/razorpay/create-order', () => {
     expect(res.status).toBe(200)
     expect(data.orderId).toMatch(/^order_mock_/)
   })
-})
 
+  it('creates mock order for valid plan', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+    mockMaybeSingle.mockResolvedValue({ data: { id: 'rest-1' }, error: null })
+    await loadModule()
+
+    const res = await POST(makeRequest({ purchaseType: 'plan', planName: 'pro' }))
+    const data = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(data.orderId).toMatch(/^order_mock_/)
+  })
+
+  it('returns 400 when plan name is invalid', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+    mockMaybeSingle.mockResolvedValue({ data: { id: 'rest-1' }, error: null })
+    await loadModule()
+
+    const res = await POST(makeRequest({ purchaseType: 'plan', planName: 'invalid' }))
+    const data = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(data.error).toBe('Invalid plan name')
+  })
+
+  it('returns 400 when recharging on free plan', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+    mockMaybeSingle.mockResolvedValue({ data: { id: 'rest-1', plan: 'free', plan_expires_at: null }, error: null })
+    await loadModule()
+
+    const res = await POST(makeRequest({ purchaseType: 'recharge', packName: 'starter' }))
+    const data = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(data.error).toBe('Recharge requires an active plan')
+  })
+
+  it('creates mock order for valid recharge with active plan', async () => {
+    const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+    mockMaybeSingle.mockResolvedValue({ data: { id: 'rest-1', plan: 'pro', plan_expires_at: futureDate }, error: null })
+    await loadModule()
+
+    const res = await POST(makeRequest({ purchaseType: 'recharge', packName: 'starter' }))
+    const data = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(data.orderId).toMatch(/^order_mock_/)
+  })
+})

@@ -51,6 +51,8 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
         birthday_discount_cents: 3500,
         winback_discount_cents: 3000,
         credits: 1000,
+        plan: 'pro',
+        plan_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       })
       .select()
       .single()
@@ -87,7 +89,7 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
     // Check basic parameters
     await expect(page.getByTestId('settings-restaurant-name')).toContainText('Slice 7 Test Diner')
     await expect(page.getByTestId('credits-value')).toContainText('1000')
-    await expect(page.getByTestId('top-up-100')).toBeVisible()
+    await expect(page.getByTestId('recharge-starter')).toBeVisible()
   })
 
   test('Top-up flow sandbox simulator (success outcome)', async ({ page }) => {
@@ -100,7 +102,7 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
     await page.goto('http://localhost:3000/dashboard/settings')
 
     // Click top-up button
-    await page.getByTestId('top-up-100').click()
+    await page.getByTestId('recharge-starter').click()
 
     // Assert sandbox modal opens
     await expect(page.getByTestId('sandbox-modal')).toBeVisible()
@@ -110,10 +112,10 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
 
     // Assert sandbox modal closes and success alert displays
     await expect(page.getByTestId('sandbox-modal')).not.toBeVisible()
-    await expect(page.getByTestId('payment-success-alert')).toContainText(/successfully purchased 100 credits/i)
+    await expect(page.getByTestId('payment-success-alert')).toContainText(/successfully purchased 500 credits/i)
 
-    // Assert credits value updated in UI (1000 + 100 = 1100)
-    await expect(page.getByTestId('credits-value')).toContainText('1100')
+    // Assert credits value updated in UI (1000 + 500 = 1500)
+    await expect(page.getByTestId('credits-value')).toContainText('1500')
   })
 
   test('Top-up flow sandbox simulator (cancel outcome)', async ({ page }) => {
@@ -126,7 +128,7 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
     await page.goto('http://localhost:3000/dashboard/settings')
 
     // Click top-up button
-    await page.getByTestId('top-up-500').click()
+    await page.getByTestId('recharge-growth').click()
 
     // Assert sandbox modal opens
     await expect(page.getByTestId('sandbox-modal')).toBeVisible()
@@ -146,7 +148,7 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
         payment: {
           entity: {
             id: `pay_webhook_test_${Date.now()}`,
-            amount: 50000,
+            amount: 150000,
             currency: 'INR',
             notes: {
               credits: '500',
@@ -167,7 +169,7 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
 
     expect(response.ok()).toBe(true)
 
-    // Query DB directly to check if credits incremented (was 1100 after previous test + 500 = 1600)
+    // Query DB directly to check if credits incremented (was 1500 after previous test + 500 = 2000)
     const { data: restaurant } = await supabase
       .from('restaurants')
       .select('credits')
@@ -175,6 +177,6 @@ test.describe('Slice 7: Credits and Razorpay Sandbox Integration', () => {
       .single()
 
     expect(restaurant).not.toBeNull()
-    expect(restaurant!.credits).toBe(1600)
+    expect(restaurant!.credits).toBe(2000)
   })
 })

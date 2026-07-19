@@ -182,6 +182,41 @@ describe('POST /api/razorpay/webhook', () => {
         plan: 'trial',
         trial_activated_at: expect.any(String),
         trial_expires_at: expect.any(String),
+        plan_expires_at: expect.any(String),
+      })
+    )
+  })
+
+  it('updates plan and adds credits on plan payment', async () => {
+    mockMaybeSingle.mockResolvedValue({ data: { credits: 5 }, error: null })
+    await loadModule()
+
+    const body = JSON.stringify({
+      event: 'payment.captured',
+      payload: {
+        payment: {
+          entity: {
+            notes: {
+              userId: 'user-1',
+              purchaseType: 'plan',
+              planName: 'pro',
+              credits: '300',
+            },
+          },
+        },
+      },
+    })
+    const res = await POST(makeRequest(body, 'sig_mock'))
+    const data = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(data.status).toBe('ok')
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        plan: 'pro',
+        credits: 305,
+        plan_expires_at: expect.any(String),
+        trial_expires_at: null,
       })
     )
   })

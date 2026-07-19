@@ -92,6 +92,7 @@ export default async function DashboardPage() {
         plan={restaurant.plan}
         trialActivatedAt={restaurant.trial_activated_at}
         trialExpiresAt={restaurant.trial_expires_at}
+        planExpiresAt={restaurant.plan_expires_at}
         ownerId={restaurant.owner_id}
         email={user.email || ''}
         restaurantName={restaurant.name}
@@ -105,28 +106,32 @@ export default async function DashboardPage() {
           value={String(retainedCount)}
           sub={`${activeCustomers} active (30d)`}
           href="/dashboard/customers"
-          icon={<UserCheck className="w-5 h-5 text-[--color-accent]" />}
+          valueClass="text-blue-600"
+          icon={<UserCheck className="w-5 h-5 text-blue-600" />}
         />
         <StatCard
           label="Revenue This Month"
           value={monthlyRevenueDisplay}
           sub="from coupon redemptions"
           href="/dashboard/validate"
-          icon={<Zap className="w-5 h-5 text-[--color-accent]" />}
+          valueClass="text-emerald-600"
+          icon={<Zap className="w-5 h-5 text-emerald-600" />}
         />
         <StatCard
           label="Coupons Sent"
           value={String(totalCoupons)}
           sub={`${redeemedCoupons} redeemed`}
           href="/dashboard/coupons"
-          icon={<Gift className="w-5 h-5 text-[--color-accent]" />}
+          valueClass="text-amber-600"
+          icon={<Gift className="w-5 h-5 text-amber-600" />}
         />
         <StatCard
           label="Redemption Rate"
           value={`${redemptionRate}%`}
           sub="of all coupons"
           href="/dashboard/coupons"
-          icon={<TrendingUp className="w-5 h-5 text-[--color-accent]" />}
+          valueClass="text-pink-700"
+          icon={<TrendingUp className="w-5 h-5 text-pink-700" />}
         />
       </div>
 
@@ -227,12 +232,14 @@ function StatCard({
   sub,
   href,
   icon,
+  valueClass = 'text-[--color-primary]',
 }: {
   label: string;
   value: string;
   sub: string;
   href: string;
   icon: React.ReactNode;
+  valueClass?: string;
 }) {
   return (
     <Link href={href} className="dash-stat-card block">
@@ -240,7 +247,7 @@ function StatCard({
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-grey-500]">{label}</span>
         {icon}
       </div>
-      <p className="text-3xl font-black text-[--color-primary] font-display uppercase">{value}</p>
+      <p className={`text-3xl font-black font-display uppercase ${valueClass}`}>{value}</p>
       <p className="text-[10px] font-bold text-[--color-grey-500] mt-1">{sub}</p>
     </Link>
   )

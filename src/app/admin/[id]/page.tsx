@@ -192,22 +192,24 @@ export default async function AdminDetailPage({ params, searchParams }: PageProp
                 >
                   <option value="free">Free</option>
                   <option value="trial">Trial</option>
-                  <option value="starter">Starter</option>
                   <option value="pro">Pro</option>
+                  <option value="max">Max</option>
+                  <option value="ultra">Ultra</option>
+                  <option value="expired">Expired</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-[10px] font-black uppercase tracking-wider text-[var(--color-grey-500)] mb-1">
-                  Trial Expiration
+                  Plan / Trial Expiration
                 </label>
                 <input
                   type="datetime-local"
                   name="trialExpiresAt"
                   data-testid="admin-trial-expires-input"
                   defaultValue={
-                    restaurant.trial_expires_at
-                      ? new Date(restaurant.trial_expires_at)
+                    (restaurant.plan_expires_at || restaurant.trial_expires_at)
+                      ? new Date(restaurant.plan_expires_at || restaurant.trial_expires_at)
                           .toISOString()
                           .slice(0, 16)
                       : ''

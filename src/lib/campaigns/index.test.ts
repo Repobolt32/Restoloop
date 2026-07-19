@@ -821,3 +821,81 @@ describe('Campaigns in Meta Mode (Template Sends)', () => {
   })
 })
 
+describe('Pricing and Expiry Guards in Campaigns', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('blocks campaigns and logs blocked_expired_plan when plan is expired', async () => {
+    const expiredDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Alice',
+            opt_in_status: 'opted_in',
+            coupons: [{ id: 'c-1', type: 'welcome', status: 'sent', code: 'W50-ABC123' }],
+          },
+        ])
+      }
+      if (table === 'restaurants') {
+        return chain([{
+          id: 'rest-1',
+          name: 'Spice Garden',
+          credits: 10,
+          welcome_reminder_days: 25,
+          plan: 'pro',
+          plan_expires_at: expiredDate
+        }])
+      }
+      if (table === 'message_logs') {
+        const c = chain(null)
+        c.insert = vi.fn().mockReturnValue(c)
+        return c
+      }
+      return chain(null)
+    }
+
+    await runWelcomeReminders()
+    expect(mockSendText).not.toHaveBeenCalled()
+    expect(mockSendTemplate).not.toHaveBeenCalled()
+  })
+
+  it('bypasses credit checks and does not deduct credits when trial is active', async () => {
+    const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    tableHandler = (table: string) => {
+      if (table === 'customers') {
+        return chain([
+          {
+            id: 'cust-1',
+            restaurant_id: 'rest-1',
+            phone: '919900000000',
+            name: 'Alice',
+            opt_in_status: 'opted_in',
+            coupons: [{ id: 'c-1', type: 'welcome', status: 'sent', code: 'W50-ABC123' }],
+          },
+        ])
+      }
+      if (table === 'restaurants') {
+        return chain([{
+          id: 'rest-1',
+          name: 'Spice Garden',
+          credits: 0, // 0 credits but trial is active!
+          welcome_reminder_days: 25,
+          plan: 'trial',
+          plan_expires_at: futureDate
+        }])
+      }
+      return chain(null)
+    }
+
+    await runWelcomeReminders()
+    // Should send successfully because credits are ignored
+    expect(mockSendText).toHaveBeenCalled()
+    // Should NOT call deduct_credit RPC
+    expect(rpcMock).not.toHaveBeenCalledWith('deduct_credit', { restaurant_id: 'rest-1' })
+  })
+})

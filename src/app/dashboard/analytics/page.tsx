@@ -90,10 +90,34 @@ export default async function AnalyticsPage() {
 
       {/* Top Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <MiniStat icon={<Users className="w-4 h-4" />} label="Total Customers" value={String(totalCustomers)} />
-        <MiniStat icon={<Gift className="w-4 h-4" />} label="Coupons Issued" value={String(couponStats.total)} />
-        <MiniStat icon={<MessageSquare className="w-4 h-4" />} label="Campaigns Sent" value={String(totalCampaignSent)} />
-        <MiniStat icon={<TrendingUp className="w-4 h-4" />} label="Redemption Rate" value={`${redemptionRate}%`} />
+        <MiniStat
+          icon={<Users className="w-4 h-4" />}
+          label="Total Customers"
+          value={String(totalCustomers)}
+          valueClass="text-blue-600"
+          iconClass="text-blue-600"
+        />
+        <MiniStat
+          icon={<Gift className="w-4 h-4" />}
+          label="Coupons Issued"
+          value={String(couponStats.total)}
+          valueClass="text-amber-600"
+          iconClass="text-amber-600"
+        />
+        <MiniStat
+          icon={<MessageSquare className="w-4 h-4" />}
+          label="Campaigns Sent"
+          value={String(totalCampaignSent)}
+          valueClass="text-primary"
+          iconClass="text-primary"
+        />
+        <MiniStat
+          icon={<TrendingUp className="w-4 h-4" />}
+          label="Redemption Rate"
+          value={`${redemptionRate}%`}
+          valueClass="text-pink-700"
+          iconClass="text-pink-700"
+        />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8 mb-8">
@@ -177,11 +201,23 @@ export default async function AnalyticsPage() {
   )
 }
 
-function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function MiniStat({
+  icon,
+  label,
+  value,
+  valueClass = 'text-[--color-foreground]',
+  iconClass = 'text-[--color-grey-400]',
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  valueClass?: string;
+  iconClass?: string;
+}) {
   return (
     <div className="glass-card p-5">
-      <div className="flex items-center gap-2 mb-2 text-[--color-grey-400]">{icon}</div>
-      <p className="text-2xl font-black font-mono text-[--color-foreground]">{value}</p>
+      <div className={`flex items-center gap-2 mb-2 ${iconClass}`}>{icon}</div>
+      <p className={`text-2xl font-black font-mono ${valueClass}`}>{value}</p>
       <p className="section-label mt-1">{label}</p>
     </div>
   )

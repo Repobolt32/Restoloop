@@ -14,7 +14,6 @@ import {
     ArrowRight,
     Menu,
     Mail,
-    Phone,
     MapPin
 } from 'lucide-react';
 
@@ -34,7 +33,7 @@ const Navbar = () => {
 
     const navLinks = [
         { name: 'How it Works', href: '#how-it-works' },
-        { name: 'Pricing', href: '#pricing' },
+        { name: 'Pricing', href: '/pricing' },
         { name: 'FAQ', href: '#faq' },
     ];
 
@@ -95,6 +94,85 @@ const Navbar = () => {
     );
 };
 
+const QUESTIONS = [
+    {
+        id: 'goal',
+        question: '1. What is your main goal?',
+        options: [
+            { label: 'Get more repeat customers', value: 'repeat' },
+            { label: 'Fill tables on slow weekdays', value: 'weekdays' },
+            { label: 'Cut food app commissions', value: 'commissions' }
+        ]
+    },
+    {
+        id: 'marketing',
+        question: '2. How do you run marketing today?',
+        options: [
+            { label: "We don't do any marketing", value: 'none' },
+            { label: 'We post on social media or print flyers', value: 'social' },
+            { label: 'We collect numbers and message manually', value: 'manual' }
+        ]
+    },
+    {
+        id: 'capacity',
+        question: '3. Seating capacity of your restaurant?',
+        options: [
+            { label: 'Small (Under 15 tables)', value: 'small' },
+            { label: 'Medium (15 to 45 tables)', value: 'medium' },
+            { label: 'Large (More than 45 tables)', value: 'large' }
+        ]
+    }
+];
+
+const PLAN_NAMES: Record<string, string> = {
+    trial: 'Trial',
+    pro: 'Pro',
+    max: 'Max',
+    ultra: 'Ultra'
+};
+
+const getRecommendation = (answers: { goal?: string; marketing?: string; capacity?: string }) => {
+    const { goal, marketing, capacity } = answers;
+    
+    let plan = 'pro';
+    let databaseGrowth = 150;
+    let revenueCents = 900000;
+    let playbook = '';
+
+    if (capacity === 'small') {
+        plan = 'pro';
+        databaseGrowth = 150;
+        revenueCents = 900000;
+    } else if (capacity === 'medium') {
+        plan = 'max';
+        databaseGrowth = 450;
+        revenueCents = 2700000;
+    } else if (capacity === 'large') {
+        plan = 'ultra';
+        databaseGrowth = 1200;
+        revenueCents = 7200000;
+    }
+
+    if (capacity === 'small' && marketing === 'none') {
+        plan = 'trial';
+    }
+
+    if (goal === 'repeat') {
+        playbook = 'Set up a 15% Welcome Coupon auto-sent 2 hours after their first dining scan.';
+    } else if (goal === 'weekdays') {
+        playbook = 'Automate Birthday rewards to drive tables on slow Mon-Thu evenings.';
+    } else if (goal === 'commissions') {
+        playbook = 'Use table QR codes to build a direct loyalty base and offer a free dessert on direct orders.';
+    }
+
+    return {
+        plan,
+        databaseGrowth,
+        revenue: Math.round(revenueCents / 100),
+        playbook
+    };
+};
+
 const Hero = () => {
     const { scrollYProgress } = useScroll();
     const y = useTransform(scrollYProgress, [0, 0.2], [100, 0]);
@@ -125,16 +203,16 @@ const Hero = () => {
                     <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-[104px] leading-[1.05] md:leading-[1.05] mb-6 md:mb-10 tracking-tight font-lp-serif max-w-5xl mx-auto">
                         Turn tonight&apos;s guests <br />
                         <span className="text-white">into </span>
-                        <span className="shimmer">repeated customers.</span>
+                        <span className="shimmer">repeat customers.</span>
                     </h1>
 
                     <p className="max-w-2xl mx-auto text-base md:text-lg text-white/40 mb-10 md:mb-12 leading-relaxed">
-                        Most visitors never return. Restoloop automatically brings them back to your tables.
+                        70% of first-time diners never return. Restoloop automatically follows up with custom coupons on WhatsApp to bring them back to your tables.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 md:mb-24">
                         <Link href="/signup" className="bg-lp-accent hover:bg-lp-accent/90 text-white px-10 py-4.5 rounded-full text-lg font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-lp-accent/20 hover:shadow-lp-accent/40 hover:scale-[1.02]">
-                            Start Trial <ArrowRight className="w-5 h-5" />
+                            Start 21-Day Trial <ArrowRight className="w-5 h-5" />
                         </Link>
                         <a href="#how-it-works" className="bg-white/[0.03] border border-white/10 text-white px-10 py-4.5 rounded-full text-lg font-bold hover:bg-white/[0.08] transition-all hover:scale-[1.02] backdrop-blur-sm">
                             See how it works
@@ -147,6 +225,12 @@ const Hero = () => {
                     className="relative max-w-5xl mx-auto"
                 >
                     <div className="glass-card rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl overflow-hidden">
+                        <div className="flex border-b border-white/10 mb-6 pb-2">
+                            <span className="text-xs font-black uppercase tracking-widest text-white border-b-2 border-lp-accent pb-2">
+                                📈 Demo Dashboard
+                            </span>
+                        </div>
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
                             {[
                                 { label: 'Total Customers', value: '247', icon: MessageSquare },
@@ -192,12 +276,162 @@ const Hero = () => {
     );
 };
 
+type Answers = { goal?: string; marketing?: string; capacity?: string };
+
+const QuizSection = ({ onRecommendPlan }: { onRecommendPlan: (plan: string | null) => void }) => {
+    const [step, setStep] = useState(1);
+    const [answers, setAnswers] = useState<Answers>({});
+
+    const handleAnswer = (questionId: string, value: string) => {
+        const next = { ...answers, [questionId]: value };
+        setAnswers(next);
+        if (step < 3) {
+            setStep(s => s + 1);
+        } else {
+            onRecommendPlan(getRecommendation(next).plan);
+            setStep(4);
+        }
+    };
+
+    const result = step === 4 ? getRecommendation(answers) : null;
+
+    const handleScrollToPricing = (plan: string) => {
+        onRecommendPlan(plan);
+        document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    return (
+        <section id="quiz-finder" className="py-20 md:py-32">
+            <div className="max-w-7xl mx-auto px-4 md:px-6">
+                <div className="text-center mb-12 md:mb-16">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-black/40 border border-white/10 rounded-full text-[10px] font-bold tracking-widest text-lp-accent/80 backdrop-blur-sm mb-6">
+                        ⚡ PLAN FINDER · 60 SECONDS
+                    </div>
+                    <h2 className="text-4xl md:text-7xl font-lp-serif mb-4">Which plan is right for you?</h2>
+                    <p className="text-white/50 text-base md:text-lg max-w-xl mx-auto">
+                        3 questions. We&apos;ll show you exactly where to start.
+                    </p>
+                </div>
+
+                <div className="glass-card max-w-2xl mx-auto p-8 md:p-12 rounded-[32px] border border-white/10">
+                    {step < 4 ? (
+                        <>
+                            <div className="flex items-center justify-between mb-8">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-lp-accent">
+                                    Step {step} of 3
+                                </span>
+                                <div className="flex gap-2">
+                                    {[1, 2, 3].map(s => (
+                                        <div
+                                            key={s}
+                                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                s < step
+                                                    ? 'bg-lp-accent border-lp-accent'
+                                                    : s === step
+                                                        ? 'border-lp-accent'
+                                                        : 'border-white/20'
+                                            }`}
+                                        >
+                                            {s < step && <Check className="w-3 h-3 text-white" />}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <h3 className="text-2xl md:text-3xl font-lp-serif text-white mb-8">
+                                {QUESTIONS[step - 1].question}
+                            </h3>
+
+                            <div className="flex flex-col gap-3">
+                                {QUESTIONS[step - 1].options.map((option, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleAnswer(QUESTIONS[step - 1].id, option.value)}
+                                        className="w-full bg-white/5 border border-white/10 hover:border-lp-accent/50 hover:bg-white/10 text-white rounded-2xl px-6 py-4 font-bold text-sm text-left transition-all cursor-pointer flex items-center justify-between group"
+                                    >
+                                        <span>{option.label}</span>
+                                        {'hint' in option && (
+                                            <span className="text-[10px] text-lp-accent/60 font-medium ml-4 shrink-0 group-hover:text-lp-accent transition-colors">
+                                                {(option as { hint: string }).hint}
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {step > 1 && (
+                                <button
+                                    onClick={() => setStep(s => s - 1)}
+                                    className="mt-6 text-[11px] text-white/30 hover:text-white/60 uppercase font-bold cursor-pointer transition-colors"
+                                >
+                                    ← Back
+                                </button>
+                            )}
+                        </>
+                    ) : result && (
+                        <div className="text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-bold tracking-widest text-emerald-400 mb-4">
+                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                                RECOMMENDED PLAN: {PLAN_NAMES[result.plan].toUpperCase()} PLAN
+                            </div>
+
+                            <h4 className="text-xl font-lp-serif text-white mb-6">
+                                We recommend starting with the <span className="text-lp-accent font-bold">{PLAN_NAMES[result.plan]} Plan</span> based on your restaurant capacity.
+                            </h4>
+
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="bg-white/5 p-5 rounded-2xl border border-white/5">
+                                    <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Est. Monthly Guests</div>
+                                    <div className="text-2xl font-bold text-white">~{result.databaseGrowth}/mo</div>
+                                </div>
+                                <div className="bg-white/5 p-5 rounded-2xl border border-white/5">
+                                    <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Est. Revenue Recovery</div>
+                                    <div className="text-2xl font-bold text-emerald-400">₹{result.revenue.toLocaleString()}</div>
+                                </div>
+                            </div>
+
+                            {result.playbook && (
+                                <div className="bg-white/5 p-5 rounded-2xl border border-white/5 mb-8">
+                                    <div className="text-[10px] text-lp-accent font-black uppercase tracking-widest mb-2">💡 Playbook tip</div>
+                                    <p className="text-sm text-white/70 leading-relaxed">{result.playbook}</p>
+                                </div>
+                            )}
+
+                            <Link
+                                href="/signup"
+                                className="w-full block text-center bg-gradient-to-r from-orange-500 to-red-600 hover:shadow-lg hover:shadow-orange-500/30 text-white py-4 rounded-full font-bold text-sm uppercase tracking-widest transition-all hover:scale-[1.02] mb-2"
+                            >
+                                Start My ₹599 Trial — 21 Days, Unlimited Guests
+                            </Link>
+                            <p className="text-center text-[11px] text-white/30 mb-6">No auto-debit · Cancel anytime</p>
+
+                            <button
+                                onClick={() => handleScrollToPricing(result.plan)}
+                                className="w-full text-center text-white/40 hover:text-white/70 text-sm transition-colors cursor-pointer"
+                            >
+                                Or see the {PLAN_NAMES[result.plan]} Plan →
+                            </button>
+
+                            <button
+                                onClick={() => { setStep(1); setAnswers({}); onRecommendPlan(null); }}
+                                className="w-full mt-4 text-center text-white/25 hover:text-white/50 text-xs uppercase tracking-widest font-bold cursor-pointer transition-colors"
+                            >
+                                Retake Quiz
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </section>
+    );
+};
+
 const StatBar = () => {
     const stats = [
-        { label: 'Setup cost', value: '₹0' },
-        { label: 'To go live', value: '7 mins' },
-        { label: 'Auto messages', value: '50/day' },
-        { label: 'Avg ROI', value: '3x' },
+        { label: 'Setup Cost', value: '₹0' },
+        { label: 'Setup Time', value: '7 Mins' },
+        { label: 'Open Rate', value: '98%' },
+        { label: 'Average ROI', value: '5x' },
     ];
 
     return (
@@ -226,20 +460,20 @@ const HowItWorks = () => {
     const steps = [
         {
             icon: '/landing/qr-code.png',
-            title: "Capture data",
-            description: "Capture customer data from your restaurant instantly via QR.",
+            title: "Diners Scan QR",
+            description: "Customers scan a beautiful QR code at their table to check in and claim their welcome coupon.",
             step: "STEP 1",
         },
         {
             icon: '/landing/step2.jpg',
-            title: "Automate follow-ups",
-            description: "Automate follow-ups and offers based on customer behavior.",
+            title: "Grow Your List",
+            description: "Restoloop automatically builds your customer database, organizing them by visits and dining habits.",
             step: "STEP 2",
         },
         {
             icon: '/landing/whatsapp-icon.png',
-            title: "Re-engage via WhatsApp",
-            description: "Re-engage customers via WhatsApp to increase repeat visits and revenue.",
+            title: "Bring Them Back",
+            description: "Our system automatically sends personalized WhatsApp coupons on birthdays, slow weekdays, and to win back dormant guests.",
             step: "STEP 3",
         }
     ];
@@ -289,52 +523,7 @@ const HowItWorks = () => {
     );
 };
 
-const Comparison = () => {
-    return (
-        <section className="py-20 md:py-32 bg-white/[0.02]">
-            <div className="max-w-7xl mx-auto px-4 md:px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                    <div className="p-6 md:p-8 rounded-[20px] border border-white/5 bg-white/[0.04] backdrop-blur-md">
-                        <h3 className="text-2xl md:text-3xl font-lp-serif mb-6 md:mb-8 text-red-500/80 italic">Without Restoloop</h3>
-                        <ul className="space-y-4 md:space-y-6">
-                            {[
-                                "Customers visit once, disappear forever",
-                                "No way to reach them on WhatsApp after",
-                                "Spend on Instagram ads with zero tracking",
-                                "No idea which offer actually worked",
-                                "Birthday moments missed every single day"
-                            ].map((item, i) => (
-                                <li key={i} className="flex items-start gap-3 md:gap-4 text-sm md:text-base text-white/40">
-                                    <X className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                                    <span>{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
 
-                    <div className="p-6 md:p-8 rounded-[20px] border border-white/5 bg-white/[0.04] backdrop-blur-md relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 blur-3xl rounded-full" />
-                        <h3 className="text-2xl md:text-3xl font-lp-serif mb-6 md:mb-8 text-green-500 italic">With Restoloop</h3>
-                        <ul className="space-y-4 md:space-y-6">
-                            {[
-                                "Own your customer WhatsApp database",
-                                "Automated outreach — zero manual effort",
-                                "Pay only per message, no wasted spend",
-                                "Dashboard shows exact ₹ attributed to us",
-                                "Birthday + win-back sent automatically"
-                            ].map((item, i) => (
-                                <li key={i} className="flex items-start gap-3 md:gap-4 text-sm md:text-base text-white/90">
-                                    <Check className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                                    <span className="font-medium">{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
-};
 
 const ROIBlock = () => {
     return (
@@ -379,7 +568,7 @@ const TestimonialMarquee = () => {
         {
             stars: "★★★★★",
             quote: "System lagane ke baad daily 2–3 repeat customers consistently aane lage. Isse approx ₹400–₹600 extra per day add ho raha hai — month me ₹12,000+ ka clear increase dikha.",
-            author: "Ravi Kumar, Owner — Shree Rama Resturant"
+            author: "Ravi Kumar, Owner — Shree Rama Restaurant"
         },
         {
             stars: "★★★★★",
@@ -410,38 +599,75 @@ const TestimonialMarquee = () => {
     );
 };
 
-const Pricing = () => {
+const Pricing = ({ recommendedPlan }: { recommendedPlan: string | null }) => {
     const tiers = [
         {
-            name: '🟢 PLAN 1 — Starter / Trial',
-            price: '₹999',
-            note: 'Bring back your past customers (basic setup)',
+            id: 'trial',
+            name: 'Trial',
+            price: '₹599',
+            period: '21 days',
+            credits: 'Unlimited messages',
+            note: 'Risk-Free Test',
             features: [
-                '300 WhatsApp messages',
-                'QR code + customer data capture',
-                'Simple follow-up messages (manual + assisted)',
-                'Basic coupon / offer sending',
-                'Setup + support included'
+                'Unlimited contact capture',
+                'Unlimited WhatsApp sends',
+                'Table QR code included',
+                'Auto-welcome coupons'
             ],
-            badge: '👉 Best for testing if this works for your restaurant',
-            cta: 'Get started',
+            badge: 'Perfect to try Restoloop before subscribing.',
+            cta: 'Start 21-Day Trial',
             popular: false
         },
         {
-            name: '🔴 PLAN 2 — Growth',
-            price: '₹2,499',
-            note: 'Turn more first-time customers into repeat customers',
+            id: 'pro',
+            name: 'Pro',
+            price: '₹999',
+            period: 'month',
+            credits: '🪙 300 credits / month',
+            note: 'Essential Automation',
             features: [
-                '800 WhatsApp messages',
-                'Everything in Starter',
-                'Automated follow-ups (no manual work)',
-                'Birthday / offer campaigns',
-                'Better tracking of returning customers',
-                'Priority support + faster setup'
+                'Unlimited contact capture',
+                '300 WhatsApp credits / mo',
+                'Auto-welcome & Expiry alerts',
+                'Customer analytics dashboard'
             ],
-            badge: '👉 Best for restaurants serious about growth',
-            cta: 'Get started',
+            badge: 'Automate your welcome greeting and save hours.',
+            cta: 'Get Pro Plan',
             popular: true
+        },
+        {
+            id: 'max',
+            name: 'Max',
+            price: '₹1,999',
+            period: 'month',
+            credits: '🪙 700 credits / month',
+            note: 'Growth & Birthdays',
+            features: [
+                'Unlimited contact capture',
+                '700 WhatsApp credits / mo',
+                'Birthday automation campaigns',
+                'Full customer loyalty portal'
+            ],
+            badge: 'Includes birthday campaigns to fill tables on slow days.',
+            cta: 'Get Max Plan',
+            popular: false
+        },
+        {
+            id: 'ultra',
+            name: 'Ultra',
+            price: '₹2,999',
+            period: 'month',
+            credits: '🪙 1,500 credits / month',
+            note: 'Advanced Campaigns',
+            features: [
+                'Unlimited contact capture',
+                '1,500 WhatsApp credits / mo',
+                'Win-back dormant guest triggers',
+                'Priority human WhatsApp support'
+            ],
+            badge: 'Advanced win-back campaigns and premium support.',
+            cta: 'Get Ultra Plan',
+            popular: false
         }
     ];
 
@@ -449,55 +675,94 @@ const Pricing = () => {
         <section id="pricing" className="py-20 md:py-32">
             <div className="max-w-7xl mx-auto px-4 md:px-6">
                 <div className="text-center mb-12 md:mb-20">
-                    <h2 className="text-4xl md:text-7xl mb-4 md:mb-6">Choose the Right Plan</h2>
-                    <p className="text-white/60">Expand your schema as per your requirements</p>
+                    <h2 className="text-4xl md:text-7xl mb-4 md:mb-6 font-lp-serif">Simple, Transparent Pricing</h2>
+                    <p className="text-white/60 text-base md:text-lg max-w-2xl mx-auto">
+                        No setup fees • No auto-debit • Unused credits rollover forever
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
-                    {tiers.map((tier, i) => (
-                        <div
-                            key={i}
-                            className={`relative p-6 md:p-8 rounded-[24px] md:rounded-[32px] flex flex-col ${tier.popular
-                                ? 'bg-lp-accent/10 border-2 border-lp-accent shadow-[0_0_40px_rgba(223,118,86,0.2)]'
-                                : 'glass-card'
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 max-w-7xl mx-auto mb-16">
+                    {tiers.map((tier, i) => {
+                        const isRecommended = recommendedPlan === tier.id;
+                        return (
+                            <div
+                                key={i}
+                                className={`relative p-6 md:p-8 rounded-[24px] md:rounded-[32px] flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] ${
+                                    isRecommended
+                                        ? 'bg-lp-accent/20 border-2 border-lp-accent shadow-[0_0_50px_rgba(223,118,86,0.4)] scale-[1.03] ring-4 ring-lp-accent/20'
+                                        : tier.popular
+                                            ? 'bg-lp-accent/10 border-2 border-lp-accent shadow-[0_0_40px_rgba(223,118,86,0.2)]'
+                                            : 'glass-card'
                                 }`}
-                        >
-                            {tier.popular && (
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-lp-accent text-white text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest">
-                                    Most Popular
-                                </div>
-                            )}
-
-                            <div className="mb-6 md:mb-8">
-                                <div className="text-sm font-bold mb-3 text-white/80">{tier.name}</div>
-                                <div className="flex items-baseline gap-1 mb-2">
-                                    <span className="text-4xl md:text-5xl font-bold">{tier.price}</span>
-                                </div>
-                                <div className="text-white/40 text-xs md:text-sm italic mt-1">{tier.note}</div>
-                            </div>
-
-                            <div className="space-y-3 md:space-y-4 mb-6 flex-grow">
-                                {tier.features.map((f, j) => (
-                                    <div key={j} className="flex items-center gap-3 text-xs md:text-sm text-white/70">
-                                        <Check className="w-3 h-3 md:w-4 md:h-4 text-lp-accent shrink-0" />
-                                        <span>{f}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="text-xs text-white/40 italic mb-6">{tier.badge}</div>
-
-                            <Link
-                                href="/signup"
-                                className={`w-full py-3 md:py-4 rounded-full font-bold text-center transition-all ${tier.popular
-                                    ? 'bg-lp-accent text-white hover:scale-[1.02]'
-                                    : 'glass hover:bg-white/10'
-                                    }`}
                             >
-                                {tier.cta}
-                            </Link>
+                                {isRecommended && (
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-md animate-pulse">
+                                        Recommended for You
+                                    </div>
+                                )}
+                                {!isRecommended && tier.popular && (
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-red-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-md">
+                                        Most Popular
+                                    </div>
+                                )}
+
+                                <div>
+                                    <div className="text-xs font-black uppercase tracking-wider text-white/50 mb-2">{tier.name}</div>
+                                    <div className="flex items-baseline gap-1 mb-1">
+                                        <span className="text-3xl md:text-4xl font-bold font-lp-serif">{tier.price}</span>
+                                        <span className="text-xs text-white/40">/ {tier.period}</span>
+                                    </div>
+                                    <div className="text-xs font-bold text-lp-accent mb-3">{tier.credits}</div>
+                                    <p className="text-white/50 text-xs leading-relaxed mb-6 border-b border-white/10 pb-6 italic">{tier.note}</p>
+
+                                    <div className="space-y-3 mb-6">
+                                        {tier.features.map((f, j) => (
+                                            <div key={j} className="flex items-start gap-2 text-xs text-white/80 font-medium">
+                                                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                                                <span>{f}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="text-[11px] text-white/50 italic mb-6 leading-tight">{tier.badge}</div>
+                                    <Link
+                                        href="/signup"
+                                        className={`w-full py-3.5 rounded-full font-bold text-center text-xs uppercase tracking-widest transition-all block ${
+                                            isRecommended || tier.popular
+                                                ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-[1.02]'
+                                                : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
+                                        }`}
+                                    >
+                                        {tier.cta}
+                                    </Link>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Recharge Callout Block */}
+                <div className="max-w-4xl mx-auto glass-card rounded-3xl p-8 md:p-10 border border-white/10 relative overflow-hidden text-left">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-lp-accent/10 blur-[60px] rounded-full pointer-events-none" />
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
+                        <div>
+                            <span className="text-lp-accent text-xs font-black uppercase tracking-widest block mb-2">Need Extra Messages?</span>
+                            <h3 className="font-display font-lp-serif text-2xl md:text-3xl text-white mb-2">Recharge packs roll over forever.</h3>
+                            <p className="text-xs md:text-sm text-white/50 leading-relaxed max-w-xl">
+                                Running low on credits? Buy recharge packs starting from ₹1,500 for 500 messages (🪙 500). Unused credits rollover as long as your account stays active.
+                            </p>
                         </div>
-                    ))}
+                        <div className="shrink-0 bg-white/5 border border-white/10 rounded-2xl p-6 font-bold text-sm w-full md:w-auto">
+                            <span className="text-[10px] text-white/40 uppercase tracking-widest block mb-3">Available Top-ups</span>
+                            <ul className="space-y-2">
+                                <li className="flex justify-between md:gap-12 text-xs"><span>Starter (🪙 500)</span> <span className="text-lp-accent">₹1,500</span></li>
+                                <li className="flex justify-between md:gap-12 text-xs"><span>Growth (🪙 1,000)</span> <span className="text-lp-accent">₹3,000</span></li>
+                                <li className="flex justify-between md:gap-12 text-xs"><span>Power (🪙 2,000)</span> <span className="text-lp-accent">₹6,000</span></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -520,15 +785,15 @@ const FAQ = () => {
         },
         {
             q: "When do credits expire?",
-            a: "Never. Buy 1000 credits and use them over 2 years — they stay as they are. No monthly subscription, no expiry. Your money won't be wasted."
+            a: "All credits you purchase via top-up packages never expire. For monthly subscription plans (Pro, Max, Ultra), your base credits roll over to the next month forever as long as your subscription remains active. Your credits are never wasted."
         },
         {
             q: "What if there's a problem with the system?",
-            a: "We are available on WhatsApp. There's a button on the dashboard — it sends a message directly to our WhatsApp. A real human responds, not a bot."
+            a: "We are available on WhatsApp. There's a support button on the dashboard that sends a message directly to our team. A real human responds, not a bot."
         },
         {
             q: "Is this only for large restaurants?",
-            a: "No. Whether it's a small dhaba or a large restaurant — as long as you have customers and want to bring them back, Restoloop works. You can start with even 50 customers."
+            a: "No. Restoloop is built for food outlets of all sizes — from neighborhood cafes and local QSRs to large multi-table dine-in restaurants. If you want to build a loyal customer base and grow repeat visits, Restoloop is for you."
         }
     ];
 
@@ -579,7 +844,7 @@ const Footer = () => {
                                 <Receipt className="text-white w-6 h-6" />
                             </div>
                             <div>
-                                <span className="text-2xl font-lp-serif font-bold block leading-none">Resto Loop</span>
+                                <span className="text-2xl font-lp-serif font-bold block leading-none">Restoloop</span>
                                 <span className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold">by Bluetideapp</span>
                             </div>
                         </div>
@@ -621,7 +886,7 @@ const Footer = () => {
 
                 <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="flex flex-col gap-2 text-center md:text-left">
-                        <span className="text-[10px] text-white/20 uppercase tracking-widest">© 2026 Resto Loop. All rights reserved.</span>
+                        <span className="text-[10px] text-white/20 uppercase tracking-widest">© 2026 Restoloop. All rights reserved.</span>
                         <div className="flex items-center gap-2 justify-center md:justify-start">
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-lp-pulse" />
                             <span className="text-[10px] text-white/40 font-medium">We only communicate with users who have provided consent to receive messages.</span>
@@ -638,6 +903,7 @@ const Footer = () => {
 
 export default function LandingPage() {
     const pathname = usePathname();
+    const [recommendedPlan, setRecommendedPlan] = useState<string | null>(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -649,10 +915,10 @@ export default function LandingPage() {
             <Hero />
             <StatBar />
             <HowItWorks />
-            <Comparison />
             <ROIBlock />
             <TestimonialMarquee />
-            <Pricing />
+            <QuizSection onRecommendPlan={setRecommendedPlan} />
+            <Pricing recommendedPlan={recommendedPlan} />
             <FAQ />
             <Footer />
         </main>

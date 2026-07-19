@@ -22,14 +22,22 @@ async function deductCredit(supabase: any, restaurantId: string) {
     // Fallback if RPC function is not defined in Postgres
     const { data: current } = await supabase
       .from('restaurants')
-      .select('credits')
+      .select('credits, plan, plan_expires_at')
       .eq('id', restaurantId)
       .single()
-    if (current && current.credits > 0) {
-      await supabase
-        .from('restaurants')
-        .update({ credits: current.credits - 1 })
-        .eq('id', restaurantId)
+    if (current) {
+      const isTrial = current.plan === 'trial'
+      const expiresAt = current.plan_expires_at ? new Date(current.plan_expires_at) : null
+      const isTrialActive = isTrial && (!expiresAt || expiresAt > new Date())
+      if (isTrialActive) {
+        return
+      }
+      if (current.credits > 0) {
+        await supabase
+          .from('restaurants')
+          .update({ credits: current.credits - 1 })
+          .eq('id', restaurantId)
+      }
     }
   }
 }
@@ -40,7 +48,7 @@ export async function runWelcomeReminders(restaurantId?: string) {
 
   let query = supabase
     .from('restaurants')
-    .select('id, name, credits, welcome_reminder_days')
+    .select('id, name, credits, welcome_reminder_days, plan, plan_expires_at')
     .eq('welcome_reminder_enabled', true)
     .eq('is_suspended', false)
 
@@ -51,6 +59,12 @@ export async function runWelcomeReminders(restaurantId?: string) {
   const { data: restaurants } = await query
 
   for (const restaurant of restaurants ?? []) {
+    const plan = restaurant.plan ?? 'free'
+    const expiresAt = restaurant.plan_expires_at ? new Date(restaurant.plan_expires_at) : null
+    const isTrial = plan === 'trial'
+    const isExpired = plan === 'expired' || (expiresAt && expiresAt <= new Date())
+    const isFree = plan === 'free'
+
     const days = restaurant.welcome_reminder_days ?? 25
     const gteDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
     const lteDate = new Date(Date.now() - (days - 1) * 24 * 60 * 60 * 1000).toISOString()
@@ -101,7 +115,18 @@ export async function runWelcomeReminders(restaurantId?: string) {
         .maybeSingle()
       if (sentToday) continue
 
-      if (restaurant.credits <= 0) {
+      if (isExpired) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'welcome_reminder',
+          status: 'blocked_expired_plan',
+        })
+        continue
+      }
+
+      if (!isTrial && restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
           restaurant_id: restaurant.id,
           customer_id: customer.id,
@@ -136,7 +161,7 @@ export async function runWelcomeReminders(restaurantId?: string) {
         provider_message_id: result.messageId ?? null,
       })
 
-      if (result.success) {
+      if (result.success && !isTrial) {
         await deductCredit(supabase, restaurant.id)
       }
     }
@@ -155,7 +180,7 @@ export async function runBirthdayCampaigns(restaurantId?: string) {
 
   let query = supabase
     .from('restaurants')
-    .select('id, name, credits, birthday_discount_percent')
+    .select('id, name, credits, birthday_discount_percent, plan, plan_expires_at')
     .eq('birthday_campaign_enabled', true)
     .eq('is_suspended', false)
 
@@ -166,6 +191,12 @@ export async function runBirthdayCampaigns(restaurantId?: string) {
   const { data: restaurants } = await query
 
   for (const restaurant of restaurants ?? []) {
+    const plan = restaurant.plan ?? 'free'
+    const expiresAt = restaurant.plan_expires_at ? new Date(restaurant.plan_expires_at) : null
+    const isTrial = plan === 'trial'
+    const isExpired = plan === 'expired' || (expiresAt && expiresAt <= new Date())
+    const isFree = plan === 'free'
+
     const { data: customers } = await supabase
       .from('customers')
       .select('*')
@@ -217,7 +248,18 @@ export async function runBirthdayCampaigns(restaurantId?: string) {
         .maybeSingle()
       if (sentToday) continue
 
-      if (restaurant.credits <= 0) {
+      if (isExpired) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'birthday_campaign',
+          status: 'blocked_expired_plan',
+        })
+        continue
+      }
+
+      if (!isTrial && restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
           restaurant_id: restaurant.id,
           customer_id: customer.id,
@@ -267,7 +309,7 @@ export async function runBirthdayCampaigns(restaurantId?: string) {
         provider_message_id: result.messageId ?? null,
       })
 
-      if (result.success) {
+      if (result.success && !isTrial) {
         await deductCredit(supabase, restaurant.id)
       }
     }
@@ -280,7 +322,7 @@ export async function runWinbackCampaigns(restaurantId?: string) {
 
   let query = supabase
     .from('restaurants')
-    .select('id, name, credits, winback_discount_percent, winback_days')
+    .select('id, name, credits, winback_discount_percent, winback_days, plan, plan_expires_at')
     .eq('winback_campaign_enabled', true)
     .eq('is_suspended', false)
 
@@ -291,6 +333,12 @@ export async function runWinbackCampaigns(restaurantId?: string) {
   const { data: restaurants } = await query
 
   for (const restaurant of restaurants ?? []) {
+    const plan = restaurant.plan ?? 'free'
+    const expiresAt = restaurant.plan_expires_at ? new Date(restaurant.plan_expires_at) : null
+    const isTrial = plan === 'trial'
+    const isExpired = plan === 'expired' || (expiresAt && expiresAt <= new Date())
+    const isFree = plan === 'free'
+
     const days = restaurant.winback_days ?? 40
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 
@@ -345,7 +393,18 @@ export async function runWinbackCampaigns(restaurantId?: string) {
         .maybeSingle()
       if (sentToday) continue
 
-      if (restaurant.credits <= 0) {
+      if (isExpired) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'winback_campaign',
+          status: 'blocked_expired_plan',
+        })
+        continue
+      }
+
+      if (!isTrial && restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
           restaurant_id: restaurant.id,
           customer_id: customer.id,
@@ -395,7 +454,7 @@ export async function runWinbackCampaigns(restaurantId?: string) {
         provider_message_id: result.messageId ?? null,
       })
 
-      if (result.success) {
+      if (result.success && !isTrial) {
         await deductCredit(supabase, restaurant.id)
       }
     }
@@ -408,7 +467,7 @@ export async function runExpiryReminders(restaurantId?: string) {
 
   let query = supabase
     .from('restaurants')
-    .select('id, name, credits, expiry_reminder_days')
+    .select('id, name, credits, expiry_reminder_days, plan, plan_expires_at')
     .eq('expiry_reminder_enabled', true)
     .eq('is_suspended', false)
 
@@ -419,6 +478,12 @@ export async function runExpiryReminders(restaurantId?: string) {
   const { data: restaurants } = await query
 
   for (const restaurant of restaurants ?? []) {
+    const plan = restaurant.plan ?? 'free'
+    const expiresAt = restaurant.plan_expires_at ? new Date(restaurant.plan_expires_at) : null
+    const isTrial = plan === 'trial'
+    const isExpired = plan === 'expired' || (expiresAt && expiresAt <= new Date())
+    const isFree = plan === 'free'
+
     const days = restaurant.expiry_reminder_days ?? 1
     const expiryStart = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
     const expiryEnd = new Date(expiryStart.getTime() + 24 * 60 * 60 * 1000)
@@ -471,7 +536,19 @@ export async function runExpiryReminders(restaurantId?: string) {
         .maybeSingle()
       if (sentToday) continue
 
-      if (restaurant.credits <= 0) {
+      if (isExpired) {
+        await supabase.from('message_logs').insert({
+          restaurant_id: restaurant.id,
+          customer_id: customer.id,
+          direction: 'outbound',
+          type: 'expiry_reminder',
+          status: 'blocked_expired_plan',
+          coupon_id: coupon.id,
+        })
+        continue
+      }
+
+      if (!isTrial && restaurant.credits <= 0) {
         await supabase.from('message_logs').insert({
           restaurant_id: restaurant.id,
           customer_id: customer.id,
@@ -508,7 +585,7 @@ export async function runExpiryReminders(restaurantId?: string) {
         provider_message_id: result.messageId ?? null,
       })
 
-      if (result.success) {
+      if (result.success && !isTrial) {
         await deductCredit(supabase, restaurant.id)
       }
     }

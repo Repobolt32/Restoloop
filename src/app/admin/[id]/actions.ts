@@ -142,11 +142,13 @@ export async function updatePlanAction(formData: FormData) {
 
   if (plan === 'trial') {
     updatePayload.trial_expires_at = trialExpiresAtStr ? new Date(trialExpiresAtStr).toISOString() : null
+    updatePayload.plan_expires_at = updatePayload.trial_expires_at
     if (!restaurant.trial_activated_at) {
       updatePayload.trial_activated_at = new Date().toISOString()
     }
   } else {
     updatePayload.trial_expires_at = null
+    updatePayload.plan_expires_at = trialExpiresAtStr ? new Date(trialExpiresAtStr).toISOString() : null
   }
 
   const { error: updateError } = await serviceSupabase

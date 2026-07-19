@@ -43,12 +43,37 @@ All core functionality (Slices 1 to 17) has been fully built, verified, and inte
     *   Manual Cron Trigger to run automated campaigns immediately.
     *   **Bug Fixes**: Context-aware success banners for detail page actions (credits, plan, suspension, campaign run, WhatsApp reset) and main table layout alignment with Status capsules (Active/Suspended). Added safe fallbacks for missing Supabase environment variables (`SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) to prevent synchronous client-initialization crashes during sandbox trial capture testing, falling back to the authenticated cookie-based client context when service role keys are missing.
 
+### 5. SaaS Pricing Model & Billing Slice (S7, S17, S19)
+*   **Database Schema & Functions**: Added `plan_expires_at` column to `restaurants` table and updated the `deduct_credit` SQL function to skip deductions during active trials.
+*   **Campaign Expiry Guards**: Verified active paid/trial plans and blocked messaging for expired accounts cleanly.
+*   **Razorpay Endpoints**: Added plan validation for `pro`, `max`, `ultra` subscriptions and recharge packs, with automated renewal extensions and webhook capture triggers.
+*   **Bento-Grid Billing UI**: Rebuilt the settings billing page to feature Bento cards (Current Plan, Change Plan, Recharge Credits) styled after Crimson & Saffron light-mode.
+*   **Renewal & Overrides**: Standardized dashboard renewal flows with rose-colored warnings, and added admin plan overrides.
+*   **Public Landing /pricing**: Created a responsive plan comparisons and FAQ list layout.
+
 ---
 
 ## 🚦 Verification Status
 
 *   **Unit Tests**: **155/155 passed** (`pnpm test` via Vitest).
-*   **E2E Tests**: Playwright suite (`pnpm test:e2e` / `npx playwright test`) covers full flows for authentication (including Google OAuth buttons), intake forms, coupon validation, credits/gating, and admin controls. All E2E tests pass successfully.
+*   **E2E Tests**: Playwright suite (`pnpm test:e2e` / `npx playwright test`) covers full flows for authentication (including Google OAuth buttons), intake forms, coupon validation, credits/gating, admin controls, and billing/pricing (`tests/pricing.spec.ts` and `tests/slice-7.spec.ts`). All E2E tests pass successfully.
+
+---
+
+## ✅ Completed Task: Seed Demo Data and Style Main Dashboard Metrics (2026-07-18)
+
+### What Was Done
+1. **Realistic Demo Data Seeding & Corrections**: Wrote and executed `scratch-seed-demo.js` to seed 180 realistic Indian customer names (with region-specific diversity, food preferences, and birthdays), 220 coupons (welcome, birthday, winback, manual), and 517 message logs. Resolved an array-bound issue where customer names from index 120+ were being seeded as `null` by cycling through the name array using `i % NAMES.length`. Also corrected registration dates to be past or current dates (preventing future July dates).
+2. **Dashboard Stat Card Styling**: Custom colored metric values and icons on both the main Dashboard page (`src/app/dashboard/page.tsx`) and the Analytics page (`src/app/dashboard/analytics/page.tsx`) for a highly polished UI:
+   - **Retained Customers / Total Customers**: Cobalt Blue (`text-blue-600`)
+   - **Revenue This Month**: Emerald Green (`text-emerald-600`)
+   - **Coupons Sent / Issued**: Saffron Amber Gold (`text-amber-600`)
+   - **Redemption Rate**: Dark Rose/Pink (`text-pink-700`)
+3. **Trial Banner Yellow Theme**: Changed the active trial banner in `src/app/dashboard/trial-banner.tsx` from green (`bg-emerald-800`) to yellow/amber (`bg-amber-400` with `text-amber-950` contrast text) for brand cohesion.
+
+### Verification Evidence
+- `pnpm typecheck` -> ✅ 0 errors
+- `pnpm lint` -> ✅ 0 errors (3 warnings)
 
 ---
 
@@ -367,8 +392,45 @@ Add to Vercel + `.env.local`:
 
 ---
 
-## 📅 Next Steps
+---
 
-1. **Add Meta Credentials**: Fill in `META_PHONE_NUMBER_ID`, `META_ACCESS_TOKEN`, `META_APP_SECRET`, `META_VERIFY_TOKEN` in Vercel env vars and `.env.local`.
-2. **Configure Meta Webhook**: In Meta App > WhatsApp > Configuration, set webhook URL to `https://<your-domain>/api/whatsapp` and verify token to `META_VERIFY_TOKEN`. Subscribe to `messages` events.
-3. **Vercel Deployment**: Deploy latest branch with Meta migration to Vercel production.
+## ✅ Completed Task: SaaS Pricing Model & Billing Implementation (2026-07-19)
+
+### What Was Done
+1. **Database Schema & Function Updates (Task 1)**: Added `plan_expires_at` column to `restaurants` table and updated the `deduct_credit` PL/pgSQL function to implement active trial bypass (trial plan does not deduct credits).
+2. **Campaign Expiry Guards (Task 2)**: Modified Welcome, Birthday, Winback, and Expiry campaign runners in `src/lib/campaigns/index.ts` to block sends if plan has expired (`plan_expires_at <= now()`). Added campaign engine unit tests confirming active plan validation and trial bypass.
+3. **Razorpay create-order & webhook endpoints (Tasks 3 & 4)**: Extended Razorpay order route to enforce subscription plans/prices and recharge packs. Added active subscription validation for recharge purchases on the server side. Webhook endpoint now handles plan upgrades, correctly extends `plan_expires_at` by 30 days (extending from future expiry if plan is currently active, or from `now()` if expired/inactive), clears trial status, and increments credits.
+4. **Bento-Grid Billing UI & Sandbox modal (Tasks 5 & 6)**: Rebuilt Settings page credits section into 3 clean Bento cards (Current Plan, Change Plan, Recharge Credits) matching the Crimson & Saffron light-mode theme. Integrated plan renewals directly inside the dashboard with visual banners for expired plans.
+5. **Admin Panel plan overrides (Task 7)**: Expanded admin details view dropdown to support pro, max, ultra, and expired statuses, writing `plan_expires_at` directly from the overrides form.
+6. **Public /pricing Page (Task 8)**: Created a responsive comparison layout at `/pricing` displaying Trial, Pro, Max, and Ultra tiers, pricing details, base credits, recharge callouts, and FAQs.
+7. **E2E coverage (Task 9)**: Created `tests/pricing.spec.ts` validating recharge button disabling, settings sandbox upgrades, dashboard expired plan banners, and `/pricing` layout checks. Adapted pre-existing `tests/slice-7.spec.ts` test selectors to fit the new Bento billing card layout.
+8. **E2E Verification**: Successfully ran all 10 tests in `tests/pricing.spec.ts` and `tests/slice-7.spec.ts` against a local dev server with all tests passing.
+
+### Verification Evidence
+- `pnpm typecheck` → ✅ 0 errors
+- `pnpm lint` → ✅ 0 errors (3 warnings)
+- `pnpm playwright test tests/pricing.spec.ts tests/slice-7.spec.ts` → ✅ 10/10 passed
+
+---
+
+---
+
+## ✅ Completed Task: Landing Page Simplified Pricing Copy (2026-07-19)
+
+### What Was Done
+1. **Simplified Punchy Bullet Points**: Simplified bullet points across all 4 plans to short, punchy 2–4 word features:
+   - **Trial (₹599 / 21d)**: Unlimited contact capture, Unlimited WhatsApp sends, Table QR code included, Auto-welcome coupons.
+   - **Pro (₹999 / mo - Popular)**: Unlimited contact capture, 300 WhatsApp credits / mo, Auto-welcome & Expiry alerts, Customer analytics dashboard.
+   - **Max (₹1,999 / mo)**: Unlimited contact capture, 700 WhatsApp credits / mo, Birthday automation campaigns, Full customer loyalty portal.
+   - **Ultra (₹2,999 / mo)**: Unlimited contact capture, 1,500 WhatsApp credits / mo, Win-back dormant guest triggers, Priority human WhatsApp support.
+2. **Prominent Universal Feature**: Included **"Unlimited contact capture"** as bullet item #1 on every plan.
+3. **Hero Subtitle**: Updated subtitle to *"No setup fees • No auto-debit • Unused credits rollover forever"*.
+
+### Verification Evidence
+- `pnpm typecheck` -> ✅ 0 errors
+- `pnpm lint` -> ✅ 0 errors (3 warnings)
+- `pnpm test` -> ✅ **160/160 unit tests passed**
+
+
+
+

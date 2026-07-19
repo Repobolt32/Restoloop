@@ -7,6 +7,7 @@ interface TrialBannerProps {
   plan: string
   trialActivatedAt: string | null
   trialExpiresAt: string | null
+  planExpiresAt?: string | null
   ownerId: string
   email: string
   restaurantName: string
@@ -16,13 +17,20 @@ export function TrialBanner({
   plan,
   trialActivatedAt,
   trialExpiresAt,
+  planExpiresAt,
   ownerId,
   email,
   restaurantName,
 }: TrialBannerProps) {
   const [isPaymentLoading, setIsPaymentLoading] = useState(false)
   const [showSandbox, setShowSandbox] = useState(false)
-  const [sandboxOrderId, setSandboxOrderId] = useState<string | null>(null)
+  const [sandboxOrder, setSandboxOrder] = useState<{
+    orderId: string
+    purchaseType: 'trial' | 'plan'
+    planName?: string
+    amount: number
+    credits: number
+  } | null>(null)
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null)
   const [paymentError, setPaymentError] = useState<string | null>(null)
 
@@ -48,7 +56,12 @@ export function TrialBanner({
       const { orderId } = await res.json()
 
       if (isMock) {
-        setSandboxOrderId(orderId)
+        setSandboxOrder({
+          orderId,
+          purchaseType: 'trial',
+          amount: 599,
+          credits: 0,
+        })
         setShowSandbox(true)
       } else {
         const options = {
@@ -66,7 +79,7 @@ export function TrialBanner({
             email: email || '',
           },
           theme: {
-            color: '#A16207',
+            color: '#E65C00',
           },
           modal: {
             ondismiss: function() {
@@ -85,23 +98,100 @@ export function TrialBanner({
     }
   }
 
+  const handlePlanRenew = async (planName: string) => {
+    setPaymentSuccess(null)
+    setPaymentError(null)
+    setIsPaymentLoading(true)
+
+    try {
+      const config = {
+        pro: { amount: 999, credits: 300 },
+        max: { amount: 1999, credits: 700 },
+        ultra: { amount: 2999, credits: 1500 },
+      }[planName as 'pro' | 'max' | 'ultra']
+
+      if (!config) throw new Error('Invalid plan name for renewal')
+
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purchaseType: 'plan', planName }),
+      })
+
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.error || 'Failed to initiate renewal order')
+      }
+
+      const { orderId } = await res.json()
+
+      if (isMock) {
+        setSandboxOrder({
+          orderId,
+          purchaseType: 'plan',
+          planName,
+          amount: config.amount,
+          credits: config.credits,
+        })
+        setShowSandbox(true)
+      } else {
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: config.amount * 100,
+          currency: 'INR',
+          name: 'Restoloop',
+          description: `Renew ${planName.toUpperCase()} Plan`,
+          order_id: orderId,
+          handler: async () => {
+            setPaymentSuccess(`${planName.toUpperCase()} plan successfully renewed!`)
+            window.location.reload()
+          },
+          prefill: {
+            email: email || '',
+          },
+          theme: {
+            color: '#E65C00',
+          },
+          modal: {
+            ondismiss: function() {
+              setPaymentError('Payment cancelled by user.')
+            }
+          }
+        }
+        const rzp = new (window as any).Razorpay(options)
+        rzp.open()
+      }
+    } catch (err: any) {
+      console.error('Razorpay renewal error:', err)
+      setPaymentError(err.message || 'Payment initiation failed.')
+    } finally {
+      setIsPaymentLoading(false)
+    }
+  }
+
   const handleSandboxSuccess = async () => {
-    if (!sandboxOrderId) return
+    if (!sandboxOrder) return
     setShowSandbox(false)
 
     try {
+      let notes: any = {
+        userId: ownerId,
+        purchaseType: sandboxOrder.purchaseType,
+      }
+      if (sandboxOrder.purchaseType === 'plan') {
+        notes.planName = sandboxOrder.planName
+        notes.credits = sandboxOrder.credits.toString()
+      }
+
       const payload = {
         event: 'payment.captured',
         payload: {
           payment: {
             entity: {
-              id: `pay_mock_trial_${Date.now()}`,
-              amount: 59900,
+              id: `pay_mock_${Date.now()}`,
+              amount: sandboxOrder.amount * 100,
               currency: 'INR',
-              notes: {
-                purchaseType: 'trial',
-                userId: ownerId,
-              }
+              notes
             }
           }
         }
@@ -117,7 +207,11 @@ export function TrialBanner({
       })
 
       if (res.ok) {
-        setPaymentSuccess('Trial successfully activated! Please refresh.')
+        setPaymentSuccess(
+          sandboxOrder.purchaseType === 'trial'
+            ? 'Trial successfully activated! Please refresh.'
+            : `${sandboxOrder.planName?.toUpperCase()} plan successfully renewed!`
+        )
         window.location.reload()
       } else {
         const errData = await res.json()
@@ -153,6 +247,9 @@ export function TrialBanner({
   const showNotStarted = plan === 'free' && !hasTrialActivated
   const showActive = isTrialPlan && !isExpired
   const showExpired = (isTrialPlan && isExpired) || (plan === 'free' && hasTrialActivated)
+
+  const isPaidPlan = ['pro', 'max', 'ultra'].includes(plan)
+  const isPaidExpired = isPaidPlan && planExpiresAt && new Date(planExpiresAt) < new Date()
 
   return (
     <div className="mb-8 relative">
@@ -201,15 +298,15 @@ export function TrialBanner({
       )}
 
       {showActive && (
-        <div data-testid="active-trial-banner" className="bg-emerald-800 rounded-2xl p-6 shadow-md text-white">
-          <h2 className="font-display text-xl font-black uppercase tracking-tight mb-1">Unlimited Growth Trial Active</h2>
-          <p className="text-sm font-medium opacity-90">
-            You have <span className="font-black text-amber-300 font-mono">{daysLeft}</span> days remaining on your trial. All marketing campaign automations are actively running.
+        <div data-testid="active-trial-banner" className="bg-amber-400 rounded-2xl p-6 shadow-md text-amber-950 border border-amber-500/20">
+          <h2 className="font-display text-xl font-black uppercase tracking-tight mb-1 text-amber-950">Unlimited Growth Trial Active</h2>
+          <p className="text-sm font-medium text-amber-900">
+            You have <span className="font-black text-amber-950 font-mono">{daysLeft}</span> days remaining on your trial. All marketing campaign automations are actively running.
           </p>
         </div>
       )}
 
-      {showExpired && (
+      {showExpired && !isPaidPlan && (
         <div data-testid="expired-trial-banner" className="bg-rose-900 rounded-2xl p-6 shadow-md text-white">
           <h2 className="font-display text-xl font-black uppercase tracking-tight mb-1">Your Growth Trial Has Ended</h2>
           <p className="text-sm font-medium opacity-90">
@@ -218,29 +315,54 @@ export function TrialBanner({
         </div>
       )}
 
+      {isPaidExpired && (
+        <div data-testid="expired-plan-banner" className="bg-rose-900 rounded-2xl p-6 shadow-md text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h2 className="font-display text-xl font-black uppercase tracking-tight mb-2">
+              Your {plan.toUpperCase()} Plan Expired
+            </h2>
+            <p className="text-sm font-medium opacity-90 max-w-2xl">
+              Campaign messaging is paused. Renew to keep campaigns running.
+            </p>
+          </div>
+          <button
+            data-testid="renew-plan-btn"
+            onClick={() => handlePlanRenew(plan)}
+            disabled={isPaymentLoading}
+            className="shrink-0 bg-white text-rose-900 hover:bg-gray-100 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest cursor-pointer transition-colors shadow-md disabled:opacity-50"
+          >
+            {isPaymentLoading ? 'Processing...' : `Renew ${plan === 'pro' ? '₹999' : plan === 'max' ? '₹1,999' : '₹2,999'}`}
+          </button>
+        </div>
+      )}
+
       {/* Sandbox Payment Simulator Modal Overlay */}
-      {showSandbox && sandboxOrderId && (
+      {showSandbox && sandboxOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs" data-testid="sandbox-modal">
           <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-[90%] mx-auto text-black">
             <h3 className="font-display text-2xl font-black text-gray-900 mb-2 uppercase">
               Razorpay Sandbox
             </h3>
             <p className="text-xs font-bold text-gray-500 mb-6">
-              This sandbox modal simulates Razorpay&apos;s checkout flow for the Trial Plan.
+              This sandbox modal simulates Razorpay&apos;s checkout flow.
             </p>
 
             <div className="bg-gray-50 rounded-xl p-4 mb-6 text-sm space-y-2 font-bold">
               <div className="flex justify-between">
                 <span className="text-gray-500">Order ID:</span>
-                <span className="font-mono text-gray-900">{sandboxOrderId}</span>
+                <span className="font-mono text-gray-900">{sandboxOrder.orderId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Package:</span>
-                <span className="text-gray-900">21-Day Unlimited Trial</span>
+                <span className="text-gray-900">
+                  {sandboxOrder.purchaseType === 'trial'
+                    ? '21-Day Unlimited Trial'
+                    : `Renew ${sandboxOrder.planName?.toUpperCase()} Plan`}
+                </span>
               </div>
               <div className="flex justify-between border-t border-gray-200 pt-2 mt-2">
                 <span className="text-gray-900">Total Price:</span>
-                <span className="text-amber-700 font-black text-base font-display">₹599.00</span>
+                <span className="text-amber-700 font-black text-base font-display">₹{sandboxOrder.amount}.00</span>
               </div>
             </div>
 

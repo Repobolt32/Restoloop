@@ -65,6 +65,25 @@ export async function POST(request: NextRequest) {
           plan: 'trial',
           trial_activated_at: new Date().toISOString(),
           trial_expires_at: trialExpiresAt.toISOString(),
+          plan_expires_at: trialExpiresAt.toISOString(),
+        }
+      } else if (purchaseType === 'plan') {
+        const planName = payment.notes.planName
+        const credits = parseInt(payment.notes.credits, 10)
+        if (!planName || isNaN(credits)) {
+          return NextResponse.json({ error: 'Missing payment notes metadata' }, { status: 400 })
+        }
+
+        const now = new Date()
+        const current = restaurant.plan_expires_at ? new Date(restaurant.plan_expires_at) : null
+        const base = current && current > now ? current : now
+        const nextExpiry = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000)
+
+        updatePayload = {
+          plan: planName,
+          credits: (restaurant.credits || 0) + credits,
+          plan_expires_at: nextExpiry.toISOString(),
+          trial_expires_at: null,
         }
       } else {
         const credits = parseInt(payment.notes.credits, 10)

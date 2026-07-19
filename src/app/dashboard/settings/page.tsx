@@ -12,7 +12,7 @@ export default function SettingsPage() {
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null)
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
-  const [isPaymentLoading, setIsPaymentLoading] = useState(false)
+  const [loadingItem, setLoadingItem] = useState<string | null>(null)
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
 
   // Sandbox modal state
@@ -21,6 +21,9 @@ export default function SettingsPage() {
     orderId: string
     amount: number
     credits: number
+    purchaseType: 'trial' | 'plan' | 'recharge'
+    planName?: string
+    packName?: string
   } | null>(null)
 
   const supabase = createClient()
@@ -64,18 +67,27 @@ export default function SettingsPage() {
     })
   }, [restaurant])
 
-  const handleTopUp = async (credits: number) => {
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const handleRecharge = async (packName: 'starter' | 'growth' | 'power') => {
     setPaymentSuccess(null)
     setPaymentError(null)
-    setIsPaymentLoading(true)
+    setLoadingItem(packName)
     
     try {
-      const amount = credits * 1 // ₹1 per credit
-      
+      const config = {
+        starter: { amount: 1500, credits: 500 },
+        growth: { amount: 3000, credits: 1000 },
+        power: { amount: 6000, credits: 2000 },
+      }[packName]
+
       const res = await fetch('/api/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, credits }),
+        body: JSON.stringify({ purchaseType: 'recharge', packName }),
       })
       
       if (!res.ok) {
@@ -84,29 +96,34 @@ export default function SettingsPage() {
       }
       
       const { orderId } = await res.json()
-      
       const isMock = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'mock' || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
       
       if (isMock) {
-        setSandboxOrder({ orderId, amount, credits })
+        setSandboxOrder({
+          orderId,
+          amount: config.amount,
+          credits: config.credits,
+          purchaseType: 'recharge',
+          packName,
+        })
         setShowSandbox(true)
       } else {
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount: amount * 100,
+          amount: config.amount * 100,
           currency: 'INR',
           name: 'Restoloop',
-          description: `${credits} credits top-up`,
+          description: `${packName.toUpperCase()} Credits Recharge`,
           order_id: orderId,
           handler: async (response: any) => {
-            setPaymentSuccess(`Successfully purchased ${credits} credits!`)
+            setPaymentSuccess(`Successfully purchased ${config.credits} credits!`)
             fetchRestaurant()
           },
           prefill: {
             email: restaurant?.email || '',
           },
           theme: {
-            color: '#A16207',
+            color: '#E65C00',
           },
           modal: {
             ondismiss: function() {
@@ -114,22 +131,21 @@ export default function SettingsPage() {
             }
           }
         }
-        
         const rzp = new (window as any).Razorpay(options)
         rzp.open()
       }
     } catch (err: any) {
-      console.error('Razorpay checkout error:', err)
+      console.error('Razorpay recharge error:', err)
       setPaymentError(err.message || 'Payment initiation failed.')
     } finally {
-      setIsPaymentLoading(false)
+      setLoadingItem(null)
     }
   }
 
   const handlePayToUnlock = async () => {
     setPaymentSuccess(null)
     setPaymentError(null)
-    setIsPaymentLoading(true)
+    setLoadingItem('trial')
     
     try {
       const res = await fetch('/api/razorpay/create-order', {
@@ -144,11 +160,15 @@ export default function SettingsPage() {
       }
       
       const { orderId } = await res.json()
-      
       const isMock = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'mock' || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
       
       if (isMock) {
-        setSandboxOrder({ orderId, amount: 599, credits: 0 })
+        setSandboxOrder({
+          orderId,
+          amount: 599,
+          credits: 0,
+          purchaseType: 'trial',
+        })
         setShowSandbox(true)
       } else {
         const options = {
@@ -166,7 +186,7 @@ export default function SettingsPage() {
             email: restaurant?.email || '',
           },
           theme: {
-            color: '#A16207',
+            color: '#E65C00',
           },
           modal: {
             ondismiss: function() {
@@ -182,7 +202,7 @@ export default function SettingsPage() {
       console.error('Razorpay checkout error:', err)
       setPaymentError(err.message || 'Payment initiation failed.')
     } finally {
-      setIsPaymentLoading(false)
+      setLoadingItem(null)
     }
   }
 
@@ -191,7 +211,21 @@ export default function SettingsPage() {
     setShowSandbox(false)
     
     try {
-      const isTrial = sandboxOrder.credits === 0
+      let notes: any = {
+        userId: restaurant.owner_id,
+        purchaseType: sandboxOrder.purchaseType,
+      }
+      
+      if (sandboxOrder.purchaseType === 'plan') {
+        notes.planName = sandboxOrder.planName
+        notes.credits = sandboxOrder.credits.toString()
+      } else if (sandboxOrder.purchaseType === 'recharge') {
+        notes.packName = sandboxOrder.packName
+        notes.credits = sandboxOrder.credits.toString()
+      } else {
+        notes.credits = sandboxOrder.credits.toString()
+      }
+
       const payload = {
         event: 'payment.captured',
         payload: {
@@ -200,15 +234,7 @@ export default function SettingsPage() {
               id: `pay_mock_${Date.now()}`,
               amount: sandboxOrder.amount * 100,
               currency: 'INR',
-              notes: isTrial 
-                ? {
-                    purchaseType: 'trial',
-                    userId: restaurant.owner_id
-                  }
-                : {
-                    credits: sandboxOrder.credits.toString(),
-                    userId: restaurant.owner_id
-                  }
+              notes
             }
           }
         }
@@ -224,7 +250,13 @@ export default function SettingsPage() {
       })
       
       if (res.ok) {
-        setPaymentSuccess(isTrial ? 'Trial successfully activated!' : `Successfully purchased ${sandboxOrder.credits} credits!`)
+        setPaymentSuccess(
+          sandboxOrder.purchaseType === 'trial'
+            ? 'Trial successfully activated!'
+            : sandboxOrder.purchaseType === 'plan'
+            ? `Successfully upgraded to ${sandboxOrder.planName?.toUpperCase()} plan!`
+            : `Successfully purchased ${sandboxOrder.credits} credits!`
+        )
         fetchRestaurant()
       } else {
         const errData = await res.json()
@@ -234,7 +266,6 @@ export default function SettingsPage() {
       setPaymentError(err.message || 'Sandbox simulator error')
     }
   }
-
 
   const handleSandboxCancel = () => {
     setShowSandbox(false)
@@ -265,8 +296,17 @@ export default function SettingsPage() {
     )
   }
 
-  const creditPct = Math.min(100, Math.round((restaurant.credits / 1000) * 100))
-  const isGated = restaurant.plan === 'free' || (restaurant.plan === 'trial' && new Date(restaurant.trial_expires_at) < new Date())
+  const now = new Date()
+  const isExpired = restaurant.plan === 'expired' || 
+                    (restaurant.plan_expires_at && new Date(restaurant.plan_expires_at) < now) ||
+                    (restaurant.plan === 'trial' && restaurant.trial_expires_at && new Date(restaurant.trial_expires_at) < now)
+  const isGated = restaurant.plan === 'free' || isExpired
+
+  // Expiry display helper
+  const expiryDate = restaurant.plan_expires_at || restaurant.trial_expires_at
+  const expiryDisplay = expiryDate 
+    ? new Date(expiryDate).toLocaleDateString('en-IN', { dateStyle: 'medium' })
+    : 'Never'
 
   return (
     <div className="p-8 max-w-4xl mx-auto relative">
@@ -323,58 +363,52 @@ export default function SettingsPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        {/* Credits Management Card */}
-        <div className="bg-white rounded-2xl p-8 shadow-md flex flex-col justify-between">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8" id="billing">
+        {/* Card 1: Current Plan Card */}
+        <div className="bg-white rounded-2xl p-8 shadow-md flex flex-col justify-between border border-[--color-border]">
           <div>
-            <h2 className="font-display text-xl font-black text-[--color-foreground] mb-4 uppercase">Message Credits</h2>
-            <div className="flex justify-between items-baseline mb-4">
-              <span className="text-3xl font-black text-[--color-primary] font-mono" data-testid="credits-value">{restaurant.credits}</span>
-              <span className="text-[--color-grey-500] text-sm font-bold">/ 1000 credits</span>
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="font-display text-xl font-black text-[--color-foreground] uppercase">Current Plan</h2>
+              <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                restaurant.plan === 'trial' ? 'badge-pending' :
+                restaurant.plan === 'free' ? 'badge-cancelled' :
+                isExpired ? 'badge-failed' : 'badge-sent'
+              }`} data-testid="plan-status-badge">
+                {restaurant.plan} {isExpired && '(Expired)'}
+              </span>
             </div>
-            
-            {/* Progress Bar */}
-            <div className="mb-6">
-              <svg width="100%" height="8" role="progressbar" aria-valuenow={restaurant.credits} aria-valuemin={0} aria-valuemax={1000} aria-label={`${restaurant.credits} of 1000 credits`}>
-                <rect x="0" y="0" width="100%" height="8" rx="4" fill="var(--color-border)" />
-                <rect x="0" y="0" width={`${creditPct}%`} height="8" rx="4" fill="var(--color-accent)" style={{ transition: 'width 600ms ease' }} />
-              </svg>
+
+            <div className="flex justify-between items-baseline mb-4">
+              <span className="text-3xl font-black text-[--color-primary] font-mono" data-testid="credits-value">
+                {restaurant.credits}
+              </span>
+              <span className="text-[--color-grey-500] text-sm font-bold">Credits Balance</span>
+            </div>
+
+            <div className="text-xs font-bold text-[--color-grey-600] space-y-1 mb-6">
+              <p>Status: <span className={isExpired ? 'text-red-600' : 'text-emerald-600'}>{isExpired ? 'Expired' : 'Active'}</span></p>
+              <p>Expiry: <span>{expiryDisplay}</span></p>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <p className="text-[10px] font-black uppercase tracking-wider text-[--color-grey-600]">Choose a package to top up (₹1 per credit):</p>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                data-testid="top-up-100"
-                onClick={() => handleTopUp(100)}
-                disabled={isPaymentLoading}
-                className="bg-black hover:bg-gray-800 text-white py-3 px-2 rounded-xl font-black text-[9px] uppercase tracking-widest border-0 cursor-pointer transition-all disabled:opacity-50"
-              >
-                100 cr<br />(₹100)
-              </button>
-              <button
-                data-testid="top-up-500"
-                onClick={() => handleTopUp(500)}
-                disabled={isPaymentLoading}
-                className="bg-black hover:bg-gray-800 text-white py-3 px-2 rounded-xl font-black text-[9px] uppercase tracking-widest border-0 cursor-pointer transition-all disabled:opacity-50"
-              >
-                500 cr<br />(₹500)
-              </button>
-              <button
-                data-testid="top-up-1000"
-                onClick={() => handleTopUp(1000)}
-                disabled={isPaymentLoading}
-                className="bg-black hover:bg-gray-800 text-white py-3 px-2 rounded-xl font-black text-[9px] uppercase tracking-widest border-0 cursor-pointer transition-all disabled:opacity-50"
-              >
-                1000 cr<br />(₹1000)
-              </button>
-            </div>
+          <div className="flex gap-2">
+            <Link
+              href="/pricing"
+              className="flex-1 bg-black hover:bg-gray-800 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest text-center no-underline transition-all block"
+            >
+              Upgrade Plan
+            </Link>
+            <button
+              onClick={() => scrollToSection('recharge-credits')}
+              className="flex-1 bg-transparent hover:bg-gray-50 text-black py-3 rounded-xl font-black text-[10px] uppercase tracking-widest border border-gray-200 cursor-pointer transition-all"
+            >
+              Buy Credits
+            </button>
           </div>
         </div>
 
         {/* Restaurant Details Card */}
-        <div className="bg-white rounded-2xl p-8 shadow-md">
+        <div className="bg-white rounded-2xl p-8 shadow-md border border-[--color-border]">
           <h2 className="font-display text-xl font-black text-[--color-foreground] mb-4 uppercase">Restaurant Details</h2>
           <div className="space-y-4 text-sm font-bold">
             <div>
@@ -407,8 +441,56 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Recharge Credits Card */}
+      <div className="bg-white rounded-2xl p-8 shadow-md border border-[--color-border] mb-8" id="recharge-credits">
+        <h2 className="font-display text-xl font-black text-[--color-foreground] mb-2 uppercase">Recharge Credits</h2>
+        <p className="text-xs font-bold text-[--color-grey-500] mb-6">Top up additional messages anytime. Flat ₹3/credit. Unused credits rollover forever.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { id: 'starter', name: 'Starter', price: '₹1,500', credits: 500 },
+            { id: 'growth', name: 'Growth', price: '₹3,000', credits: 1000 },
+            { id: 'power', name: 'Power', price: '₹6,000', credits: 2000 },
+          ].map((pack) => {
+            const isRechargeDisabled = restaurant.plan === 'free' || isExpired
+            const isThisLoading = loadingItem === pack.id
+            return (
+              <div key={pack.id} className="p-6 rounded-xl border border-[--color-border] flex flex-col justify-between">
+                <div>
+                  <span className="font-display font-black text-sm uppercase text-[--color-foreground] block mb-1">{pack.name}</span>
+                  <p className="text-2xl font-black font-mono text-[--color-primary] mb-1">{pack.price}</p>
+                  <p className="text-xs font-bold text-gray-700 mb-6">🪙 {pack.credits} Credits</p>
+                </div>
+
+                <div className="relative group">
+                  <button
+                    disabled={isRechargeDisabled || !!loadingItem}
+                    onClick={() => handleRecharge(pack.id as any)}
+                    className={`w-full py-3 rounded-xl font-black text-[9px] uppercase tracking-widest border-0 cursor-pointer transition-all ${
+                      isThisLoading
+                        ? 'bg-amber-600 text-white animate-pulse'
+                        : 'bg-black text-white hover:bg-gray-800'
+                    } ${
+                      isRechargeDisabled ? 'opacity-40 cursor-not-allowed' : ''
+                    }`}
+                    data-testid={`recharge-${pack.id}`}
+                  >
+                    {isThisLoading ? 'Processing...' : 'Buy Pack'}
+                  </button>
+                  {isRechargeDisabled && (
+                    <div className="absolute left-1/2 -translate-x-1/2 -top-10 scale-0 group-hover:scale-100 transition-all bg-gray-900 text-white text-[9px] py-1.5 px-3 rounded shadow-lg whitespace-nowrap z-20 font-bold">
+                      Requires active paid or trial plan
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
       {/* QR Code Card */}
-      <div className="bg-white rounded-2xl p-8 shadow-md mb-8 relative overflow-hidden">
+      <div className="bg-white rounded-2xl p-8 shadow-md mb-8 relative overflow-hidden border border-[--color-border]">
         <h2 className="font-display text-xl font-black text-[--color-foreground] mb-4 uppercase">
           Enrollment QR Code
         </h2>
@@ -456,17 +538,16 @@ export default function SettingsPage() {
                 <button
                   data-testid="pay-to-unlock-btn"
                   onClick={handlePayToUnlock}
-                  disabled={isPaymentLoading}
+                  disabled={!!loadingItem}
                   className="bg-[--color-primary] hover:bg-[--color-primary-dark] text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer font-bold shadow-md disabled:opacity-50"
                 >
-                  {isPaymentLoading ? 'Processing...' : 'Pay to Unlock'}
+                  {loadingItem === 'trial' ? 'Processing...' : 'Pay to Unlock'}
                 </button>
               </div>
             </div>
           )}
         </div>
       </div>
-
 
       {/* Sandbox Payment Simulator Modal Overlay */}
       {showSandbox && sandboxOrder && (
@@ -487,7 +568,11 @@ export default function SettingsPage() {
               <div className="flex justify-between">
                 <span className="text-gray-500">Simulated Package:</span>
                 <span className="text-gray-900">
-                  {sandboxOrder.credits === 0 ? '21-Day Unlimited Trial' : `${sandboxOrder.credits} Credits`}
+                  {sandboxOrder.purchaseType === 'trial'
+                    ? '21-Day Unlimited Trial'
+                    : sandboxOrder.purchaseType === 'plan'
+                    ? `${sandboxOrder.planName?.toUpperCase()} Plan Upgrade`
+                    : `${sandboxOrder.credits} Credits Top-up`}
                 </span>
               </div>
               <div className="flex justify-between border-t border-gray-200 pt-2 mt-2">
@@ -516,36 +601,5 @@ export default function SettingsPage() {
         </div>
       )}
     </div>
-  )
-}
-
-function ToggleRow({
-  name,
-  label,
-  description,
-  defaultChecked,
-}: {
-  name: string
-  label: string
-  description: string
-  defaultChecked: boolean
-}) {
-  return (
-    <label className="flex items-center justify-between cursor-pointer group">
-      <div>
-        <p className="text-sm font-bold text-[--color-foreground]">{label}</p>
-        <p className="text-xs font-bold text-[--color-grey-500]">{description}</p>
-      </div>
-      <div className="relative ml-4 shrink-0">
-        <input
-          type="checkbox"
-          name={name}
-          defaultChecked={defaultChecked}
-          className="sr-only peer"
-        />
-        <div className="w-12 h-6 bg-[--color-grey-200] peer-checked:bg-emerald-500 rounded-full transition-colors" />
-        <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-6 pointer-events-none" />
-      </div>
-    </label>
   )
 }
