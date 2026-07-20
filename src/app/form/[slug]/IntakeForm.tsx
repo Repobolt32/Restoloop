@@ -20,10 +20,11 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
 
     const formData = new FormData(e.currentTarget)
     
-    // Client-side phone format validation check (10 digits with optional +91 or 91)
+    // Client-side phone format validation check (10 to 15 digits supporting US and international)
     const phone = formData.get('phone') as string
-    if (!/^(?:\+91|91)?\d{10}$/.test(phone)) {
-      setError('Please enter a valid 10-digit WhatsApp number (e.g. 9876543210).')
+    const normalizedPhone = phone.replace(/\D/g, '')
+    if (!/^\d{10,15}$/.test(normalizedPhone)) {
+      setError('Please enter a valid WhatsApp number (10 to 15 digits).')
       setLoading(false)
       return
     }
@@ -106,11 +107,11 @@ export default function IntakeForm({ slug, restaurantName }: IntakeFormProps) {
             type="tel"
             id="phone"
             name="phone"
-            placeholder="9876543210"
+            placeholder="15551734928"
             required
             className="w-full bg-white border border-[--color-border] focus:border-[--color-primary] rounded-xl px-4 py-3 text-sm text-[--color-foreground] placeholder-[--color-grey-300] font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[--color-primary]/10 transition duration-150"
           />
-          <p className="text-[--color-grey-400] text-[10px] font-bold">Enter your 10-digit WhatsApp number (e.g. 9876543210)</p>
+          <p className="text-[--color-grey-400] text-[10px] font-bold">Enter your WhatsApp number with country code (e.g. 15551734928)</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

@@ -235,7 +235,7 @@ describe('submitIntakeForm', () => {
     const result = await submitIntakeForm('spice-garden', formData)
 
     expect(result.success).toBe(false)
-    expect(result.error).toContain('10-digit number')
+    expect(result.error).toContain('valid number')
   })
 
   it('rejects submission when customer is opted out', async () => {

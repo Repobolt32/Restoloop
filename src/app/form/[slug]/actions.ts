@@ -6,7 +6,7 @@ import { normalizePhone } from '@/lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
-  phone: z.string().regex(/^91\d{10}$/, 'Phone number must be a valid 10-digit number (e.g. 9876543210)'),
+  phone: z.string().regex(/^\d{10,15}$/, 'Phone number must be a valid number (10 to 15 digits)'),
   birthdayMonth: z.number().int().min(1).max(12).optional(),
   birthdayDay: z.number().int().min(1).max(31).optional(),
   foodPreference: z.string().optional(),
