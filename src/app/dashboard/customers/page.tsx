@@ -112,10 +112,14 @@ export default function CustomersPage() {
   useEffect(() => { fetchCustomers() }, [fetchCustomers])
 
   const handleDelete = (id: string) => {
-    if (!confirm('Delete this guest? Their coupons will also be removed.')) return
+    if (!confirm('Delete this guest? Their coupons and message history will also be removed.')) return
     startTransition(async () => {
-      await deleteCustomerAction(id)
-      await fetchCustomers()
+      const res = await deleteCustomerAction(id)
+      if (res?.error) {
+        alert(`Failed to delete guest: ${res.error}`)
+      } else {
+        await fetchCustomers()
+      }
     })
   }
 

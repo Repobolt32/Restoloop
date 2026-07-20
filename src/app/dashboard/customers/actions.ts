@@ -66,6 +66,10 @@ export async function deleteCustomerAction(customerId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Delete dependent records first to satisfy foreign key constraints
+  await supabase.from('message_logs').delete().eq('customer_id', customerId)
+  await supabase.from('coupons').delete().eq('customer_id', customerId)
+
   const { error } = await supabase
     .from('customers')
     .delete()
