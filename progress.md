@@ -524,6 +524,23 @@ progress.md entry from 2026-07-13 claimed full Meta migration was completed, but
 ---
 
 
+## ✅ Completed Task: WhatsApp Webhook Coupon Reply Fix (2026-07-20)
 
+### Problem
+The wa.me prefilled message embedded the coupon code inside it (`"Hi! I just signed up. My coupon code is W5-PWOUTS"`), so it looked like the customer was giving the coupon to the restaurant instead of receiving one. Then the webhook, on receiving that message from an already `opted_in` customer, was asking them to reply YES (double opt-in prompt) instead of immediately sending the coupon back.
 
+### What Was Done
+1. **`src/app/form/[slug]/actions.ts`** — Changed the wa.me prefilled message (both new and duplicate-customer paths) to a simple greeting: `"Hi, I would like to join your loyalty club!"`
+2. **`src/app/api/whatsapp/route.ts`** — For an `opted_in` customer who messages and has no `opt_in_confirm` log yet: directly fetch/create the welcome coupon and send it back. No YES prompt needed.
+3. **`src/app/api/whatsapp/route.test.ts`** — Updated tests to match new flow.
+
+### New Flow
+1. Customer scans QR → fills form → gets wa.me link
+2. Customer taps link → sends `"Hi, I would like to join your loyalty club!"`
+3. System replies: `"Thanks [name] for joining [restaurant]! 🎁 Here's your welcome coupon: *CODE* — X% OFF."`
+
+### Verification Evidence
+- `pnpm test` → ✅ **187/187 passed** (18 files)
+- `pnpm typecheck` → ✅ 0 errors
+- `graphify update .` → ✅ graph updated (2303 nodes, 2451 edges)
 

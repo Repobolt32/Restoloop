@@ -79,10 +79,7 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
             .eq('customer_id', existingCustomer.id)
             .eq('type', 'welcome')
             .maybeSingle()
-          const code = existingCoupon?.code || ''
-          const prefilledMessage = encodeURIComponent(
-            `Hi! I just signed up for your loyalty club.${code ? ` My coupon code is ${code}` : ''}`
-          )
+          const prefilledMessage = encodeURIComponent('Hi, I would like to join your loyalty club!')
           const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=${prefilledMessage}`
           return { success: true, waUrl }
         }
@@ -108,7 +105,7 @@ export async function submitIntakeForm(slug: string, formData: FormData) {
       return { success: false, error: couponError.message }
     }
 
-    const prefilledMessage = encodeURIComponent(`Hi! I just signed up for your loyalty club. My coupon code is ${couponCode}`)
+    const prefilledMessage = encodeURIComponent('Hi, I would like to join your loyalty club!')
     const waUrl = `https://wa.me/${restaurant.whatsapp_number}?text=${prefilledMessage}`
     return { success: true, waUrl }
   } catch (error) {

@@ -287,17 +287,41 @@ export async function POST(request: NextRequest) {
           .maybeSingle()
 
         if (!confirmLog) {
-          // First contact: send warm greeting + YES prompt instead of coupon
+          // Customer opted in via the form and messaged us — send their coupon directly
+          let couponCode = ''
+          const { data: existingCoupon } = await supabase
+            .from('coupons')
+            .select('*')
+            .eq('customer_id', capturedCustomer.id)
+            .eq('type', 'welcome')
+            .maybeSingle()
+
+          if (existingCoupon) {
+            couponCode = existingCoupon.code
+          } else {
+            couponCode = `W${capturedRestaurant.welcome_discount_percent}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+            await supabase.from('coupons').insert({
+              restaurant_id: capturedRestaurant.id,
+              customer_id: capturedCustomer.id,
+              type: 'welcome',
+              code: couponCode,
+              discount_percent: capturedRestaurant.welcome_discount_percent,
+              discount_cents: 0,
+              status: 'sent',
+              expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            })
+          }
+
           await jitter(5000, 8000)
-          const greetMsg = resolveSpintax(
-            `{Hi|Hey|Hello} ${capturedCustomer.name || 'there'}! 🎁 Welcome to ${capturedRestaurant.name}. {Reply YES to confirm and|To receive} your ${capturedRestaurant.welcome_discount_percent}% discount coupon, {just reply YES|reply YES below}. Reply STOP to cancel.`
+          const welcomeMsg = resolveSpintax(
+            `{Thanks|Thank you} ${capturedCustomer.name || 'there'} for joining ${capturedRestaurant.name}! 🎁 {Here is|Here's} your welcome coupon: *${couponCode}* — ${capturedRestaurant.welcome_discount_percent}% OFF. Valid till ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN')}. {Enjoy|Use it on your next visit}! Reply STOP to opt out.`
           )
-          const result = await adapter.sendText(replyTo, greetMsg)
+          const result = await adapter.sendText(replyTo, welcomeMsg)
           await supabase.from('message_logs').insert({
             restaurant_id: capturedRestaurant.id,
             customer_id: capturedCustomer.id,
             direction: 'outbound',
-            type: 'opt_in_prompt',
+            type: 'opt_in_confirm',
             status: result.success ? 'sent' : 'failed',
             error: result.error || null,
             provider_message_id: result.messageId || null,

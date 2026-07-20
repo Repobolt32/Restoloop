@@ -337,29 +337,32 @@ describe('WhatsApp Webhook Route', () => {
     expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('W50-EXISTING'))
   })
 
-  it('silently ignores non-YES/STOP from opted_in customer', async () => {
+  it('opted_in customer first message: sends coupon directly without YES prompt', async () => {
     mockValidateWebhook.mockReturnValue({
       from: '919900000000@c.us',
       to: '918800000000@c.us',
-      body: 'hello',
-      messageId: 'msg-silent-1',
+      body: 'Hi, I would like to join your loyalty club!',
+      messageId: 'msg-optin-1',
       timestamp: 1700000000,
     })
 
     const messageLogsChain = chain(null)
     messageLogsChain.maybeSingle = vi.fn()
       .mockResolvedValueOnce({ data: null, error: null }) // 1st call (dedupe)
-      .mockResolvedValueOnce({ data: { id: 'confirm-log' }, error: null }) // 2nd call (confirmLog check)
+      .mockResolvedValueOnce({ data: null, error: null }) // 2nd call (confirmLog check — no prior confirm)
 
     tableHandler = (table: string) => {
       if (table === 'message_logs') {
         return messageLogsChain
       }
       if (table === 'restaurants') {
-        return chain({ id: 'rest-1', name: 'Spice Garden' })
+        return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_percent: 10 })
       }
       if (table === 'customers') {
-        return chain({ id: 'cust-1', opt_in_status: 'opted_in' })
+        return chain({ id: 'cust-1', name: 'Arjun', opt_in_status: 'opted_in' })
+      }
+      if (table === 'coupons') {
+        return chain({ id: 'cpn-1', code: 'W10-ABCDEF' })
       }
       return chain(null)
     }
@@ -367,23 +370,24 @@ describe('WhatsApp Webhook Route', () => {
     const res = await POST(makeRequest({
       from: '919900000000@c.us',
       to: '918800000000@c.us',
-      body: 'hello',
-      id: 'msg-silent-1',
+      body: 'Hi, I would like to join your loyalty club!',
+      id: 'msg-optin-1',
       timestamp: 1700000000,
     }))
 
     await Promise.all(afterPromises)
 
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).not.toHaveBeenCalled()
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('W10-ABCDEF'))
+    expect(mockSendText).toHaveBeenCalledWith('919900000000', expect.stringContaining('Arjun'))
   })
 
-  it('LID + coupon code in body: finds customer via coupon join, sends coupon, replies to raw LID JID', async () => {
+  it('LID + unresolvable phone: sends opt-in prompt to unknown customer at raw LID JID', async () => {
     mockResolveLidPhone.mockResolvedValue(null)
     mockValidateWebhook.mockReturnValue({
       from: '48816900317433@lid',
       to: '917542011085@c.us',
-      body: 'Hi! I just signed up. My coupon code is W2-9O06V8',
+      body: 'Hi, I would like to join your loyalty club!',
       messageId: 'false_48816900317433@lid_ACED50DB',
       timestamp: 1700000000,
     })
@@ -397,27 +401,14 @@ describe('WhatsApp Webhook Route', () => {
       if (table === 'restaurants') {
         return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_percent: 2 })
       }
-      if (table === 'coupons') {
-        const c = chain({
-          id: 'cpn-1',
-          code: 'W2-9O06V8',
-          customer_id: 'cust-1',
-          restaurant_id: 'rest-1',
-          type: 'welcome',
-          discount_percent: 2,
-          expires_at: '2026-08-08T09:50:13.000Z',
-          customers: {
-            id: 'cust-1',
-            restaurant_id: 'rest-1',
-            phone: '919876543210',
-            name: 'Tester',
-            opt_in_status: 'opted_in',
-          },
+      if (table === 'customers') {
+        const c = chain(null)
+        c.insert = vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: { id: 'new-cust' } }),
+          }),
         })
         return c
-      }
-      if (table === 'customers') {
-        return chain(null)
       }
       return chain(null)
     }
@@ -425,7 +416,7 @@ describe('WhatsApp Webhook Route', () => {
     const res = await POST(makeRequest({
       from: '48816900317433@lid',
       to: '917542011085@c.us',
-      body: 'Hi! I just signed up. My coupon code is W2-9O06V8',
+      body: 'Hi, I would like to join your loyalty club!',
       id: 'false_48816900317433@lid_ACED50DB',
       timestamp: 1700000000,
     }))
@@ -433,25 +424,29 @@ describe('WhatsApp Webhook Route', () => {
     await Promise.all(afterPromises)
 
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('Welcome to Spice Garden'))
+    expect(mockSendText).toHaveBeenCalledWith('48816900317433@lid', expect.stringContaining('Reply YES'))
   })
 
-  it('LID + senderPhone resolved: looks up customer by resolved phone, replies to resolved phone', async () => {
+
+  it('LID + senderPhone resolved: looks up customer by resolved phone, sends coupon, replies to resolved phone', async () => {
     mockResolveLidPhone.mockResolvedValue('919876543210')
     mockValidateWebhook.mockReturnValue({
       from: '48816900317433@lid',
       to: '917542011085@c.us',
-      body: 'Hi! I just signed up for your loyalty club.',
+      body: 'Hi, I would like to join your loyalty club!',
       messageId: 'msg-lid-resolved-2',
       timestamp: 1700000000,
       senderPhone: '919876543210',
     })
 
+    const messageLogsChain = chain(null)
+    messageLogsChain.maybeSingle = vi.fn()
+      .mockResolvedValueOnce({ data: null, error: null }) // dedupe check
+      .mockResolvedValueOnce({ data: null, error: null }) // confirmLog check
+
     tableHandler = (table: string) => {
       if (table === 'message_logs') {
-        const c = chain(null)
-        c.insert = vi.fn().mockReturnValue(c)
-        return c
+        return messageLogsChain
       }
       if (table === 'restaurants') {
         return chain({ id: 'rest-1', name: 'Spice Garden', welcome_discount_percent: 2 })
@@ -481,7 +476,7 @@ describe('WhatsApp Webhook Route', () => {
     const res = await POST(makeRequest({
       from: '48816900317433@lid',
       to: '917542011085@c.us',
-      body: 'Hi! I just signed up for your loyalty club.',
+      body: 'Hi, I would like to join your loyalty club!',
       id: 'msg-lid-resolved-2',
       timestamp: 1700000000,
       senderPhone: '919876543210',
@@ -490,6 +485,6 @@ describe('WhatsApp Webhook Route', () => {
     await Promise.all(afterPromises)
 
     expect(res.body).toEqual({ status: 'ok' })
-    expect(mockSendText).toHaveBeenCalledWith('919876543210', expect.stringContaining('Welcome to Spice Garden'))
+    expect(mockSendText).toHaveBeenCalledWith('919876543210', expect.stringContaining('W2-9O06V8'))
   })
 })
