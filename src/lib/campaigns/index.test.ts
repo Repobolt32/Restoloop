@@ -7,6 +7,7 @@ vi.mock('@/lib/whatsapp/adapter', () => ({
   createWhatsAppAdapter: () => ({
     sendText: mockSendText,
     sendTemplate: mockSendTemplate,
+    verifySignature: vi.fn().mockReturnValue(true),
     validateWebhook: vi.fn(),
     parseInbound: vi.fn(),
   }),
@@ -814,7 +815,7 @@ describe('Campaigns in Meta Mode (Template Sends)', () => {
 
     expect(mockSendTemplate).toHaveBeenCalledWith(
       '919900000000',
-      'expiry_reminder',
+      'expiry_reminder_f',
       ['Diana', 'EXP-ABC', 'Spice Garden', '1']
     )
     expect(mockSendText).not.toHaveBeenCalled()

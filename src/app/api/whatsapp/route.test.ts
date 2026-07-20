@@ -3,11 +3,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockSendText = vi.fn().mockResolvedValue({ success: true, messageId: 'msg-1' })
 const mockValidateWebhook = vi.fn()
 const mockResolveLidPhone = vi.fn()
+const mockVerifySignature = vi.fn().mockReturnValue(true)
 vi.mock('@/lib/whatsapp/adapter', () => ({
   createWhatsAppAdapter: () => ({
     sendText: mockSendText,
     sendTemplate: vi.fn(),
     validateWebhook: mockValidateWebhook,
+    verifySignature: mockVerifySignature,
     parseInbound: vi.fn(),
     resolveLidPhone: mockResolveLidPhone,
   }),

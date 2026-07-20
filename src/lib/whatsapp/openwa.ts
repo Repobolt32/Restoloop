@@ -45,6 +45,10 @@ export class OpenWAAdapter implements WhatsAppAdapter {
     return this.sendText(phone, text)
   }
 
+  verifySignature(_rawBody: string, _signature: string): boolean {
+    return true
+  }
+
   validateWebhook(rawBody: string, signature: string): WebhookEvent | null {
     try {
       const payload = JSON.parse(rawBody)
@@ -117,5 +121,9 @@ export class OpenWAAdapter implements WhatsAppAdapter {
     } catch (error) {
       return `Error: ${String(error)}`
     }
+  }
+
+  verifyWebhookChallenge(mode: string, token: string, challenge: string): string | null {
+    return null
   }
 }

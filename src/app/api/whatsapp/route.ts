@@ -25,13 +25,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text()
-  const signature = request.headers.get('x-signature') || ''
+  const signature = request.headers.get('x-hub-signature-256') || request.headers.get('x-signature') || ''
 
   const adapter = createWhatsAppAdapter()
+
+  if (!adapter.verifySignature(rawBody, signature)) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+  }
+
   const event = adapter.validateWebhook(rawBody, signature)
 
   if (!event) {
-    return NextResponse.json({ error: 'Invalid webhook' }, { status: 400 })
+    return NextResponse.json({ status: 'status_update' })
   }
 
   const supabase = createServiceClient()

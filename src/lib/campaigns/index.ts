@@ -564,7 +564,7 @@ export async function runExpiryReminders(restaurantId?: string) {
       if (process.env.WHATSAPP_PROVIDER === 'meta') {
         result = await adapter.sendTemplate(
           customer.phone,
-          'expiry_reminder',
+          'expiry_reminder_f',
           [customer.name || 'there', coupon.code, restaurant.name, String(days)]
         )
       } else {

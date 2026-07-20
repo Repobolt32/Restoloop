@@ -130,6 +130,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
             display: 'flex',
             justifyContent: 'flex-end',
             padding: '24px 32px 0 32px',
+            marginBottom: '-50px',
+            position: 'relative',
+            zIndex: 10,
+            pointerEvents: 'none',
           }}
         >
           <Link
@@ -147,6 +151,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               textDecoration: 'none',
               cursor: 'pointer',
               transition: 'all 200ms ease',
+              pointerEvents: 'auto',
             }}
           >
             {isTrialActive ? (
